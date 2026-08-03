@@ -1,0 +1,23 @@
+[
+    {
+        "name": "Điện thoại",
+        "description": "Smartphone các hãng",
+        "status": "active",
+        "created_at": "2026-06-16 01:46:26",
+        "id": 1
+    },
+    {
+        "name": "Laptop",
+        "description": "Máy tính xách tay",
+        "status": "active",
+        "created_at": "2026-06-16 01:46:26",
+        "id": 2
+    },
+    {
+        "name": "Phụ kiện",
+        "description": "Tai nghe, sạc, ốp lưng",
+        "status": "active",
+        "created_at": "2026-06-16 01:46:26",
+        "id": 3
+    }
+]

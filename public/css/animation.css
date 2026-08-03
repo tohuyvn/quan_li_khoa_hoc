@@ -1,0 +1,239 @@
+/* ===================================================
+   Cart Animation – flying icon + badge bounce
+   =================================================== */
+
+/* Flying cart icon được tạo ra động bởi JS */
+.cart-fly-icon {
+    position: fixed;
+    z-index: 99999;
+    pointer-events: none;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--accent, #d70018);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    box-shadow: 0 4px 16px rgba(215, 0, 24, 0.5);
+    opacity: 1;
+}
+
+/* Badge số lượng giỏ hàng */
+.cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #d70018;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 3px;
+    line-height: 1;
+    pointer-events: none;
+}
+
+/* Hiệu ứng nảy khi số tăng */
+.cart-badge.bounce {
+    animation: badge-bounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes badge-bounce {
+    0%   { transform: scale(1); }
+    30%  { transform: scale(1.7); }
+    60%  { transform: scale(0.85); }
+    80%  { transform: scale(1.15); }
+    100% { transform: scale(1); }
+}
+
+/* Wrapper cho btn-cart để đặt badge */
+#cart-icon {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Hiệu ứng nhấn nút thêm giỏ */
+.btn-buy.adding {
+    transform: scale(0.92);
+    opacity: 0.8;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+/* ===================================================
+   Toast Notifications (info + warning variants)
+   =================================================== */
+.toast-info {
+    background: rgba(37, 99, 235, 0.95) !important;
+    color: #fff !important;
+    border-left: 4px solid #1d4ed8 !important;
+}
+.toast-info::after { background: rgba(255,255,255,0.4) !important; }
+
+.toast-warning {
+    background: rgba(234, 179, 8, 0.95) !important;
+    color: #fff !important;
+    border-left: 4px solid #a16207 !important;
+}
+.toast-warning::after { background: rgba(255,255,255,0.4) !important; }
+
+/* ===================================================
+   Checkout step indicator
+   =================================================== */
+.checkout-steps {
+    max-width: 520px;
+    margin: 0 auto;
+}
+.checkout-steps-list {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    position: relative;
+}
+.checkout-steps-list::before {
+    content: '';
+    position: absolute;
+    top: 18px;
+    left: 12%;
+    right: 12%;
+    height: 2px;
+    background: var(--border, #e5e7eb);
+    z-index: 0;
+}
+.checkout-step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    position: relative;
+    z-index: 1;
+    text-align: center;
+}
+.checkout-step-num {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 14px;
+    background: var(--card-bg, #fff);
+    border: 2px solid var(--border, #e5e7eb);
+    color: var(--text-muted, #6b7280);
+    transition: all 0.3s ease;
+}
+.checkout-step-label {
+    font-size: 12px;
+    color: var(--text-muted, #6b7280);
+    font-weight: 500;
+}
+.checkout-step.done .checkout-step-num {
+    background: var(--accent, #d70018);
+    border-color: var(--accent, #d70018);
+    color: #fff;
+}
+.checkout-step.done .checkout-step-label {
+    color: var(--accent, #d70018);
+}
+.checkout-step.active .checkout-step-num {
+    background: var(--accent, #d70018);
+    border-color: var(--accent, #d70018);
+    color: #fff;
+    box-shadow: 0 0 0 4px rgba(215, 0, 24, 0.2);
+    animation: step-pulse 2s ease-in-out infinite;
+}
+.checkout-step.active .checkout-step-label {
+    color: var(--text, #111);
+    font-weight: 600;
+}
+@keyframes step-pulse {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(215, 0, 24, 0.2); }
+    50% { box-shadow: 0 0 0 8px rgba(215, 0, 24, 0.08); }
+}
+
+/* ===================================================
+   Order success page
+   =================================================== */
+.success-checkmark {
+    font-size: 64px;
+    margin-bottom: 16px;
+    line-height: 1;
+}
+.success-pop {
+    animation: success-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.success-title {
+    animation: fade-up 0.5s ease 0.2s both;
+}
+.order-success-card p.text-muted {
+    animation: fade-up 0.5s ease 0.35s both;
+}
+@keyframes success-pop {
+    0% { transform: scale(0); opacity: 0; }
+    60% { transform: scale(1.15); }
+    100% { transform: scale(1); opacity: 1; }
+}
+@keyframes fade-up {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===================================================
+   Search / product skeleton shimmer
+   =================================================== */
+.skeleton-suggestions {
+    padding: 8px 12px;
+}
+.skeleton-line {
+    height: 52px;
+    margin-bottom: 8px;
+    border-radius: 8px;
+    background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.2s ease-in-out infinite;
+}
+.skeleton-line:last-child {
+    margin-bottom: 0;
+    width: 70%;
+}
+@keyframes skeleton-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+.product-card.skeleton-card {
+    pointer-events: none;
+}
+.product-card.skeleton-card .product-img-wrap,
+.product-card.skeleton-card .product-name,
+.product-card.skeleton-card .product-price {
+    background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.2s ease-in-out infinite;
+    color: transparent;
+    border-radius: 6px;
+}
+.product-card.skeleton-card .product-img-wrap {
+    min-height: 180px;
+}
+.product-card.skeleton-card .product-name {
+    height: 16px;
+    width: 85%;
+    margin: 10px 0;
+}
+.product-card.skeleton-card .product-price {
+    height: 20px;
+    width: 50%;
+}

@@ -1,0 +1,29 @@
+[
+    {
+        "name": "Admin",
+        "email": "admin@shop.test",
+        "phone": "0901234567",
+        "password": "$2y$10$kdcd7bTl11qWkeuQlDjHd.wgsCUWuTjJnwtXad0WNKtB\/9154yWwu",
+        "role": "admin",
+        "created_at": "2026-06-16 01:46:26",
+        "id": 1
+    },
+    {
+        "name": "Nguyễn Văn A",
+        "email": "khach@shop.test",
+        "phone": "0912345678",
+        "password": "$2y$10$Qrp7GX7\/3abDVbnAZdVLX.1edRvM80TkGu4fyTWJPaFa27LA2WbAC",
+        "role": "customer",
+        "created_at": "2026-06-16 01:46:26",
+        "id": 2
+    },
+    {
+        "name": "huy",
+        "email": "huy28072k5@gmail.com",
+        "phone": "0282988222",
+        "password": "$2y$10$cCqWELlWRZmgKb6Z7s7LkOidM4AE7mHQprOgieoXMO4GEuDYy3bb.",
+        "role": "customer",
+        "created_at": "2026-06-16 02:34:05",
+        "id": 3
+    }
+]

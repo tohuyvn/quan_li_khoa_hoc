@@ -1,0 +1,42 @@
+[
+    {
+        "order_id": 1,
+        "product_id": 1,
+        "product_name": "iPhone 15",
+        "quantity": 2,
+        "price": 22000000,
+        "id": 1
+    },
+    {
+        "order_id": 2,
+        "product_id": 1,
+        "product_name": "iPhone 15",
+        "quantity": 2,
+        "price": 22000000,
+        "id": 2
+    },
+    {
+        "order_id": 3,
+        "product_id": 1,
+        "product_name": "iPhone 15",
+        "quantity": 2,
+        "price": 22000000,
+        "id": 3
+    },
+    {
+        "order_id": 4,
+        "product_id": 1,
+        "product_name": "iPhone 15",
+        "quantity": 1,
+        "price": 22000000,
+        "id": 4
+    },
+    {
+        "order_id": 4,
+        "product_id": 7,
+        "product_name": "Dây sạc nhanh USB-C",
+        "quantity": 1,
+        "price": 450000,
+        "id": 5
+    }
+]

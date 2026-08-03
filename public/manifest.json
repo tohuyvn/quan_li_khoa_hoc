@@ -1,0 +1,24 @@
+{
+  "name": "Shop Hades",
+  "short_name": "Hades Shop",
+  "description": "Hệ thống bán lẻ điện thoại, laptop, phụ kiện chính hãng",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/image/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/image/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
+    }
+  ]
+}

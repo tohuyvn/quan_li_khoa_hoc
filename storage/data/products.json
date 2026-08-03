@@ -1,0 +1,86 @@
+[
+    {
+        "id": 1,
+        "category_id": 1,
+        "name": "iPhone 15",
+        "price": 22000000,
+        "description": "iPhone 15 128GB — Chính hãng VN/A",
+        "detail": "Apple iPhone 15 128GB với chip A16 Bionic mạnh mẽ, màn hình Super Retina XDR 6.1 inch, camera chính 48MP hỗ trợ chế độ chân dung mới. Pin dùng cả ngày, sạc nhanh USB-C, kháng nước IP68.\n\n• Màn hình: 6.1\" OLED, 60Hz\n• Chip: Apple A16 Bionic\n• RAM: 6GB | Bộ nhớ: 128GB\n• Camera sau: 48MP + 12MP ultrawide\n• Camera trước: 12MP TrueDepth\n• Pin: ~3.349 mAh, sạc USB-C\n• Bảo hành: 12 tháng chính hãng Apple",
+        "stock": 10,
+        "image": "/image/ip15.webp",
+        "status": "active",
+        "created_at": "2026-06-16 01:46:26"
+    },
+    {
+        "id": 2,
+        "category_id": 1,
+        "name": "iPhone 17",
+        "price": 28990000,
+        "description": "iPhone 17 256GB — Flagship mới nhất",
+        "detail": "iPhone 17 thế hệ mới với thiết kế viền mỏng, hiệu năng vượt trội và hệ thống camera AI thông minh. Màn hình ProMotion 120Hz mượt mà, pin tối ưu cho người dùng năng động.\n\n• Màn hình: 6.3\" OLED ProMotion 120Hz\n• Chip: Apple A19 (thế hệ mới)\n• RAM: 8GB | Bộ nhớ: 256GB\n• Camera sau: 48MP chính + 48MP ultrawide\n• Zoom quang học 2x, quay video 4K Dolby Vision\n• Sạc không dây MagSafe, USB-C\n• Bảo hành: 12 tháng chính hãng",
+        "stock": 12,
+        "image": "/image/ip17.webp",
+        "status": "active",
+        "created_at": "2026-06-16 01:46:26"
+    },
+    {
+        "id": 3,
+        "category_id": 2,
+        "name": "MacBook M5",
+        "price": 32990000,
+        "description": "MacBook Air/Pro chip M5 — Siêu mỏng, siêu mạnh",
+        "detail": "MacBook trang bị chip Apple M5 cho hiệu năng xử lý và đồ họa vượt trội, thời lượng pin lên đến 18 giờ. Màn hình Liquid Retina sắc nét, loa 6 loa chất lượng cao, phù hợp học tập, làm việc và sáng tạo nội dung.\n\n• Chip: Apple M5 (8-core CPU, 10-core GPU)\n• RAM: 16GB thống nhất\n• SSD: 512GB\n• Màn hình: 13.6\" / 14.2\" Liquid Retina\n• Pin: đến 18 giờ sử dụng\n• Cổng: 2x Thunderbolt/USB 4, MagSafe 3\n• Hệ điều hành: macOS mới nhất\n• Bảo hành: 12 tháng Apple chính hãng",
+        "stock": 8,
+        "image": "/image/mac m5.webp",
+        "status": "active",
+        "created_at": "2026-06-16 01:46:26"
+    },
+    {
+        "id": 4,
+        "category_id": 2,
+        "name": "Dell XPS 13",
+        "price": 28000000,
+        "description": "Dell XPS 13 Plus — Laptop cao cấp",
+        "detail": "Dell XPS 13 Plus với thiết kế InfinityEdge sang trọng, màn hình OLED 3.5K sống động, bàn phím cảm ứng Capacitive hiện đại. Phù hợp doanh nhân và người sáng tạo cần laptop mỏng nhẹ nhưng mạnh mẽ.\n\n• CPU: Intel Core Ultra 7\n• RAM: 16GB LPDDR5\n• SSD: 512GB NVMe\n• Màn hình: 13.4\" OLED 3.5K (3456×2160)\n• Đồ họa: Intel Arc tích hợp\n• Pin: ~55Wh, sạc nhanh 60W\n• Trọng lượng: ~1.26 kg\n• Bảo hành: 12 tháng Dell Việt Nam",
+        "stock": 5,
+        "image": "/image/dell xps.webp",
+        "status": "active",
+        "created_at": "2026-06-16 01:46:26"
+    },
+    {
+        "id": 5,
+        "category_id": 2,
+        "name": "Lenovo ThinkPad Gen 13",
+        "price": 26500000,
+        "description": "ThinkPad Gen 13 — Bền bỉ chuẩn doanh nghiệp",
+        "detail": "Lenovo ThinkPad Gen 13 thiết kế chuẩn quân đội MIL-STD-810H, bàn phím ThinkPad huyền thoại, trackpoint đỏ đặc trưng. Laptop lý tưởng cho lập trình viên, kế toán và nhân viên văn phòng.\n\n• CPU: Intel Core Ultra 5/7\n• RAM: 16GB DDR5 (nâng cấp được)\n• SSD: 512GB PCIe Gen4\n• Màn hình: 13.3\" IPS Full HD, chống chói\n• Bảo mật: vân tay, TPM 2.0, webcam shutter\n• Pin: ~54Wh, sạc 65W USB-C\n• Cổng: USB-C, USB-A, HDMI, audio jack\n• Bảo hành: 24 tháng Lenovo chính hãng",
+        "stock": 7,
+        "image": "/image/thinkpad gen13.webp",
+        "status": "active",
+        "created_at": "2026-06-16 09:00:00"
+    },
+    {
+        "id": 6,
+        "category_id": 3,
+        "name": "Tai nghe Bluetooth",
+        "price": 5500000,
+        "description": "Tai nghe chống ồn chủ động ANC",
+        "detail": "Tai nghe Bluetooth cao cấp với chống ồn chủ động ANC, âm thanh Hi-Res, driver dynamic 11mm cho bass sâu và treble trong trẻo. Thiết kế in-ear ergonomic, đeo thoải mái cả ngày.\n\n• Chống ồn chủ động ANC + Transparency mode\n• Bluetooth 5.3, độ trễ thấp cho game\n• Pin tai nghe: 8 giờ | Hộp sạc: 30 giờ\n• Sạc nhanh: 10 phút = 2 giờ nghe\n• Chống nước IPX4\n• Tương thích iOS / Android / Windows\n• Phụ kiện: 3 size eartip, cáp USB-C\n• Bảo hành: 12 tháng",
+        "stock": 20,
+        "image": "/image/tai_nghe.webp",
+        "status": "active",
+        "created_at": "2026-06-16 01:46:26"
+    },
+    {
+        "id": 7,
+        "category_id": 3,
+        "name": "Dây sạc nhanh USB-C",
+        "price": 450000,
+        "description": "Cáp sạc USB-C to USB-C 100W",
+        "detail": "Dây sạc USB-C chính hãng hỗ trợ sạc nhanh lên đến 100W, truyền dữ liệu USB 2.0 480Mbps. Vỏ bọc nylon chống rối, đầu nối hợp kim chống gãy, tương thích iPhone 15+, MacBook, Samsung, laptop USB-C.\n\n• Chuẩn: USB-C to USB-C\n• Công suất: tối đa 100W (20V/5A)\n• Dữ liệu: USB 2.0 — 480Mbps\n• Chiều dài: 1.2 mét\n• Vật liệu: nylon braided + hợp kim\n• Chứng nhận: CE, RoHS\n• Màu: đen / trắng\n• Bảo hành: 6 tháng đổi mới 1 đổi 1",
+        "stock": 50,
+        "image": "/image/day_sac.webp",
+        "status": "active",
+        "created_at": "2026-06-16 01:46:26"
+    }
+]
