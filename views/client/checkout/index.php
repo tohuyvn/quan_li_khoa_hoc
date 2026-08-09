@@ -795,7 +795,6 @@ function selectPaymentMethod(method) {
     });
 
     const issueDateInput = document.getElementById('issue_date');
-    const issueDatePicker = document.getElementById('issue_date_picker');
     const cardHolderInput = document.getElementById('card_holder');
 
     if (issueDateInput) {
@@ -946,5 +945,228 @@ function selectPaymentMethod(method) {
 
     togglePaymentFields();
     recalculateCheckoutTotal();
+})();
+</script>
+
+<script>
+// LEAFLET MAP & GEOLOCATION SCRIPT
+(function() {
+    let map = null, marker = null, selectedLat = null, selectedLng = null, selectedAddr = "";
+    const stores = [
+        { name: 'Trụ sở chính', address: 'Võng Thị, Tây Hồ, Hà Nội', lat: 21.05440, lng: 105.81180, radius: 25 },
+        { name: 'Cơ sở 2', address: 'Số 3 Duy Tân, Cầu Giấy, Hà Nội', lat: 21.02940, lng: 105.78250, radius: 25 },
+        { name: 'Cơ sở 3', address: 'Lê Duẩn, Hải Châu, Đà Nẵng', lat: 16.05940, lng: 108.22080, radius: 25 },
+        { name: 'Cơ sở 4', address: 'Số 99 Nguyễn Huệ, Quận 1, TP. HCM', lat: 10.77560, lng: 106.70190, radius: 25 },
+        { name: 'Cơ sở 5', address: 'Số 250 CMT8, Q.3, Sài Gòn', lat: 10.78180, lng: 106.67980, radius: 25 }
+    ];
+
+    const openMapBtn = document.getElementById('open-map-btn');
+    const currentLocationBtn = document.getElementById('use-current-location-btn');
+    const mapModalEl = document.getElementById('mapModal');
+
+    if (openMapBtn) {
+        openMapBtn.addEventListener('click', function() {
+            const modal = new bootstrap.Modal(mapModalEl);
+            modal.show();
+        });
+    }
+
+    if (mapModalEl) {
+        mapModalEl.addEventListener('shown.bs.modal', function () {
+            if (!map) {
+                map = L.map('map-container').setView([21.028511, 105.804817], 13);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                }).addTo(map);
+
+                map.on('click', function (e) {
+                    updateMarker(e.latlng.lat, e.latlng.lng);
+                });
+            } else {
+                map.invalidateSize();
+            }
+
+            const currentAddr = document.getElementById('shipping_address').value.trim();
+            if (currentAddr !== "" && !selectedLat) {
+                document.getElementById('map-search-input').value = currentAddr;
+                performSearch(true);
+            }
+        });
+    }
+
+    if (currentLocationBtn) {
+        currentLocationBtn.addEventListener('click', function() {
+            if (navigator.geolocation) {
+                currentLocationBtn.disabled = true;
+                currentLocationBtn.innerHTML = '⏳ Đang định vị...';
+                navigator.geolocation.getCurrentPosition(
+                    position => {
+                        currentLocationBtn.disabled = false;
+                        currentLocationBtn.innerHTML = '🎯 Vị trí hiện tại';
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        updateMarker(lat, lng);
+                        if (map) map.setView([lat, lng], 16);
+                    },
+                    error => {
+                        currentLocationBtn.disabled = false;
+                        currentLocationBtn.innerHTML = '🎯 Vị trí hiện tại';
+                        alert('Không thể lấy vị trí hiện tại. Vui lòng cho phép quyền truy cập vị trí trên trình duyệt.');
+                    }
+                );
+            } else {
+                alert('Trình duyệt của bạn không hỗ trợ Geolocation.');
+            }
+        });
+    }
+
+    function updateMarker(lat, lng) {
+        selectedLat = lat;
+        selectedLng = lng;
+        document.getElementById('shipping_lat').value = lat.toFixed(8);
+        document.getElementById('shipping_lng').value = lng.toFixed(8);
+        updateShippingPreview(lat, lng);
+        
+        if (map) {
+            if (marker) {
+                marker.setLatLng([lat, lng]);
+            } else {
+                marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+                marker.on('dragend', function (e) {
+                    const pos = marker.getLatLng();
+                    updateMarker(pos.lat, pos.lng);
+                });
+            }
+            map.panTo([lat, lng]);
+        }
+
+        const previewInput = document.getElementById('selected-address-preview');
+        const confirmBtn = document.getElementById('confirm-address-btn');
+        if (previewInput) previewInput.value = "Đang xác thực tọa độ...";
+        if (confirmBtn) confirmBtn.disabled = true;
+
+        fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&accept-language=vi`)
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.display_name) {
+                    selectedAddr = data.display_name;
+                    if (previewInput) previewInput.value = selectedAddr;
+                    if (document.getElementById('shipping_address').value.trim() === '') {
+                        document.getElementById('shipping_address').value = selectedAddr;
+                    }
+                    if (confirmBtn) confirmBtn.disabled = false;
+                } else {
+                    selectedAddr = `Tọa độ: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+                    if (previewInput) previewInput.value = selectedAddr;
+                    if (confirmBtn) confirmBtn.disabled = false;
+                }
+            })
+            .catch(() => {
+                selectedAddr = `Tọa độ: ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+                if (previewInput) previewInput.value = selectedAddr;
+                if (confirmBtn) confirmBtn.disabled = false;
+            });
+    }
+
+    function performSearch(quiet = false) {
+        const query = document.getElementById('map-search-input').value.trim();
+        if (!query) return;
+
+        const searchBtn = document.getElementById('map-search-btn');
+        if (searchBtn) {
+            searchBtn.disabled = true;
+            searchBtn.textContent = "Đang tìm...";
+        }
+
+        fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1&accept-language=vi`)
+            .then(res => res.json())
+            .then(results => {
+                if (searchBtn) {
+                    searchBtn.disabled = false;
+                    searchBtn.textContent = "Tìm kiếm";
+                }
+                if (results && results.length > 0) {
+                    const lat = parseFloat(results[0].lat);
+                    const lon = parseFloat(results[0].lon);
+                    updateMarker(lat, lon);
+                    if (map) map.setView([lat, lon], 16);
+                } else if (!quiet) {
+                    alert("Không tìm thấy địa điểm phù hợp.");
+                }
+            })
+            .catch(() => {
+                if (searchBtn) {
+                    searchBtn.disabled = false;
+                    searchBtn.textContent = "Tìm kiếm";
+                }
+            });
+    }
+
+    const searchBtn = document.getElementById('map-search-btn');
+    if (searchBtn) searchBtn.addEventListener('click', () => performSearch(false));
+    
+    const searchInput = document.getElementById('map-search-input');
+    if (searchInput) {
+        searchInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') { e.preventDefault(); performSearch(false); }
+        });
+    }
+
+    const confirmBtn = document.getElementById('confirm-address-btn');
+    if (confirmBtn) {
+        confirmBtn.addEventListener('click', function () {
+            if (selectedAddr) {
+                document.getElementById('shipping_address').value = selectedAddr;
+                const modalInstance = bootstrap.Modal.getInstance(mapModalEl);
+                if (modalInstance) modalInstance.hide();
+            }
+        });
+    }
+
+    function distanceKm(lat1, lng1, lat2, lng2) {
+        const r = 6371;
+        const dLat = (lat2 - lat1) * Math.PI / 180;
+        const dLng = (lng2 - lng1) * Math.PI / 180;
+        const a = Math.sin(dLat / 2) ** 2
+            + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180)
+            * Math.sin(dLng / 2) ** 2;
+        return r * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    }
+
+    function shippingFee(distance) {
+        if (distance <= 3) return 0;
+        if (distance <= 10) return 25000;
+        return 25000 + Math.ceil(distance - 10) * 5000;
+    }
+
+    function etaLabel(distance) {
+        if (distance > 100) return 'mất 3 ngày';
+        if (distance > 50) return 'mất 2 ngày';
+        if (distance > 20) return 'mất 1 ngày';
+        if (distance < 10) return 'mất 1h';
+        return 'mất 1 ngày';
+    }
+
+    function updateShippingPreview(lat, lng) {
+        const box = document.getElementById('shipping-estimate-box');
+        if (!box) return;
+
+        const nearest = stores
+            .map(store => ({ ...store, distance: distanceKm(lat, lng, store.lat, store.lng) }))
+            .sort((a, b) => a.distance - b.distance)[0];
+
+        const fee = shippingFee(nearest.distance);
+        if (window.hadesSetShippingFee) window.hadesSetShippingFee(fee);
+
+        box.style.display = 'block';
+        box.innerHTML = '<strong>Giao từ ' + nearest.name + '</strong> — cách bạn khoảng '
+            + nearest.distance.toFixed(1) + ' km. Phí ship: <strong>' + formatMoneyClient(fee)
+            + '</strong>. Giao ' + etaLabel(nearest.distance) + '.<br><span class="small text-muted">'
+            + nearest.address + '</span>';
+    }
+
+    function formatMoneyClient(amount) {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount).replace(/₫/g, 'đ');
+    }
 })();
 </script>
