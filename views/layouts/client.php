@@ -1008,8 +1008,8 @@ document.addEventListener('DOMContentLoaded', function () {
         <div class="chatbot-header-info">
             <div class="chatbot-avatar">H</div>
             <div class="chatbot-title-container">
-                <span class="chatbot-title">Hades AI · Gemini 3.5</span>
-                <span class="chatbot-status"><span class="chatbot-status-dot"></span><span id="chatbotAiStatusText">Trợ lý AI nội bộ (không còn ai.dino)</span></span>
+                <span class="chatbot-title">Hades AI</span>
+                <span class="chatbot-status"><span class="chatbot-status-dot"></span><span id="chatbotAiStatusText">Trợ lý AI đang hoạt động</span></span>
             </div>
         </div>
         <button id="chatbotClose" class="chatbot-close" title="Đóng">&times;</button>
@@ -1021,9 +1021,6 @@ document.addEventListener('DOMContentLoaded', function () {
     </div>
 
     <div id="chatbotBodyAI" class="chatbot-tab-panel" style="display:flex;flex-direction:column;min-height:0;flex:1;">
-        <div class="px-3 py-2 small border-bottom" style="background:#eff6ff;color:#1e40af;font-size:12px;">
-            💬 Chat AI đã thay iframe ai.dino.top — gõ câu hỏi bên dưới (Gemini 3.5). Lịch sử được lưu trong phiên.
-        </div>
         <div id="chatbotMessages" class="chatbot-messages">
             <div class="chat-bubble bot">Xin chào! Mình là <strong>Hades AI</strong>. Hỏi về sản phẩm, giá, khuyến mãi hoặc chính sách shop nhé.</div>
         </div>
@@ -1200,10 +1197,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateAiStatus(source) {
         const el = document.getElementById('chatbotAiStatusText');
         if (!el) return;
-        if (source === 'gemini') el.textContent = 'Gemini 3.5 đang trả lời';
-        else if (source === 'ollama') el.textContent = 'Ollama local';
-        else if (source === 'fallback' || source === 'greeting') el.textContent = 'Chế độ tra cứu shop (Gemini key lỗi/thiếu)';
-        else el.textContent = 'Trợ lý AI nội bộ (không còn ai.dino)';
+        el.textContent = 'Trợ lý AI đang hoạt động';
     }
 
     function renderChatHistory() {
@@ -1254,7 +1248,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(function (r) { return r.json(); })
         .then(function (data) {
             removeTypingIndicator(typingId);
-            appendSearchMessage(data.reply, 'bot');
+            appendSearchMessage((data.reply || '').replace(/\n/g, '<br>'), 'bot');
             updateAiStatus(data.source || '');
             if (Array.isArray(data.history)) {
                 chatHistory = data.history;
@@ -1277,7 +1271,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function appendSearchMessage(text, sender) {
         const bubble = document.createElement('div');
         bubble.classList.add('chat-bubble', sender);
-        bubble.innerHTML = text;
+        bubble.innerHTML = text ? text.replace(/\n/g, '<br>') : '';
         messagesContainer.appendChild(bubble);
     }
 

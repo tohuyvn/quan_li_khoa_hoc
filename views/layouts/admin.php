@@ -87,13 +87,13 @@
 
 <main class="container py-4">
     <?php if ($msg = flash('success')): ?>
-        <div class="alert-hades alert-success"><?= e($msg) ?></div>
+        <div class="alert-hades alert-success shadow-sm rounded-3 border-0 d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill fs-5"></i><span><?= e($msg) ?></span></div>
     <?php endif; ?>
     <?php if ($msg = flash('error')): ?>
-        <div class="alert-hades alert-danger"><?= e($msg) ?></div>
+        <div class="alert-hades alert-danger shadow-sm rounded-3 border-0 d-flex align-items-center gap-2"><i class="bi bi-exclamation-triangle-fill fs-5"></i><span><?= e($msg) ?></span></div>
     <?php endif; ?>
 
-    <div class="content-card bg-white p-4 rounded-3 border">
+    <div class="admin-main-wrapper">
         <?= $content ?? '' ?>
     </div>
 </main>

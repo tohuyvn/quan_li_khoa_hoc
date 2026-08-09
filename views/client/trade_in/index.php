@@ -1,40 +1,94 @@
 <?php $title = 'Thu Cũ Đổi Mới – Lên Đời Điện Thoại'; ?>
 
-<div class="container py-5">
+<style>
+.tradein-banner-header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border-radius: 20px;
+    padding: 32px 36px;
+    color: #fff;
+    margin-bottom: 28px;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
+    position: relative;
+    overflow: hidden;
+}
+.tradein-banner-header::after {
+    content: '';
+    position: absolute;
+    right: -30px;
+    top: -30px;
+    width: 200px;
+    height: 200px;
+    background: rgba(34, 197, 94, 0.15);
+    border-radius: 50%;
+    filter: blur(45px);
+}
+.tradein-main-card {
+    background: #ffffff;
+    border-radius: 20px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+    padding: 32px;
+}
+.device-card-item {
+    border: 1px solid #cbd5e1;
+    border-radius: 14px;
+    padding: 16px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background: #ffffff;
+}
+.device-card-item:hover {
+    border-color: #ef4444;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(239, 68, 68, 0.08);
+}
+.device-card-item.active {
+    border-color: #ef4444 !important;
+    background: #fef2f2 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+}
+</style>
+
+<div class="container py-4">
+    <!-- Header Banner -->
+    <div class="tradein-banner-header text-center">
+        <span class="badge bg-success rounded-pill px-3 py-1.5 fw-bold text-uppercase mb-2" style="font-size: 11px; letter-spacing: 1px;">Chương Trình Trợ Giá Lên Đời</span>
+        <h1 class="fw-bold mb-2 text-white" style="font-size: 2.2rem;">Thu Cũ Đổi Mới – Lên Đời Siêu Phẩm</h1>
+        <p class="text-slate-300 mx-auto mb-0 small" style="max-width: 600px; color: #cbd5e1;">
+            Định giá máy cũ tự động trong 3 giây. Nhận ngay Voucher giảm giá trực tiếp mua điện thoại mới tại Hades Shop!
+        </p>
+    </div>
+
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="content-card p-4 p-md-5 shadow-sm rounded-4" style="background: #ffffff; border: 1px solid rgba(0,0,0,0.08);">
-                <div class="text-center mb-5">
-                    <span class="badge bg-danger-subtle text-danger px-3 py-2 rounded-pill fw-bold mb-3">CHƯƠNG TRÌNH ĐẶC BIỆT</span>
-                    <h1 class="fw-bold text-dark display-6 mb-2">Thu Cũ Đổi Mới – Lên Đời Siêu Phẩm</h1>
-                    <p class="text-muted">Định giá máy cũ nhanh chóng trong 3 giây. Nhận ngay Voucher giảm giá trực tiếp mua máy mới!</p>
-                </div>
+        <div class="col-lg-9">
+            <div class="tradein-main-card">
 
                 <?php if (isset($_SESSION['trade_in_success'])): 
                     $success = $_SESSION['trade_in_success'];
                     unset($_SESSION['trade_in_success']);
                 ?>
-                    <div class="card border-0 rounded-4 p-4 text-center mb-4" style="background: #f8fdf9; border: 1px solid #d4edda !important;">
-                        <div class="text-success mb-3" style="font-size: 64px;">
+                    <div class="card border-0 rounded-4 p-4 text-center mb-4" style="background: #f0fdf4; border: 1px solid #bbf7d0 !important;">
+                        <div class="text-success mb-2" style="font-size: 56px;">
                             <i class="bi bi-patch-check-fill"></i>
                         </div>
-                        <h3 class="fw-bold text-success mb-2">Định Giá Thành Công!</h3>
-                        <p class="text-muted mb-4">Chúng tôi đã tạo voucher giảm giá trực tiếp cho bạn khi mua máy mới tại Shop Hades.</p>
+                        <h3 class="fw-bold text-success mb-1">Định Giá Thành Công!</h3>
+                        <p class="text-muted small mb-4">Mã Voucher trợ giá đã được khởi tạo thành công dành riêng cho bạn.</p>
 
-                        <div class="bg-white p-4 rounded-3 shadow-sm mx-auto mb-4 border" style="max-width: 450px;">
-                            <div class="text-muted small uppercase fw-bold mb-1">MÃ VOUCHER THU CŨ CỦA BẠN</div>
-                            <div class="fs-2 fw-bold text-danger mb-3 font-monospace tracking-wide" id="voucherCodeText"><?= e($success['voucher_code']) ?></div>
-                            <button class="btn btn-outline-danger btn-sm" onclick="copyVoucherCode()">
-                                <i class="bi bi-clipboard"></i> Sao chép mã
+                        <div class="bg-white p-4 rounded-4 shadow-sm mx-auto mb-4 border" style="max-width: 440px;">
+                            <div class="text-muted small uppercase fw-bold mb-1" style="font-size: 11px;">MÃ VOUCHER THU CŨ CỦA BẠN</div>
+                            <div class="fs-2 fw-extrabold text-danger mb-3 font-monospace tracking-wide" id="voucherCodeText"><?= e($success['voucher_code']) ?></div>
+                            <button class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1.5 fw-bold" onclick="copyVoucherCode()">
+                                <i class="bi bi-clipboard me-1"></i> Sao chép mã Voucher
                             </button>
                         </div>
 
-                        <div class="row g-3 text-start mx-auto mb-4" style="max-width: 450px;">
+                        <div class="row g-2 text-start mx-auto mb-4 p-3 bg-white rounded-3 border" style="max-width: 440px; font-size: 14px;">
                             <div class="col-6 text-muted">Thiết bị thu cũ:</div>
-                            <div class="col-6 fw-bold text-end"><?= e($success['device_name']) ?></div>
+                            <div class="col-6 fw-bold text-end text-dark"><?= e($success['device_name']) ?></div>
 
                             <div class="col-6 text-muted">Tình trạng máy:</div>
-                            <div class="col-6 fw-bold text-end"><?= e($success['condition_name']) ?></div>
+                            <div class="col-6 fw-bold text-end text-dark"><?= e($success['condition_name']) ?></div>
 
                             <div class="col-6 text-muted">Giá trị thu hồi:</div>
                             <div class="col-6 fw-bold text-end text-success fs-5"><?= formatMoney($success['estimated_value']) ?></div>
@@ -55,7 +109,7 @@
                         }
                     </script>
                 <?php else: ?>
-                    <form action="/trade-in/submit" method="POST" id="tradeInForm" class="needs-validation" novalidate>
+                    <form action="/trade-in/submit" method="POST" id="tradeInForm">
                         <?= csrf_field() ?>
                         
                         <!-- Step 1: Chọn máy -->
@@ -63,13 +117,13 @@
                             <label class="form-label fw-bold text-dark mb-3"><i class="bi bi-phone me-2 text-danger"></i>1. Chọn dòng máy cũ của bạn</label>
                             <div class="row g-3">
                                 <?php foreach ($devices as $key => $device): ?>
-                                    <div class="col-md-6 col-lg-4">
-                                        <div class="card border rounded-3 p-3 text-center cursor-pointer h-100 device-card" 
+                                    <div class="col-6 col-md-4">
+                                        <div class="device-card-item h-100 device-card" 
                                              data-key="<?= e($key) ?>" 
                                              data-val="<?= $device['base_value'] ?>"
                                              onclick="selectDevice(this)">
                                             <div class="fw-bold text-dark small mb-1"><?= e($device['name']) ?></div>
-                                            <div class="text-muted small">Định giá tối đa:</div>
+                                            <div class="text-muted small" style="font-size: 11px;">Thu hồi tối đa:</div>
                                             <div class="text-danger fw-bold small"><?= formatMoney($device['base_value']) ?></div>
                                         </div>
                                     </div>
@@ -84,7 +138,7 @@
                             <div class="row g-3">
                                 <?php foreach ($conditions as $key => $cond): ?>
                                     <div class="col-md-6">
-                                        <div class="card border rounded-3 p-3 cursor-pointer h-100 condition-card" 
+                                        <div class="device-card-item text-start h-100 condition-card" 
                                              data-key="<?= e($key) ?>" 
                                              data-ratio="<?= $cond['ratio'] ?>"
                                              onclick="selectCondition(this)">
@@ -100,15 +154,15 @@
                         </div>
 
                         <!-- Live Valuation Preview -->
-                        <div class="card border-0 rounded-4 p-4 mb-4 text-center d-none" id="valuationPreview" style="background: #fffcf5; border: 1px solid #ffeeba !important;">
-                            <div class="text-warning-emphasis small uppercase fw-bold mb-1">GIÁ TRỊ THU HỒI DỰ KIẾN</div>
-                            <div class="display-6 fw-bold text-success mb-1" id="liveEstimatedValue">0đ</div>
-                            <p class="text-muted small mb-0">Voucher giảm giá tương ứng sẽ được áp dụng trực tiếp tại trang thanh toán.</p>
+                        <div class="card border-0 rounded-4 p-4 mb-4 text-center d-none shadow-sm" id="valuationPreview" style="background: #fffcf5; border: 1px solid #fde68a !important;">
+                            <div class="text-warning-emphasis small uppercase fw-bold mb-1" style="font-size: 11px;">GIÁ TRỊ THU HỒI DỰ KIẾN</div>
+                            <div class="display-6 fw-extrabold text-success mb-1" id="liveEstimatedValue">0đ</div>
+                            <p class="text-muted small mb-0">Voucher giảm giá tương ứng sẽ được áp dụng trực tiếp khi bạn đặt đơn máy mới.</p>
                         </div>
 
                         <!-- Step 3: Thông tin liên hệ -->
                         <div class="mb-4 d-none" id="contactSection">
-                            <label class="form-label fw-bold text-dark mb-3"><i class="bi bi-person me-2 text-danger"></i>3. Thông tin nhận Voucher</label>
+                            <label class="form-label fw-bold text-dark mb-3"><i class="bi bi-person me-2 text-danger"></i>3. Thông tin nhận Voucher trợ giá</label>
                             <div class="row g-3">
                                 <div class="col-md-6">
                                     <label for="customer_name" class="form-label small text-muted">Họ và tên *</label>
@@ -124,7 +178,9 @@
                         </div>
 
                         <div class="text-center d-none" id="submitSection">
-                            <button type="submit" class="btn btn-danger px-5 py-3 rounded-3 fw-bold shadow-sm">Nhận Voucher & Lên Đời Ngay</button>
+                            <button type="submit" class="btn btn-danger px-5 py-3 rounded-3 fw-bold shadow-sm" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); border: none;">
+                                Nhận Voucher & Lên Đời Ngay <i class="bi bi-arrow-right ms-1"></i>
+                            </button>
                         </div>
                     </form>
                 <?php endif; ?>
@@ -132,23 +188,6 @@
         </div>
     </div>
 </div>
-
-<style>
-.cursor-pointer {
-    cursor: pointer;
-    transition: all 0.2s ease-in-out;
-}
-.device-card:hover, .condition-card:hover {
-    border-color: var(--accent) !important;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-}
-.device-card.active, .condition-card.active {
-    border-color: #dc3545 !important;
-    background-color: #fff8f8 !important;
-    box-shadow: 0 0 0 3px rgba(220,53,69,0.15);
-}
-</style>
 
 <script>
 let selectedBaseValue = 0;

@@ -5,114 +5,186 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Đăng nhập - <?= e(config('app_name')) ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
     <link href="/css/shop.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+        .auth-container {
+            width: 100%;
+            max-width: 440px;
+            padding: 20px;
+        }
+        .auth-card-modern {
+            background: #ffffff;
+            border-radius: 22px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+            padding: 36px 32px;
+            position: relative;
+            overflow: hidden;
+        }
+        .auth-card-modern::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #ef4444 0%, #3b82f6 100%);
+        }
+        .form-control-modern {
+            border-radius: 12px;
+            padding: 12px 16px;
+            border: 1px solid #cbd5e1;
+            font-size: 14px;
+            transition: all 0.2s ease;
+        }
+        .form-control-modern:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+        }
+        .btn-login-main {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            padding: 13px;
+            font-weight: 700;
+            width: 100%;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.2);
+        }
+        .btn-login-main:hover {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+        .btn-google-auth {
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            background: #ffffff;
+            color: #1e293b;
+            font-weight: 600;
+            font-size: 14px;
+            padding: 12px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-decoration: none !important;
+            transition: all 0.2s ease;
+        }
+        .btn-google-auth:hover {
+            background: #f8fafc;
+            border-color: #94a3b8;
+            color: #0f172a;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+        }
+    </style>
 </head>
 <body>
-<div class="auth-page">
-    <div class="auth-card">
-        <div class="text-center mb-3">
-            <img src="/image/logo.webp" alt="Logo" class="logo-img" style="height:60px;">
+
+<div class="auth-container">
+    <div class="auth-card-modern">
+        <!-- Logo & Header -->
+        <div class="text-center mb-4">
+            <a href="/">
+                <img src="/image/logo.webp" alt="Logo" style="height: 64px; object-fit: contain;">
+            </a>
+            <h4 class="fw-bold mt-3 text-dark mb-1">Đăng Nhập Tài Khoản</h4>
+            <p class="text-muted small mb-0">Chào mừng bạn quay lại với Hades Shop</p>
         </div>
-        <h2>Đăng nhập</h2>
-        <p class="subtitle">Nhập thông tin đăng nhập của bạn</p>
 
-        <?php if ($msg = flash('success')): ?><div class="alert-hades alert-success"><?= e($msg) ?></div><?php endif; ?>
-        <?php if ($msg = flash('error')): ?><div class="alert-hades alert-danger"><?= e($msg) ?></div><?php endif; ?>
+        <?php if ($msg = flash('success')): ?>
+            <div class="alert alert-success border-0 rounded-3 small py-2.5 px-3 mb-3 fw-medium">
+                <i class="bi bi-check-circle-fill me-1"></i><?= e($msg) ?>
+            </div>
+        <?php endif; ?>
 
+        <?php if ($msg = flash('error')): ?>
+            <div class="alert alert-danger border-0 rounded-3 small py-2.5 px-3 mb-3 fw-medium">
+                <i class="bi bi-exclamation-triangle-fill me-1"></i><?= e($msg) ?>
+            </div>
+        <?php endif; ?>
+
+        <!-- Form đăng nhập bằng Email / Mật khẩu -->
         <form method="post" action="/login">
             <?= csrf_field() ?>
+            
             <div class="mb-3">
-                <label class="form-label">Email</label>
-                <input type="email" name="email" class="form-control" value="<?= old('email') ?>" required placeholder="email@example.com">
+                <label class="form-label small fw-bold text-dark">Email đăng nhập</label>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0 text-muted" style="border-radius: 12px 0 0 12px;">
+                        <i class="bi bi-envelope"></i>
+                    </span>
+                    <input type="email" name="email" class="form-control form-control-modern border-start-0" value="<?= old('email') ?>" required placeholder="name@example.com" style="border-radius: 0 12px 12px 0;">
+                </div>
             </div>
+
             <div class="mb-3">
-                <label class="form-label">Mật khẩu</label>
-                <input type="password" name="password" class="form-control" required>
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <label class="form-label small fw-bold text-dark mb-0">Mật khẩu</label>
+                    <a href="/forgot-password" class="small text-decoration-none" style="color: #ef4444; font-size: 12px; font-weight: 600;">Quên mật khẩu?</a>
+                </div>
+                <div class="input-group">
+                    <span class="input-group-text bg-light border-end-0 text-muted" style="border-radius: 12px 0 0 12px;">
+                        <i class="bi bi-lock"></i>
+                    </span>
+                    <input type="password" name="password" class="form-control form-control-modern border-start-0" required placeholder="••••••••" style="border-radius: 0 12px 12px 0;">
+                </div>
             </div>
-            <?= \App\Services\CaptchaService::fieldHtml() ?>
-            <button type="submit" class="btn-primary-hades">Đăng nhập</button>
+
+            <button type="submit" class="btn-login-main mt-2">
+                Đăng Nhập <i class="bi bi-arrow-right ms-1"></i>
+            </button>
         </form>
-        <div class="d-flex align-items-center my-3">
-            <hr class="flex-grow-1 text-muted">
-            <span class="mx-2 text-muted small">Hoặc</span>
-            <hr class="flex-grow-1 text-muted">
+
+        <div class="d-flex align-items-center my-4">
+            <hr class="flex-grow-1 text-muted opacity-25 m-0">
+            <span class="mx-3 text-muted small fw-semibold" style="font-size: 11px; letter-spacing: 0.05em; text-transform: uppercase;">Xác thực qua Google Gmail</span>
+            <hr class="flex-grow-1 text-muted opacity-25 m-0">
         </div>
-        <a href="/login/google" class="btn btn-outline-dark w-100 d-flex align-items-center justify-content-center gap-2 py-2" style="border-radius: 8px; font-weight: 500; border-color: #cbd5e1; color: #334155; text-decoration: none;">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-google" viewBox="0 0 16 16">
-                <path d="M15.545 6.558a9.42 9.42 0 0 1 .139 1.626c0 2.434-.87 4.492-2.384 5.885h.002C11.978 15.292 10.158 16 8 16A8 8 0 1 1 8 0c2.181 0 4.027.818 5.485 2.183l-2.25 2.25C10.22 3.3 9.22 3 8 3a5 5 0 1 0 0 10c1.848 0 3.32-.98 3.882-2.45h-3.882V6.558h7.545z"/>
+
+        <!-- Form Nhập Gmail để Nhận Mã OTP Xác Minh -->
+        <form method="get" action="/login/google" class="mb-3">
+            <label class="form-label small fw-semibold text-muted mb-1" style="font-size: 12px;">Nhập địa chỉ Gmail để nhận mã OTP:</label>
+            <div class="input-group">
+                <input type="email" name="email" class="form-control form-control-sm border-end-0" placeholder="user.google@gmail.com" required style="border-radius: 10px 0 0 10px; font-size: 13px;">
+                <button type="submit" class="btn btn-danger btn-sm fw-bold px-3" style="border-radius: 0 10px 10px 0; background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); border: none;">
+                    Gửi OTP <i class="bi bi-send-fill ms-1"></i>
+                </button>
+            </div>
+        </form>
+
+        <!-- Official Google OAuth Button -->
+        <a href="/login/google" class="btn-google-auth">
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 48 48">
+                <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
+                <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
+                <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
+                <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
             </svg>
-            Đăng nhập bằng Google
+            <span>Đăng nhập nhanh bằng Google</span>
         </a>
 
-        <p class="text-center mt-3 mb-0 small">
-            Chưa có tài khoản? <a href="/register" style="color:var(--accent)">Đăng ký</a> ·
-            <a href="/forgot-password" style="color:var(--accent)">Quên mật khẩu?</a> ·
-            <a href="/admin/login" style="color:var(--accent)">Đăng nhập Admin</a> ·
-            <a href="/">Trang chủ</a>
-        </p>
-    </div>
-</div>
-
-<?php if (isset($_GET['google_demo'])): ?>
-<!-- Google Demo Login Modal -->
-<div class="modal fade show d-block" id="googleModal" tabindex="-1" style="background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
-            <div class="modal-header border-bottom-0 pb-0 pt-4 px-4">
-                <div class="d-flex align-items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48">
-                        <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z"/>
-                        <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
-                        <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z"/>
-                        <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z"/>
-                    </svg>
-                    <h5 class="modal-title fw-bold mb-0" style="font-size: 1.15rem;">Đăng nhập với Google</h5>
-                </div>
-                <a href="/login" class="btn-close"></a>
-            </div>
-            <div class="modal-body px-4 py-3">
-                <p class="text-muted small mb-3">Chọn tài khoản Google để đăng nhập vào <strong>Shop Hades</strong>:</p>
-
-                <div class="list-group gap-2 mb-3">
-                    <a href="/login/google?email=khach@shop.test&name=Khách+Hàng+Demo" class="list-group-item list-group-item-action border rounded-3 p-3 d-flex align-items-center gap-3">
-                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width:40px;height:40px;">K</div>
-                        <div class="flex-grow-1">
-                            <div class="fw-bold small text-dark">Khách Hàng (Tài khoản mẫu)</div>
-                            <div class="text-muted" style="font-size: 11px;">khach@shop.test</div>
-                        </div>
-                        <i class="bi bi-chevron-right text-muted"></i>
-                    </a>
-                    <a href="/login/google?email=user.google@gmail.com&name=Google+User" class="list-group-item list-group-item-action border rounded-3 p-3 d-flex align-items-center gap-3">
-                        <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center fw-bold" style="width:40px;height:40px;">G</div>
-                        <div class="flex-grow-1">
-                            <div class="fw-bold small text-dark">Tài khoản Google cá nhân</div>
-                            <div class="text-muted" style="font-size: 11px;">user.google@gmail.com</div>
-                        </div>
-                        <i class="bi bi-chevron-right text-muted"></i>
-                    </a>
-                </div>
-
-                <form method="get" action="/login/google" class="mt-3">
-                    <label class="form-label small fw-bold text-secondary mb-1">Hoặc nhập email Google khác:</label>
-                    <div class="input-group">
-                        <input type="email" name="email" class="form-control form-control-sm" placeholder="example@gmail.com" required>
-                        <button type="submit" class="btn btn-dark btn-sm fw-bold">Đăng nhập</button>
-                    </div>
-                </form>
-
-                <div class="mt-4 p-3 bg-light rounded-3 border" style="font-size: 11px; color: #64748b;">
-                    <div class="fw-bold text-dark mb-1">💡 Hướng dẫn cấu hình Google OAuth 2.0 thật:</div>
-                    Để bật đăng nhập qua nút Google OAuth chính thức từ Google Cloud Platform, hãy thêm 2 dòng sau vào file <code>.env</code>:
-                    <pre class="bg-dark text-white p-2 rounded mt-1 mb-0" style="font-size: 10px;">GOOGLE_CLIENT_ID=your-client-id.apps.googleusercontent.com
-GOOGLE_CLIENT_SECRET=your-client-secret</pre>
-                </div>
-            </div>
-            <div class="modal-footer border-top-0 pt-0 px-4 pb-4">
-                <a href="/login" class="btn btn-outline-secondary btn-sm w-100 rounded-3">Đóng</a>
+        <div class="text-center mt-4 pt-2">
+            <p class="small text-muted mb-0">
+                Chưa có tài khoản? <a href="/register" class="fw-bold text-decoration-none" style="color: #ef4444;">Đăng ký ngay</a>
+            </p>
+            <div class="mt-2" style="font-size: 12px;">
+                <a href="/admin/login" class="text-muted text-decoration-none me-2">Quản trị Admin</a> ·
+                <a href="/" class="text-muted text-decoration-none ms-2">Trang chủ</a>
             </div>
         </div>
     </div>
 </div>
-<?php endif; ?>
+
 </body>
 </html>

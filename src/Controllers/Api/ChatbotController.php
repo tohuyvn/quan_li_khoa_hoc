@@ -113,12 +113,23 @@ class ChatbotController
             $payload = [
                 'contents'          => $this->buildGeminiContents($history, $message),
                 'systemInstruction' => ['parts' => [['text' => $systemPrompt]]],
-                'generationConfig'  => ['temperature' => 0.6, 'maxOutputTokens' => 800],
+                'generationConfig'  => ['temperature' => 0.4, 'maxOutputTokens' => 1000],
             ];
 
             $reply = $this->callGemini($url, $payload);
 
             if ($reply !== '') {
+                // Tự động chuyển đổi Markdown link [Tên](/products/id) thành thẻ HTML link nếu Gemini dùng Markdown
+                $reply = preg_replace_callback(
+                    '/\[([^\]]+)\]\(([^)]+)\)/u',
+                    function ($m) {
+                        $title = $m[1];
+                        $url   = $m[2];
+                        return "<a href='{$url}' style='color:#d70018;font-weight:bold;text-decoration:underline;'>{$title}</a>";
+                    },
+                    $reply
+                );
+
                 $this->jsonResponse($reply, 'gemini', $message, $history);
             }
         }
@@ -178,11 +189,11 @@ class ChatbotController
                 continue;
             }
             $role = $item['role'] ?? '';
-            $text = trim(strip_tags($item['text'] ?? $item['content'] ?? ''));
+            $text = trim($item['text'] ?? $item['content'] ?? '');
             if (!in_array($role, ['user', 'model'], true) || $text === '') {
                 continue;
             }
-            $normalized[] = ['role' => $role, 'text' => mb_substr($text, 0, 500)];
+            $normalized[] = ['role' => $role, 'text' => mb_substr($text, 0, 1000)];
         }
 
         return array_slice($normalized, -20);
@@ -193,7 +204,7 @@ class ChatbotController
         if ($userMessage !== '') {
             $history[] = ['role' => 'user', 'text' => $userMessage];
         }
-        $history[] = ['role' => 'model', 'text' => strip_tags($reply)];
+        $history[] = ['role' => 'model', 'text' => $reply];
         $history   = array_slice($history, -20);
         $_SESSION['chatbot_history'] = $history;
 
@@ -204,7 +215,7 @@ class ChatbotController
             if ($userMessage !== '') {
                 \App\Services\ChatHistoryService::append($userId ?: null, $sessionKey, 'user', $userMessage, $source);
             }
-            \App\Services\ChatHistoryService::append($userId ?: null, $sessionKey, 'model', strip_tags($reply), $source);
+            \App\Services\ChatHistoryService::append($userId ?: null, $sessionKey, 'model', $reply, $source);
         } catch (\Throwable $e) {
         }
 
@@ -221,19 +232,14 @@ class ChatbotController
         $greeting = $this->getGreetingByTime();
 
         return <<<PROMPT
-Bạn là **Hades AI** – Trợ lý ảo thân thiện, thông minh của cửa hàng công nghệ **Shop Hades**.
+Bạn là **Hades AI** – Trợ lý tư vấn sản phẩm thông minh của cửa hàng công nghệ **Shop Hades**.
 Múi giờ hiện tại là Asia/Ho_Chi_Minh. Lời chào đúng thời điểm hiện tại: "{$greeting}!".
 
 == PHONG CÁCH TRẢ LỜI ==
-- Ngôn ngữ: Tiếng Việt tự nhiên, thân thiện, đôi khi dùng emoji sinh động.
-- Độ dài: Ngắn gọn, súc tích (tối đa 4-5 câu), trừ khi liệt kê sản phẩm.
-- Luôn xưng "mình" với khách hàng, gọi khách là "bạn".
-- ĐỌC KỸ lịch sử hội thoại trước đó — trả lời ĐÚNG TRỌNG TÂM câu hỏi hiện tại, không lệch chủ đề.
-- Nếu khách vừa hỏi về sản phẩm A, câu tiếp theo "cái nào rẻ hơn" / "xem thêm" → hiểu ngữ cảnh, so sánh hoặc gợi ý liên quan A.
-- Nếu khách CHỈ chào hỏi / trò chuyện / hỏi thăm → chào lại ấm áp, TUYỆT ĐỐI KHÔNG tự ý giới thiệu hay gợi ý sản phẩm ngay.
-- Nếu khách hỏi thăm sức khỏe hoặc nói chuyện phiếm, hãy trả lời tự nhiên, ấm áp, sau đó nhẹ nhàng hỏi có cần hỗ trợ mua sắm không.
-- Nếu khách khen shop hoặc cảm ơn, hãy phản hồi chân thành.
-- Nếu khách phàn nàn, hãy xin lỗi và hướng dẫn liên hệ hotline.
+- Ngôn ngữ: Tiếng Việt tự nhiên, thân thiện, súc tích, dùng emoji sinh động.
+- Xưng "mình" với khách hàng, gọi khách là "bạn".
+- ĐỌC KỸ lịch sử hội thoại trước đó — trả lời ĐÚNG TRỌNG TÂM câu hỏi hiện tại.
+- Nếu khách CHỈ chào hỏi / trò chuyện / hỏi thăm → chào lại ấm áp, không ép mua hàng.
 
 == THÔNG TIN SHOP ==
 {$shopInfo}
@@ -241,17 +247,19 @@ Múi giờ hiện tại là Asia/Ho_Chi_Minh. Lời chào đúng thời điểm 
 == KHUYẾN MÃI HIỆN TẠI ==
 {$promosContext}
 
-== SẢN PHẨM LIÊN QUAN ==
+== SẢN PHẨM LIÊN QUAN TRONG HỆ THỐNG SHOP HADES ==
 {$productsContext}
 
-== QUY TẮC QUAN TRỌNG ==
-1. Khi giới thiệu sản phẩm, LUÔN tạo link HTML: <a href='/products/{id}' style='color:#d70018;font-weight:bold;text-decoration:underline;'>Tên sản phẩm</a>
-2. Lọc sản phẩm theo khoảng giá chính xác khi khách yêu cầu (ví dụ: "dưới 20 triệu", "trên 10tr").
-3. Gợi ý tối đa 4-5 sản phẩm phù hợp nhất, không liệt kê tràn lan.
-4. Nếu không tìm thấy sản phẩm phù hợp, hãy thông báo lịch sự và gợi ý phương án thay thế.
-5. Khi khách so sánh các sản phẩm, hãy phân tích ưu/nhược điểm ngắn gọn, khách quan.
-6. Luôn kết thúc bằng một câu hỏi mở hoặc gợi ý hành động tiếp theo (ví dụ: "Bạn muốn xem thêm không?").
-7. KHÔNG tự ý chào hàng / bán hàng khi khách chỉ đang chào hỏi hoặc trò chuyện xã giao.
+== QUY TẮC QUAN TRỌNG VỀ SẢN PHẨM & LINK (BẮT BUỘC TUÂN THỦ) ==
+1. KHI NGƯỜI DÙNG HỎI TÌM SẢN PHẨM, HỎI DÒNG SẢN PHẨM (VÍ DỤ "iphone 15", "macbook", "tai nghe", "laptop"...):
+   - Bạn BẮT BUỘC phải liệt kê chi tiết 2-5 sản phẩm phù hợp nhất có trong phần [SẢN PHẨM LIÊN QUAN TRONG HỆ THỐNG SHOP HADES].
+   - TÊN MỖI SẢN PHẨM BẮT BUỘC PHẢI CHỨA LINK HTML THEO ĐÚNG CÚ PHÁP: <a href='/products/{id}' style='color:#d70018;font-weight:bold;text-decoration:underline;'>Tên sản phẩm</a>
+   - Ví dụ format chuẩn bắt buộc:
+     • <a href='/products/1' style='color:#d70018;font-weight:bold;text-decoration:underline;'>iPhone 15 Pro Max 256GB</a> — Giá: 29.990.000đ (Còn hàng)
+     • <a href='/products/4' style='color:#d70018;font-weight:bold;text-decoration:underline;'>iPhone 15 128GB</a> — Giá: 19.990.000đ (Còn hàng)
+2. Không bao giờ trả lời lấp lửng dạng "bên mình có các dòng này:" mà lại KHÔNG liệt kê danh sách sản phẩm và link bên dưới!
+3. Nếu khách yêu cầu giá (ví dụ "dưới 20tr"), chỉ đưa sản phẩm có giá phù hợp.
+4. Cuối câu trả lời, hãy hỏi nhẹ nhàng xem khách cần hỗ trợ thêm thông tin gì không.
 PROMPT;
     }
 
@@ -260,15 +268,34 @@ PROMPT;
         $maxPrice = null;
         $minPrice = null;
 
-        if (preg_match('/(?:dưới|nhỏ hơn|<|duoi|nho hon)\s*([0-9\.,]+)\s*(?:triệu|tr|t|trieu|k)/u', $messageLower, $m)) {
-            $maxPrice = (int) str_replace(['.', ','], '', $m[1]) * 1000000;
-        }
-        if (preg_match('/(?:trên|lớn hơn|>|tren|lon hon)\s*([0-9\.,]+)\s*(?:triệu|tr|t|trieu|k)/u', $messageLower, $m)) {
-            $minPrice = (int) str_replace(['.', ','], '', $m[1]) * 1000000;
+        // Xử lý giá max (dưới / nhỏ hơn / <)
+        if (preg_match('/(?:dưới|nhỏ hơn|<|duoi|nho hon)\s*([0-9\.,]+)\s*(triệu|tr|trieu|k|đ|đồng)?/u', $messageLower, $m)) {
+            $val = (float) str_replace(['.', ','], '', $m[1]);
+            $unit = mb_strtolower($m[2] ?? 'triệu', 'UTF-8');
+            if ($unit === 'k') {
+                $maxPrice = (int) ($val * 1000);
+            } elseif ($unit === 'đ' || $unit === 'đồng') {
+                $maxPrice = (int) $val;
+            } else {
+                $maxPrice = (int) ($val * 1000000);
+            }
         }
 
-        $cleanMsg = preg_replace('/(?:dưới|nhỏ hơn|<|duoi|nho hon|trên|lớn hơn|>|tren|lon hon|từ)\s*[0-9\.,]+\s*(?:triệu|tr|t|trieu|k)/u', '', $messageLower);
-        $stopWords = ['tìm', 'kiếm', 'mua', 'bán', 'hỏi', 'cần', 'shop', 'hades', 'giá', 'sản', 'phẩm', 'có', 'cho', 'xem', 'thử', 'muốn', 'gợi', 'ý', 'chào', 'bạn', 'mình'];
+        // Xử lý giá min (trên / lớn hơn / > / từ)
+        if (preg_match('/(?:trên|lớn hơn|>|tren|lon hon)\s*([0-9\.,]+)\s*(triệu|tr|trieu|k|đ|đồng)?/u', $messageLower, $m)) {
+            $val = (float) str_replace(['.', ','], '', $m[1]);
+            $unit = mb_strtolower($m[2] ?? 'triệu', 'UTF-8');
+            if ($unit === 'k') {
+                $minPrice = (int) ($val * 1000);
+            } elseif ($unit === 'đ' || $unit === 'đồng') {
+                $minPrice = (int) $val;
+            } else {
+                $minPrice = (int) ($val * 1000000);
+            }
+        }
+
+        $cleanMsg = preg_replace('/(?:dưới|nhỏ hơn|<|duoi|nho hon|trên|lớn hơn|>|tren|lon hon|từ)\s*[0-9\.,]+\s*(?:triệu|tr|trieu|k|đ|đồng)?/u', '', $messageLower);
+        $stopWords = ['tìm', 'kiếm', 'mua', 'bán', 'hỏi', 'cần', 'shop', 'hades', 'giá', 'sản', 'phẩm', 'có', 'cho', 'xem', 'thử', 'muốn', 'gợi', 'ý', 'chào', 'bạn', 'mình', 'nào', 'gì', 'không', 'nhỉ', 'tư', 'vấn'];
         $terms = array_filter(
             explode(' ', trim(preg_replace('/\s+/', ' ', $cleanMsg))),
             fn($t) => mb_strlen($t, 'UTF-8') > 1 && !in_array($t, $stopWords, true)
@@ -293,7 +320,7 @@ PROMPT;
 
         if (!empty($terms)) {
             $likes = [];
-            foreach ($terms as $i => $term) {
+            foreach ($terms as $term) {
                 $likes[] = "(p.name LIKE ? OR c.name LIKE ?)";
                 $params[] = '%' . $term . '%';
                 $params[] = '%' . $term . '%';

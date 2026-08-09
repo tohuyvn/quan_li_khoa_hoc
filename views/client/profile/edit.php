@@ -602,6 +602,7 @@ $initial = mb_strtoupper(mb_substr($user['name'] ?? 'H', 0, 1, 'UTF-8'), 'UTF-8'
                                 </div>
                             </div>
                         </form>
+                    </div>
                 </div>
 
                 <!-- TAB 5: Lịch sử đơn hàng gần đây -->
