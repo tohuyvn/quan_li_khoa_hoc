@@ -6,6 +6,35 @@ $ogDescription = $metaDescription;
 $ogImage = !empty($product['image']) ? imageUrl($product['image']) : '';
 ?>
 
+<!-- Schema.org JSON-LD Structured Data for SEO -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": <?= json_encode($product['name']) ?>,
+  "image": [<?= json_encode($ogImage) ?>],
+  "description": <?= json_encode(strip_tags($product['description'] ?? '')) ?>,
+  "sku": "HADES-<?= (int)$product['id'] ?>",
+  "offers": {
+    "@type": "Offer",
+    "url": "<?= e($_SERVER['REQUEST_URI'] ?? '') ?>",
+    "priceCurrency": "VND",
+    "price": <?= (int)($product['sale_price'] ?? $product['price']) ?>,
+    "itemCondition": "https://schema.org/NewCondition",
+    "availability": <?= (int)($product['stock'] ?? 0) > 0 ? '"https://schema.org/InStock"' : '"https://schema.org/OutOfStock"' ?>
+  }
+  <?php if (!empty($ratingStats['count'])): ?>
+  ,
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "<?= $ratingStats['average'] ?>",
+    "reviewCount": "<?= $ratingStats['count'] ?>"
+  }
+  <?php endif; ?>
+}
+</script>
+
+
 <nav class="breadcrumb-nav">
     <a href="/">Trang chủ</a>
     <span class="text-muted"> / </span>
@@ -343,9 +372,55 @@ $ogImage = !empty($product['image']) ? imageUrl($product['image']) : '';
 </div>
 
 
+<!-- Related Products Section -->
+<?php if (!empty($relatedProducts)): ?>
+    <div class="content-card mt-5 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+            <h5 class="fw-bold mb-0 text-dark">
+                <i class="bi bi-grid-fill text-primary me-2"></i>Sản phẩm liên quan cùng danh mục
+            </h5>
+            <a href="/?category=<?= (int)$product['category_id'] ?>" class="btn btn-sm btn-link text-decoration-none">
+                Xem tất cả <i class="bi bi-chevron-right ms-1"></i>
+            </a>
+        </div>
+        <div class="product-grid">
+            <?php 
+            $mainProductBackup = $product;
+            foreach ($relatedProducts as $pCard):
+                $product = $pCard;
+                require BASE_PATH . '/views/partials/product_card.php';
+            endforeach;
+            $product = $mainProductBackup;
+            ?>
+        </div>
+    </div>
+<?php endif; ?>
+
+<!-- Recently Viewed Products Section -->
+<?php if (!empty($recentlyViewedProducts)): ?>
+    <div class="content-card mt-4 p-4">
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+            <h5 class="fw-bold mb-0 text-dark">
+                <i class="bi bi-clock-history text-danger me-2"></i>Sản phẩm bạn vừa xem gần đây
+            </h5>
+        </div>
+        <div class="product-grid">
+            <?php 
+            $mainProductBackup = $product;
+            foreach ($recentlyViewedProducts as $pCard):
+                $product = $pCard;
+                require BASE_PATH . '/views/partials/product_card.php';
+            endforeach;
+            $product = $mainProductBackup;
+            ?>
+        </div>
+    </div>
+<?php endif; ?>
+
 <div class="mt-4">
     <a href="javascript:history.back()" class="btn btn-outline-secondary rounded-pill px-4 btn-sm"><i class="bi bi-arrow-left"></i> Quay lại</a>
 </div>
+
 
 <script>
 function switchGalleryImage(el, src, filter) {

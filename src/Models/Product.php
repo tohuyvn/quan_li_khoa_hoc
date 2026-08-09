@@ -217,6 +217,34 @@ class Product
         return PriceCalculator::resolveMany(array_map([$this, 'cast'], $stmt->fetchAll()));
     }
 
+    public function getRelatedProducts(int $categoryId, int $excludeId, int $limit = 4): array
+    {
+        $stmt = $this->db->prepare("SELECT * FROM products WHERE status = 'active' AND category_id = ? AND id != ? ORDER BY id DESC LIMIT ?");
+        $stmt->bindValue(1, $categoryId, PDO::PARAM_INT);
+        $stmt->bindValue(2, $excludeId, PDO::PARAM_INT);
+        $stmt->bindValue(3, $limit, PDO::PARAM_INT);
+        $stmt->execute();
+
+        return PriceCalculator::resolveMany(array_map([$this, 'cast'], $stmt->fetchAll()));
+    }
+
+    public function getByIds(array $ids): array
+    {
+        if (empty($ids)) {
+            return [];
+        }
+        $ids = array_values(array_filter(array_map('intval', $ids)));
+        if (empty($ids)) {
+            return [];
+        }
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $stmt = $this->db->prepare("SELECT * FROM products WHERE status = 'active' AND id IN ($placeholders)");
+        $stmt->execute($ids);
+
+        return PriceCalculator::resolveMany(array_map([$this, 'cast'], $stmt->fetchAll()));
+    }
+
+
     public function create(array $data): array
     {
         $stmt = $this->db->prepare(

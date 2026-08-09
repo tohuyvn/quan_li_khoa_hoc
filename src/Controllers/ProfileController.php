@@ -59,6 +59,10 @@ class ProfileController
         $vouchersCount = count((new \App\Models\UserVoucher())->activeForUser((int) $currentUser['id']));
         $wishlistCount = (new \App\Models\Wishlist())->countByUser((int) $currentUser['id']);
 
+        $stmtRecentOrders = $db->prepare('SELECT * FROM orders WHERE user_id = ? ORDER BY id DESC LIMIT 15');
+        $stmtRecentOrders->execute([$currentUser['id']]);
+        $recentOrders = $stmtRecentOrders->fetchAll();
+
         view('client.profile.edit', [
             'title' => 'Thông tin cá nhân',
             'user' => $user,
@@ -68,6 +72,7 @@ class ProfileController
             'walletBalance' => $walletBalance,
             'vouchersCount' => $vouchersCount,
             'wishlistCount' => $wishlistCount,
+            'recentOrders' => $recentOrders,
         ]);
     }
 

@@ -16,9 +16,11 @@ class ProductController
         $page = max(1, (int) ($_GET['page'] ?? 1));
         $perPage = 12;
 
-        $search = is_scalar($_GET['q'] ?? '') ? trim((string) $_GET['q']) : '';
-        $categoryId = is_scalar($_GET['category'] ?? null) && (int) $_GET['category'] > 0
-            ? (int) $_GET['category']
+        $rawQ = $_GET['q'] ?? null;
+        $search = is_scalar($rawQ) ? trim((string) $rawQ) : '';
+        $rawCategory = $_GET['category'] ?? null;
+        $categoryId = is_scalar($rawCategory) && (int) $rawCategory > 0
+            ? (int) $rawCategory
             : null;
         $selectedCategoryId = $categoryId;
         if ($selectedCategoryId === null && $search !== '') {
@@ -38,17 +40,21 @@ class ProductController
             return array_values(array_unique(array_intersect($allowed, $values)));
         };
         $allowedSorts = ['newest', 'oldest', 'price_asc', 'price_desc', 'bestseller', 'rating'];
-        $sort = is_scalar($_GET['sort'] ?? '') ? (string) $_GET['sort'] : 'newest';
+        $rawSort = $_GET['sort'] ?? null;
+        $sort = is_scalar($rawSort) ? (string) $rawSort : 'newest';
         if (!in_array($sort, $allowedSorts, true)) {
             $sort = 'newest';
         }
 
-        $inStock = is_scalar($_GET['in_stock'] ?? null) ? (string) $_GET['in_stock'] : '';
+        $rawInStock = $_GET['in_stock'] ?? null;
+        $inStock = is_scalar($rawInStock) ? (string) $rawInStock : '';
+        $rawMinPrice = $_GET['min_price'] ?? null;
+        $rawMaxPrice = $_GET['max_price'] ?? null;
         $filters = [
             'category_id' => $selectedCategoryId,
             'search' => $search,
-            'min_price' => is_scalar($_GET['min_price'] ?? null) ? $_GET['min_price'] : null,
-            'max_price' => is_scalar($_GET['max_price'] ?? null) ? $_GET['max_price'] : null,
+            'min_price' => is_scalar($rawMinPrice) ? $rawMinPrice : null,
+            'max_price' => is_scalar($rawMaxPrice) ? $rawMaxPrice : null,
             'in_stock' => in_array($inStock, ['1', 'true', 'on'], true),
             'sort' => $sort,
             'ram' => $normalizeList($_GET['ram'] ?? [], ['4GB', '6GB', '8GB', '12GB', '16GB']),
@@ -98,14 +104,30 @@ class ProductController
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        $recentlyViewed = $_SESSION['recently_viewed'] ?? [];
-        $recentlyViewed = array_diff($recentlyViewed, [$id]);
+        $recentlyViewedSession = $_SESSION['recently_viewed'] ?? [];
+        $recentlyViewedIds = array_diff($recentlyViewedSession, [$id]);
+
+        $recentlyViewed = array_diff($recentlyViewedSession, [$id]);
         array_unshift($recentlyViewed, $id);
         $_SESSION['recently_viewed'] = array_slice($recentlyViewed, 0, 8);
 
         $category = $categoryModel->find((int) $product['category_id']);
         $product['category_name'] = $category['name'] ?? 'Khác';
         $categories = $categoryModel->all();
+
+        $categoryMap = [];
+        foreach ($categories as $cat) {
+            $categoryMap[$cat['id']] = $cat['name'];
+        }
+
+        // Fetch Related Products (same category, excluding current product)
+        $rawRelated = $productModel->getRelatedProducts((int) $product['category_id'], $id, 4);
+        $relatedProducts = enrichProductsForDisplay($rawRelated, $categoryMap);
+
+        // Fetch Recently Viewed Products
+        $rawRecently = $recentlyViewedIds !== [] ? $productModel->getByIds($recentlyViewedIds) : [];
+        $recentlyViewedProducts = enrichProductsForDisplay($rawRecently, $categoryMap);
+
         $reviews = $reviewModel->byProduct($id);
         $ratingStats = $reviewModel->getAverageRating($id);
         $currentUser = authUser();
@@ -128,6 +150,8 @@ class ProductController
             'variants' => $variants,
             'canReview' => $eligibleReviewOrderId !== null && !$hasReviewed,
             'hasReviewed' => $hasReviewed,
+            'relatedProducts' => $relatedProducts,
+            'recentlyViewedProducts' => $recentlyViewedProducts,
         ]);
     }
 

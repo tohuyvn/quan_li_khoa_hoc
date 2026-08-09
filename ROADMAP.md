@@ -86,17 +86,27 @@
 
 ---
 
-### 🎯 v1.5 — Nội dung & Khám phá (Dự kiến: 2–3 tuần)
+## ✅ Đã hoàn thành trong v1.5
+
+- [x] **🔗 Sản phẩm liên quan (Related Products)** — Gợi ý tự động các sản phẩm cùng danh mục ở trang chi tiết
+- [x] **👁️ Sản phẩm đã xem gần đây (Recently Viewed)** — Tự động lưu và gợi ý danh sách sản phẩm vừa duyệt
+- [x] **🔍 SEO chuẩn Schema.org & OpenGraph** — Tích hợp JSON-LD Product Schema cho Google Rich Snippets & OpenGraph Meta tags
+- [x] **🎨 Trang Error 404 nâng cấp** — Giao diện 404 đẹp hiện đại tích hợp ô tìm kiếm real-time và gợi ý sản phẩm HOT
+- [x] **📦 Tab Lịch sử đơn hàng trong Profile** — Tích hợp quản lý & theo dõi đơn hàng trực tiếp ngay trong Hồ sơ cá nhân
+
+---
+
+### 🎯 v1.5 — Nội dung & Khám phá
 
 > **Mục tiêu**: Cải thiện SEO, trải nghiệm duyệt sản phẩm và tìm kiếm
 
-| # | Tính năng | Độ ưu tiên | Ghi chú |
+| # | Tính năng | Độ ưu tiên | Trạng thái / Ghi chú |
 |---|---|---|---|
-| 6 | 🔗 **Sản phẩm liên quan** (Related Products) | 🟠 Cao | Gợi ý cùng danh mục / đã xem ở trang chi tiết |
-| 7 | 🖼️ **Gallery ảnh sản phẩm nhiều hình + Zoom** | 🟡 Trung bình | Thay thế 1 ảnh hiện tại |
-| 8 | 📄 **Phân trang AJAX mượt** khi lọc sản phẩm | 🟡 Trung bình | Không reload, URL thay đổi theo filter |
-| 9 | 👁️ **Xem gần đây** (Recently Viewed) | 🟡 Trung bình | Lưu localStorage, hiển thị dưới trang chi tiết |
-| 10 | 🔍 **SEO chuẩn** cho từng trang sản phẩm | 🟡 Trung bình | OpenGraph, Schema.org JSON-LD, Canonical |
+| 6 | 🔗 **Sản phẩm liên quan** (Related Products) | 🟠 Cao | ✅ Hoàn thành — Gợi ý cùng danh mục ở trang chi tiết |
+| 7 | 🖼️ **Gallery ảnh sản phẩm nhiều hình + Zoom** | 🟡 Trung bình | ✅ Hoàn thành — Gallery thumbnail đổi màu & xem ảnh |
+| 8 | 📄 **Phân trang AJAX mượt** khi lọc sản phẩm | 🟡 Trung bình | ✅ Hoàn thành |
+| 9 | 👁️ **Xem gần đây** (Recently Viewed) | 🟡 Trung bình | ✅ Hoàn thành — Lưu session & hiển thị trang chi tiết |
+| 10 | 🔍 **SEO chuẩn** cho từng trang sản phẩm | 🟡 Trung bình | ✅ Hoàn thành — OpenGraph, Schema.org JSON-LD |
 
 ---
 
@@ -130,13 +140,13 @@
 
 ## 🐛 Backlog — Cần sửa / Cải thiện
 
-| # | Vấn đề | Ưu tiên |
-|---|---|---|
-| B1 | Trang 404 đẹp hơn, có nút "Về trang chủ" | 🟡 |
-| B2 | Loading skeleton cho danh sách sản phẩm khi lọc AJAX | 🟡 |
-| B3 | Trang Profile → Thêm tab "Lịch sử đơn hàng" ngay trong Profile | 🟡 |
-| B4 | Email OTP vào tab Spam/Promotions → Cải thiện email template để vào Primary | 🟡 |
-| B5 | Admin: Thống kê sản phẩm bán chạy nhất | 🟢 |
+| # | Vấn đề | Ưu tiên | Trạng thái |
+|---|---|---|---|
+| B1 | Trang 404 đẹp hơn, tích hợp ô tìm kiếm real-time | 🟡 | ✅ Hoàn thành |
+| B2 | Loading skeleton cho danh sách sản phẩm khi lọc AJAX | 🟡 | ✅ Hoàn thành |
+| B3 | Trang Profile → Thêm tab "Lịch sử đơn hàng" ngay trong Profile | 🟡 | ✅ Hoàn thành |
+| B4 | Email OTP vào tab Spam/Promotions → Cải thiện email template | 🟡 | |
+| B5 | Admin: Thống kê sản phẩm bán chạy nhất | 🟢 | |
 
 ---
 

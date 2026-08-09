@@ -6,6 +6,7 @@ $walletBalance = $walletBalance ?? 0;
 $vouchersCount = $vouchersCount ?? 0;
 $wishlistCount = $wishlistCount ?? 0;
 $addresses = $addresses ?? [];
+$recentOrders = $recentOrders ?? [];
 
 $points = (int)($user['loyalty_points'] ?? 0);
 $tier = $user['loyalty_tier'] ?? 'Standard';
@@ -280,6 +281,9 @@ $initial = mb_strtoupper(mb_substr($user['name'] ?? 'H', 0, 1, 'UTF-8'), 'UTF-8'
                     </a>
                     <a class="profile-nav-link" id="tab-address-btn" data-bs-toggle="pill" href="#tab-address" role="tab">
                         <i class="bi bi-geo-alt-fill"></i> Sổ địa chỉ nhận hàng
+                    </a>
+                    <a class="profile-nav-link" id="tab-orders-btn" data-bs-toggle="pill" href="#tab-orders" role="tab">
+                        <i class="bi bi-box-seam-fill"></i> Lịch sử đơn hàng
                     </a>
                     <a class="profile-nav-link" id="tab-password-btn" data-bs-toggle="pill" href="#tab-password" role="tab">
                         <i class="bi bi-shield-lock-fill"></i> Đổi mật khẩu
@@ -598,6 +602,88 @@ $initial = mb_strtoupper(mb_substr($user['name'] ?? 'H', 0, 1, 'UTF-8'), 'UTF-8'
                                 </div>
                             </div>
                         </form>
+                </div>
+
+                <!-- TAB 5: Lịch sử đơn hàng gần đây -->
+                <div class="tab-pane fade" id="tab-orders" role="tabpanel">
+                    <div class="content-section-card shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom">
+                            <div>
+                                <h5 class="fw-bold mb-1 text-dark">Lịch sử đơn hàng</h5>
+                                <p class="text-muted small mb-0">Xem và theo dõi các đơn hàng gần đây của bạn</p>
+                            </div>
+                            <a href="/orders" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                                Xem tất cả đơn hàng <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+
+                        <?php if (empty($recentOrders)): ?>
+                            <div class="text-center py-5 text-muted">
+                                <i class="bi bi-box-seam fs-1 d-block mb-2 opacity-25"></i>
+                                Bạn chưa có đơn hàng nào.
+                                <div class="mt-3">
+                                    <a href="/" class="btn btn-danger btn-sm rounded-pill px-4">Mua sắm ngay</a>
+                                </div>
+                            </div>
+                        <?php else: ?>
+                            <div class="table-responsive">
+                                <table class="table table-hover align-middle mb-0">
+                                    <thead class="table-light small text-muted text-uppercase">
+                                        <tr>
+                                            <th>Mã đơn</th>
+                                            <th>Ngày đặt</th>
+                                            <th>Trạng thái</th>
+                                            <th>Thanh toán</th>
+                                            <th>Tổng tiền</th>
+                                            <th class="text-end">Thao tác</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="small">
+                                        <?php foreach ($recentOrders as $ord): ?>
+                                            <tr>
+                                                <td>
+                                                    <span class="fw-bold text-dark">#<?= e($ord['order_code'] ?? $ord['id']) ?></span>
+                                                </td>
+                                                <td class="text-muted"><?= date('d/m/Y H:i', strtotime($ord['created_at'])) ?></td>
+                                                <td>
+                                                    <?php
+                                                    $status = $ord['status'] ?? 'pending';
+                                                    $stBadge = match($status) {
+                                                        'completed', 'delivered' => 'bg-success-subtle text-success border border-success-subtle',
+                                                        'processing', 'shipping' => 'bg-info-subtle text-info border border-info-subtle',
+                                                        'cancelled' => 'bg-danger-subtle text-danger border border-danger-subtle',
+                                                        default => 'bg-warning-subtle text-warning border border-warning-subtle'
+                                                    };
+                                                    $stText = match($status) {
+                                                        'completed' => 'Hoàn thành',
+                                                        'delivered' => 'Đã giao hàng',
+                                                        'shipping' => 'Đang giao',
+                                                        'processing' => 'Đang xử lý',
+                                                        'cancelled' => 'Đã hủy',
+                                                        default => 'Chờ xử lý'
+                                                    };
+                                                    ?>
+                                                    <span class="badge <?= $stBadge ?> px-2 py-1"><?= $stText ?></span>
+                                                </td>
+                                                <td>
+                                                    <?php if (($ord['payment_status'] ?? '') === 'paid'): ?>
+                                                        <span class="badge bg-success bg-opacity-10 text-success"><i class="bi bi-check-circle me-1"></i>Đã thanh toán</span>
+                                                    <?php else: ?>
+                                                        <span class="badge bg-secondary bg-opacity-10 text-secondary">Chưa thanh toán</span>
+                                                    <?php endif; ?>
+                                                </td>
+                                                <td class="fw-bold text-danger"><?= formatMoney((int)($ord['total_amount'] ?? 0)) ?></td>
+                                                <td class="text-end">
+                                                    <a href="/orders/track?code=<?= e($ord['order_code'] ?? $ord['id']) ?>" class="btn btn-sm btn-outline-secondary rounded-pill py-1 px-3">
+                                                        <i class="bi bi-eye me-1"></i>Chi tiết
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
