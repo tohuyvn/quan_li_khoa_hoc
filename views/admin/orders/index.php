@@ -214,9 +214,20 @@ if (!empty($orders)) {
 <!-- Filter Toolbar -->
 <div class="bg-white p-3 rounded-4 border mb-4 shadow-sm">
     <form method="get" action="/admin/orders" class="row g-3">
-        <div class="col-md-3">
+        <div class="col-md-2">
             <label class="form-label small fw-bold text-muted mb-1"><i class="bi bi-search me-1"></i>Tìm kiếm</label>
-            <input type="text" name="q" class="form-control form-control-sm" placeholder="Mã đơn, tên KH, SĐT..." value="<?= e($search ?? '') ?>">
+            <input type="text" name="q" class="form-control form-control-sm" placeholder="Mã đơn, KH, SĐT..." value="<?= e($search ?? '') ?>">
+        </div>
+        <div class="col-md-2">
+            <label class="form-label small fw-bold text-muted mb-1"><i class="bi bi-calendar3 me-1"></i>Thời gian (Kỳ)</label>
+            <select name="period" class="form-select form-select-sm fw-bold border-primary text-primary">
+                <option value="">Tất cả thời gian</option>
+                <option value="day" <?= ($periodFilter ?? '') === 'day' ? 'selected' : '' ?>>📅 Hôm nay (Ngày)</option>
+                <option value="week" <?= ($periodFilter ?? '') === 'week' ? 'selected' : '' ?>>🗓️ Tuần này</option>
+                <option value="month" <?= ($periodFilter ?? '') === 'month' ? 'selected' : '' ?>>📊 Tháng này</option>
+                <option value="quarter" <?= ($periodFilter ?? '') === 'quarter' ? 'selected' : '' ?>>📈 Quý này</option>
+                <option value="year" <?= ($periodFilter ?? '') === 'year' ? 'selected' : '' ?>>🏆 Năm nay</option>
+            </select>
         </div>
         <div class="col-md-2">
             <label class="form-label small fw-bold text-muted mb-1"><i class="bi bi-funnel me-1"></i>Trạng thái đơn</label>
@@ -251,8 +262,8 @@ if (!empty($orders)) {
                 <option value="failed" <?= ($paymentStatusFilter ?? '') === 'failed' ? 'selected' : '' ?>>Thất bại</option>
             </select>
         </div>
-        <div class="col-md-3 d-flex gap-2 align-self-end">
-            <button type="submit" class="btn btn-primary btn-sm flex-grow-1 fw-bold"><i class="bi bi-filter"></i> Lọc dữ liệu</button>
+        <div class="col-md-2 d-flex gap-2 align-self-end">
+            <button type="submit" class="btn btn-primary btn-sm flex-grow-1 fw-bold"><i class="bi bi-filter"></i> Lọc</button>
             <a href="/admin/orders" class="btn btn-outline-secondary btn-sm"><i class="bi bi-x-circle"></i> Đặt lại</a>
         </div>
     </form>

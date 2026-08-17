@@ -98,10 +98,20 @@
             <h2 class="h3 fw-bold mb-0 text-white"><i class="bi bi-speedometer2 me-2 text-primary"></i>Bảng Điều Khiển Admin</h2>
             <span class="badge bg-danger rounded-pill px-3 py-1 text-uppercase" style="font-size: 10px; letter-spacing: 0.05em;">Overview Dashboard</span>
         </div>
-        <p class="mb-0 text-slate-300 small" style="color: #cbd5e1;">Tổng quan doanh thu shop, biểu đồ tăng trưởng đơn hàng & thông báo hỗ trợ khách hàng real-time.</p>
+        <p class="mb-0 text-slate-300 small" style="color: #cbd5e1;">Tổng quan doanh thu shop, phân tích thống kê theo Ngày / Tuần / Tháng / Quý / Năm & biểu đồ real-time.</p>
     </div>
-    <div class="text-end">
-        <span class="badge bg-dark border border-secondary px-3 py-2 text-white font-monospace" style="font-size: 12px;">
+    <div class="d-flex align-items-center gap-2">
+        <form method="get" action="/admin/dashboard" class="d-flex align-items-center gap-2 bg-dark p-2 rounded-3 border border-secondary shadow-sm">
+            <label class="text-white small fw-bold mb-0 ms-1 d-none d-sm-inline"><i class="bi bi-funnel-fill text-warning me-1"></i>Quản lý theo:</label>
+            <select name="period" class="form-select form-select-sm bg-white text-dark fw-bold border-0" onchange="this.form.submit()" style="min-width: 150px; cursor: pointer;">
+                <option value="day" <?= ($selectedPeriod ?? 'week') === 'day' ? 'selected' : '' ?>>📅 Theo Ngày</option>
+                <option value="week" <?= ($selectedPeriod ?? 'week') === 'week' ? 'selected' : '' ?>>🗓️ Theo Tuần</option>
+                <option value="month" <?= ($selectedPeriod ?? 'week') === 'month' ? 'selected' : '' ?>>📊 Theo Tháng</option>
+                <option value="quarter" <?= ($selectedPeriod ?? 'week') === 'quarter' ? 'selected' : '' ?>>📈 Theo Quý</option>
+                <option value="year" <?= ($selectedPeriod ?? 'week') === 'year' ? 'selected' : '' ?>>🏆 Theo Năm</option>
+            </select>
+        </form>
+        <span class="badge bg-dark border border-secondary px-3 py-2 text-white font-monospace d-none d-md-inline" style="font-size: 12px;">
             <i class="bi bi-clock-fill text-warning me-1"></i><?= date('d/m/Y H:i') ?>
         </span>
     </div>
@@ -109,23 +119,23 @@
 
 <!-- Widgets Row -->
 <div class="row g-3 mb-4">
-    <!-- Today's Revenue -->
+    <!-- Selected Period Revenue Card -->
     <div class="col-md-6 col-lg-3">
         <div class="dashboard-stat-card blue">
-            <div class="dashboard-stat-icon"><i class="bi bi-currency-dollar"></i></div>
-            <h6 class="text-white-50 text-uppercase small fw-bold mb-2">Doanh Thu Hôm Nay</h6>
-            <h3 class="fw-extrabold mb-0" style="font-weight: 800;"><?= number_format($todayRevenue, 0, ',', '.') ?> đ</h3>
-            <span class="badge bg-white text-dark mt-2 small fw-bold" style="font-size: 10px;">Hệ thống live</span>
+            <div class="dashboard-stat-icon"><i class="bi bi-graph-up-arrow"></i></div>
+            <h6 class="text-white-50 text-uppercase small fw-bold mb-2">Doanh Thu <?= e($periodLabel ?? 'Kỳ Chọn') ?></h6>
+            <h3 class="fw-extrabold mb-0" style="font-weight: 800;"><?= number_format($selectedPeriodRevenue ?? 0, 0, ',', '.') ?> đ</h3>
+            <span class="badge bg-white text-primary mt-2 small fw-bold" style="font-size: 10px;">⚡ Kỳ đang chọn</span>
         </div>
     </div>
 
-    <!-- Weekly Revenue -->
+    <!-- Today & Weekly Revenue summary card -->
     <div class="col-md-6 col-lg-3">
         <div class="dashboard-stat-card green">
             <div class="dashboard-stat-icon"><i class="bi bi-calendar-check"></i></div>
-            <h6 class="text-white-50 text-uppercase small fw-bold mb-2">Doanh Thu Tuần Này</h6>
-            <h3 class="fw-extrabold mb-0" style="font-weight: 800;"><?= number_format($weeklyRevenue, 0, ',', '.') ?> đ</h3>
-            <span class="badge bg-white text-success mt-2 small fw-bold" style="font-size: 10px;">7 ngày gần nhất</span>
+            <h6 class="text-white-50 text-uppercase small fw-bold mb-2">Hôm Nay & Tuần Này</h6>
+            <h3 class="fw-extrabold mb-0" style="font-weight: 800; font-size: 1.35rem;"><?= number_format($todayRevenue ?? 0, 0, ',', '.') ?> đ</h3>
+            <div class="mt-2 text-white-50 small fw-bold" style="font-size: 11px;">Tuần: <?= number_format($weeklyRevenue ?? 0, 0, ',', '.') ?> đ</div>
         </div>
     </div>
 
@@ -143,17 +153,13 @@
         </div>
     </div>
 
-    <!-- Low Stock Alert -->
+    <!-- Monthly / Yearly / Low Stock -->
     <div class="col-md-6 col-lg-3">
         <div class="dashboard-stat-card red">
-            <div class="dashboard-stat-icon"><i class="bi bi-exclamation-triangle"></i></div>
-            <h6 class="text-white-50 text-uppercase small fw-bold mb-2">Sản Phẩm Sắp Hết</h6>
-            <h3 class="fw-extrabold mb-0" style="font-weight: 800;"><?= number_format($lowStock) ?></h3>
-            <?php if ($lowStock > 0): ?>
-                <a href="/admin/inventory?stock_status=low_stock" class="badge bg-white text-danger mt-2 small fw-bold text-decoration-none" style="font-size: 10px;">Xem tồn kho</a>
-            <?php else: ?>
-                <span class="badge bg-white text-dark mt-2 small fw-bold" style="font-size: 10px;">Kho an toàn</span>
-            <?php endif; ?>
+            <div class="dashboard-stat-icon"><i class="bi bi-cash-stack"></i></div>
+            <h6 class="text-white-50 text-uppercase small fw-bold mb-2">Doanh Thu Tháng & Năm</h6>
+            <h3 class="fw-extrabold mb-0" style="font-weight: 800; font-size: 1.25rem;"><?= number_format($monthlyRevenue ?? 0, 0, ',', '.') ?> đ</h3>
+            <div class="mt-2 text-white-50 small fw-bold" style="font-size: 11px;">Năm <?= date('Y') ?>: <?= number_format($yearlyRevenue ?? 0, 0, ',', '.') ?> đ</div>
         </div>
     </div>
 </div>
@@ -162,10 +168,26 @@
     <!-- Chart Column -->
     <div class="col-lg-8">
         <div class="bg-white border rounded-4 p-4 h-100 shadow-sm">
-            <h5 class="fw-bold mb-3 d-flex align-items-center gap-2 text-dark">
-                <i class="bi bi-graph-up-arrow text-danger"></i> Biểu Đồ Doanh Thu & Đơn Hàng (7 ngày qua)
-            </h5>
-            <div style="position: relative; height: 330px; width: 100%;">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+                <h5 class="fw-bold mb-0 d-flex align-items-center gap-2 text-dark">
+                    <i class="bi bi-graph-up-arrow text-danger"></i> Biểu Đồ Doanh Thu & Đơn Hàng
+                </h5>
+                <form method="get" action="/admin/dashboard" class="d-flex align-items-center gap-2">
+                    <span class="small text-muted fw-bold">Kỳ thống kê:</span>
+                    <select name="period" class="form-select form-select-sm border-primary fw-bold" onchange="this.form.submit()" style="width: auto;">
+                        <option value="day" <?= ($selectedPeriod ?? 'week') === 'day' ? 'selected' : '' ?>>📅 Theo Ngày (24h)</option>
+                        <option value="week" <?= ($selectedPeriod ?? 'week') === 'week' ? 'selected' : '' ?>>🗓️ Theo Tuần (7 ngày)</option>
+                        <option value="month" <?= ($selectedPeriod ?? 'week') === 'month' ? 'selected' : '' ?>>📊 Theo Tháng (Các ngày)</option>
+                        <option value="quarter" <?= ($selectedPeriod ?? 'week') === 'quarter' ? 'selected' : '' ?>>📈 Theo Quý (Các tháng)</option>
+                        <option value="year" <?= ($selectedPeriod ?? 'week') === 'year' ? 'selected' : '' ?>>🏆 Theo Năm (12 tháng)</option>
+                    </select>
+                </form>
+            </div>
+            <div class="alert alert-light border p-2 mb-3 rounded-3 small text-muted d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-info-circle text-primary me-1"></i>Đang hiển thị dữ liệu: <strong><?= e($periodLabel ?? '') ?></strong></span>
+                <span class="badge bg-primary rounded-pill">Tổng doanh thu kỳ: <?= number_format($selectedPeriodRevenue ?? 0, 0, ',', '.') ?> đ</span>
+            </div>
+            <div style="position: relative; height: 320px; width: 100%;">
                 <canvas id="salesChart"></canvas>
             </div>
         </div>

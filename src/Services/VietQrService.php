@@ -13,7 +13,79 @@ class VietQrService
             'account_name' => (string) config('bank_transfer.account_name', 'TO QUANG HUY'),
             'account_name_display' => (string) config('bank_transfer.account_name_display', 'Tô Quang Huy'),
             'template' => (string) config('bank_transfer.template', 'compact2'),
+            'sepay_api_key' => (string) config('bank_transfer.sepay_api_key', ''),
+            'auto_confirm' => (bool) config('bank_transfer.auto_confirm', true),
         ];
+    }
+
+    /** Verify SePay Authorization: Apikey <key> (also accepts Bearer). */
+    public static function verifySepayAuth(?string $authorizationHeader): bool
+    {
+        $expected = trim((string) (self::config()['sepay_api_key'] ?? ''));
+        if ($expected === '') {
+            // Chưa cấu hình key → chỉ chấp nhận khi APP_DEBUG (test cục bộ).
+            return (bool) config('app_debug', false);
+        }
+
+        $auth = trim((string) $authorizationHeader);
+        if ($auth === '') {
+            return false;
+        }
+
+        if (preg_match('/^Apikey\s+(.+)$/i', $auth, $m)) {
+            return hash_equals($expected, trim($m[1]));
+        }
+        if (preg_match('/^Bearer\s+(.+)$/i', $auth, $m)) {
+            return hash_equals($expected, trim($m[1]));
+        }
+
+        return hash_equals($expected, $auth);
+    }
+
+    /**
+     * Trích mã đơn từ nội dung CK / SePay code.
+     * Ví dụ: "THANH TOAN HD260812-XZ3IU" hoặc "NGUYEN VAN A chuyen HD260812-XZ3IU"
+     */
+    public static function extractOrderCode(?string $content, ?string $sepayCode = null): ?string
+    {
+        $candidates = [];
+        if ($sepayCode !== null && trim($sepayCode) !== '') {
+            $candidates[] = strtoupper(trim($sepayCode));
+        }
+        if ($content !== null && trim($content) !== '') {
+            $normalized = self::sanitizeAddInfo($content);
+            $candidates[] = $normalized;
+            if (preg_match('/\b(HD\d{6}-[A-Z0-9]{5})\b/i', $normalized, $m)) {
+                return strtoupper($m[1]);
+            }
+            if (preg_match('/THANH\s*TOAN\s+([A-Z0-9\-]+)/i', $normalized, $m)) {
+                return strtoupper(trim($m[1]));
+            }
+        }
+
+        foreach ($candidates as $text) {
+            if (preg_match('/\b(HD\d{6}-[A-Z0-9]{5})\b/i', $text, $m)) {
+                return strtoupper($m[1]);
+            }
+        }
+
+        return null;
+    }
+
+    public static function amountsMatch(int $orderAmount, int $transferAmount): bool
+    {
+        return $orderAmount > 0 && $orderAmount === $transferAmount;
+    }
+
+    public static function accountMatches(?string $accountNumber): bool
+    {
+        $expected = preg_replace('/\D+/', '', self::config()['account_no'] ?? '') ?? '';
+        $actual = preg_replace('/\D+/', '', (string) $accountNumber) ?? '';
+        if ($expected === '' || $actual === '') {
+            return true; // không đủ thông tin → bỏ qua check tài khoản
+        }
+
+        return hash_equals($expected, $actual);
     }
 
     public static function imageUrl(?int $amount = null, ?string $addInfo = null, string $template = ''): string

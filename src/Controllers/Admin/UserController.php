@@ -16,9 +16,127 @@ class UserController
     public function index(): void
     {
         $this->guard();
+
+        $search = trim($_GET['q'] ?? '');
+        $segmentFilter = trim($_GET['segment'] ?? '');
+
+        $db = \App\DB::connection();
+        $sql = "
+            SELECT 
+                u.*,
+                COALESCE(
+                    (SELECT COUNT(*) FROM orders o WHERE (o.user_id = u.id OR (o.user_id IS NULL AND o.email = u.email))), 0
+                ) AS total_orders,
+                COALESCE(
+                    (SELECT SUM(o.total_amount) FROM orders o WHERE (o.user_id = u.id OR (o.user_id IS NULL AND o.email = u.email)) AND o.status != 'cancelled'), 0
+                ) AS total_spent,
+                (SELECT MAX(o.created_at) FROM orders o WHERE (o.user_id = u.id OR (o.user_id IS NULL AND o.email = u.email))) AS last_order_date
+            FROM users u
+            WHERE 1=1
+        ";
+        $params = [];
+
+        if ($search !== '') {
+            $sql .= " AND (u.name LIKE ? OR u.email LIKE ? OR u.phone LIKE ?)";
+            $params[] = "%$search%";
+            $params[] = "%$search%";
+            $params[] = "%$search%";
+        }
+
+        $sql .= " ORDER BY u.id DESC";
+
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        $allUsers = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        $segmentCounts = [
+            'total' => count($allUsers),
+            'vip' => 0,
+            'potential' => 0,
+            'new' => 0,
+            'inactive' => 0,
+            'admin' => 0,
+        ];
+
+        $filteredUsers = [];
+
+        foreach ($allUsers as &$u) {
+            $u['id'] = (int)$u['id'];
+            $u['total_orders'] = (int)$u['total_orders'];
+            $u['total_spent'] = (float)$u['total_spent'];
+
+            $segment = $this->determineSegment($u);
+            $u['segment'] = $segment;
+            $segmentCounts[$segment['code']]++;
+
+            if ($segmentFilter === '' || $segmentFilter === $segment['code']) {
+                $filteredUsers[] = $u;
+            }
+        }
+        unset($u);
+
         view('admin.users.index', [
-            'users' => $this->users->all(),
+            'users' => $filteredUsers,
+            'search' => $search,
+            'segmentFilter' => $segmentFilter,
+            'segmentCounts' => $segmentCounts,
         ]);
+    }
+
+    private function determineSegment(array $u): array
+    {
+        if (($u['role'] ?? '') === 'admin') {
+            return [
+                'code' => 'admin',
+                'name' => 'Quản Trị Viên',
+                'badge' => 'bg-danger text-white',
+                'icon' => 'bi-shield-lock-fill',
+                'desc' => 'Tài khoản quản lý hệ thống'
+            ];
+        }
+
+        $totalSpent = (float)($u['total_spent'] ?? 0);
+        $totalOrders = (int)($u['total_orders'] ?? 0);
+        $createdAt = strtotime($u['created_at'] ?? 'now');
+        $daysSinceReg = (time() - $createdAt) / 86400;
+
+        if ($totalSpent >= 20000000 || $totalOrders >= 5) {
+            return [
+                'code' => 'vip',
+                'name' => 'Khách VIP',
+                'badge' => 'bg-warning text-dark',
+                'icon' => 'bi-star-fill',
+                'desc' => 'Doanh thu >20tr hoặc >= 5 đơn'
+            ];
+        }
+
+        if ($totalOrders >= 1 || $totalSpent >= 1000000) {
+            return [
+                'code' => 'potential',
+                'name' => 'Khách Tiềm Năng',
+                'badge' => 'bg-success text-white',
+                'icon' => 'bi-graph-up-arrow',
+                'desc' => 'Đã có 1-4 đơn hàng'
+            ];
+        }
+
+        if ($daysSinceReg <= 30) {
+            return [
+                'code' => 'new',
+                'name' => 'Khách Mới',
+                'badge' => 'bg-info text-white',
+                'icon' => 'bi-person-plus-fill',
+                'desc' => 'Mới đăng ký trong 30 ngày'
+            ];
+        }
+
+        return [
+            'code' => 'inactive',
+            'name' => 'Chưa Mua / Ngủ Đông',
+            'badge' => 'bg-secondary text-white',
+            'icon' => 'bi-moon-stars-fill',
+            'desc' => 'Đăng ký lâu nhưng chưa mua'
+        ];
     }
 
     public function createForm(): void

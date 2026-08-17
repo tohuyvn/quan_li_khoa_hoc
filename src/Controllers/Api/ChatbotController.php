@@ -10,20 +10,49 @@ class ChatbotController
     // ─────────────────────────────────────────────
     // Tiện ích: lấy lời chào theo giờ Việt Nam
     // ─────────────────────────────────────────────
-    private function getGreetingByTime(): string
+    // ─────────────────────────────────────────────
+    // Tiện ích: lấy ngữ cảnh thời gian thực chính xác
+    // ─────────────────────────────────────────────
+    private function getCurrentTimeContext(): array
     {
-        // Múi giờ Việt Nam (UTC+7)
-        $hour = (int) (new \DateTime('now', new \DateTimeZone('Asia/Ho_Chi_Minh')))->format('H');
+        $now = new \DateTime('now', new \DateTimeZone('Asia/Ho_Chi_Minh'));
+        $dayOfWeekMap = [
+            1 => 'Thứ Hai',
+            2 => 'Thứ Ba',
+            3 => 'Thứ Tư',
+            4 => 'Thứ Năm',
+            5 => 'Thứ Sáu',
+            6 => 'Thứ Bảy',
+            7 => 'Chủ Nhật',
+        ];
+        $dayOfWeekNum = (int) $now->format('N');
+        $dayOfWeekStr = $dayOfWeekMap[$dayOfWeekNum] ?? 'Thứ Tư';
+        $fullDate     = $now->format('d/m/Y');
+        $timeStr      = $now->format('H:i');
+        $hour         = (int) $now->format('H');
 
         if ($hour >= 5 && $hour < 12) {
-            return "Chào buổi sáng";
+            $greeting = "Chào buổi sáng";
         } elseif ($hour >= 12 && $hour < 14) {
-            return "Chào buổi trưa";
+            $greeting = "Chào buổi trưa";
         } elseif ($hour >= 14 && $hour < 18) {
-            return "Chào buổi chiều";
+            $greeting = "Chào buổi chiều";
         } else {
-            return "Chào buổi tối";
+            $greeting = "Chào buổi tối";
         }
+
+        return [
+            'greeting'  => $greeting,
+            'dayOfWeek' => $dayOfWeekStr,
+            'fullDate'  => $fullDate,
+            'time'      => $timeStr,
+            'datetime'  => "{$dayOfWeekStr}, ngày {$fullDate} (lúc {$timeStr})",
+        ];
+    }
+
+    private function getGreetingByTime(): string
+    {
+        return $this->getCurrentTimeContext()['greeting'];
     }
 
     // ─────────────────────────────────────────────
@@ -47,6 +76,21 @@ class ChatbotController
             $greeting = $this->getGreetingByTime();
             $reply    = "{$greeting}! 👋 Mình là <strong>Hades AI</strong> – trợ lý ảo của Shop Hades. Mình có thể giúp bạn tìm sản phẩm, xem khuyến mãi, hoặc giải đáp bất kỳ thắc mắc nào nhé!";
             $this->jsonResponse($reply, 'greeting', '', $history);
+        }
+
+        // Xử lý trực tiếp và chính xác câu hỏi về Thứ / Ngày / Giờ
+        if (preg_match('/hôm nay (?:là )?(?:thứ mấy|ngày mấy|ngày bao nhiêu)/ui', $message) || preg_match('/bây giờ là mấy giờ/ui', $message)) {
+            $timeCtx = $this->getCurrentTimeContext();
+            if (preg_match('/thứ mấy/ui', $message)) {
+                $reply = "{$timeCtx['greeting']}! Hôm nay là **{$timeCtx['dayOfWeek']}** (ngày {$timeCtx['fullDate']}) bạn nhé. ☀️ Bạn có cần mình hỗ trợ thêm thông tin gì về các sản phẩm công nghệ hay chương trình khuyến mãi tại Shop Hades không ạ? 🥰";
+                $this->jsonResponse($reply, 'system_date', $message, $history);
+            } elseif (preg_match('/ngày (?:mấy|bao nhiêu)/ui', $message)) {
+                $reply = "{$timeCtx['greeting']}! Hôm nay là **{$timeCtx['dayOfWeek']}, ngày {$timeCtx['fullDate']}** bạn nhé. ☀️ Bạn có cần mình hỗ trợ thêm thông tin gì không ạ? 🥰";
+                $this->jsonResponse($reply, 'system_date', $message, $history);
+            } elseif (preg_match('/mấy giờ/ui', $message)) {
+                $reply = "{$timeCtx['greeting']}! Bây giờ là **{$timeCtx['time']}** ({$timeCtx['dayOfWeek']}, ngày {$timeCtx['fullDate']}) bạn nhé. ☀️";
+                $this->jsonResponse($reply, 'system_date', $message, $history);
+            }
         }
 
         $db          = DB::connection();
@@ -229,16 +273,23 @@ class ChatbotController
 
     private function buildSystemPrompt(string $shopInfo, string $promosContext, string $productsContext): string
     {
-        $greeting = $this->getGreetingByTime();
+        $timeCtx = $this->getCurrentTimeContext();
 
         return <<<PROMPT
 Bạn là **Hades AI** – Trợ lý tư vấn sản phẩm thông minh của cửa hàng công nghệ **Shop Hades**.
-Múi giờ hiện tại là Asia/Ho_Chi_Minh. Lời chào đúng thời điểm hiện tại: "{$greeting}!".
+
+== THỜI GIAN HỆ THỐNG HIỆN TẠI ==
+- Múi giờ: Việt Nam (Asia/Ho_Chi_Minh)
+- Thời gian hiện tại: {$timeCtx['datetime']}
+- Thứ trong tuần hiện tại: **{$timeCtx['dayOfWeek']}**
+- Ngày/tháng/năm hiện tại: **{$timeCtx['fullDate']}**
+- Lời chào thời điểm hiện tại: "{$timeCtx['greeting']}!"
 
 == PHONG CÁCH TRẢ LỜI ==
 - Ngôn ngữ: Tiếng Việt tự nhiên, thân thiện, súc tích, dùng emoji sinh động.
 - Xưng "mình" với khách hàng, gọi khách là "bạn".
 - ĐỌC KỸ lịch sử hội thoại trước đó — trả lời ĐÚNG TRỌNG TÂM câu hỏi hiện tại.
+- Khi người dùng hỏi về thời gian/thứ/ngày/tháng/năm (ví dụ: "hôm nay là thứ mấy", "hôm nay ngày bao nhiêu"): BẮT BUỘC trả lời chính xác dựa vào [THỜI GIAN HỆ THỐNG HIỆN TẠI] ở trên (Hôm nay là {$timeCtx['dayOfWeek']}, ngày {$timeCtx['fullDate']}). Không được tự suy đoán hoặc nhầm lẫn sang ngày khác!
 - Nếu khách CHỈ chào hỏi / trò chuyện / hỏi thăm → chào lại ấm áp, không ép mua hàng.
 
 == THÔNG TIN SHOP ==

@@ -52,7 +52,12 @@
       <p><strong>Trạng thái:</strong> <?= ($order['payment_status'] ?? '') === 'paid' ? '✅ Đã thanh toán' : '⏳ Chờ xử lý' ?></p>
       <p><strong>Tổng tiền:</strong> <span class="cart-total"><?= formatMoney($order['total_amount']) ?></span></p>
 
-      <?php if ($method === 'bank_transfer' && ($order['payment_status'] ?? '') !== 'paid'): ?>
+      <?php if ($method === 'bank_transfer' && ($order['payment_status'] ?? '') === 'paid'): ?>
+        <div class="mt-3 p-3 border rounded text-center" style="background:#ecfdf5;border-color:#86efac!important;">
+          <div class="fw-bold text-success mb-1">Thanh toán VietQR thành công</div>
+          <div class="small text-muted">Hệ thống đã xác nhận nhận chuyển khoản tự động.</div>
+        </div>
+      <?php elseif ($method === 'bank_transfer' && ($order['payment_status'] ?? '') !== 'paid'): ?>
         <?php
           $vietQrAmount = (int) ($order['total_amount'] ?? 0);
           $vietQrInfo = \App\Services\VietQrService::transferContent($order);
@@ -66,6 +71,7 @@
                onerror="this.onerror=null;this.src='<?= e(\App\Services\VietQrService::localFallbackUrl()) ?>';">
           <div class="small text-muted mb-1"><?= e($vietQrBank['bank_name']) ?> · <?= e($vietQrBank['account_no']) ?> · <?= e($vietQrBank['account_name_display']) ?></div>
           <div class="small">Nội dung: <code><?= e($vietQrInfo) ?></code></div>
+          <div class="small text-muted mt-1">Trang thanh toán sẽ tự chuyển hướng khi nhận được tiền.</div>
           <a href="/payment/vietqr/pay?order_id=<?= (int)$order['id'] ?>" class="btn btn-sm btn-danger mt-2">Mở trang thanh toán VietQR</a>
         </div>
       <?php endif; ?>

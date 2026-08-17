@@ -77,7 +77,7 @@ if ($filters['in_stock']) {
     <!-- Home View: Carousel, Flash Sale, and Sections -->
     <section class="home-hero-shell" aria-label="Ưu đãi nổi bật">
     <div class="home-hero-main">
-    <div id="promoCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4000" data-bs-pause="false">
+    <div id="promoCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="6000" data-bs-pause="false">
         <div class="carousel-indicators">
             <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
             <button type="button" data-bs-target="#promoCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
@@ -728,7 +728,7 @@ document.addEventListener('DOMContentLoaded', function() {
     var myCarousel = document.querySelector('#promoCarousel');
     if (myCarousel) {
         var carousel = new bootstrap.Carousel(myCarousel, {
-            interval: 10000, ride: 'carousel', pause: false
+            interval: 6000, ride: 'carousel', pause: false
         });
         carousel.cycle();
     }

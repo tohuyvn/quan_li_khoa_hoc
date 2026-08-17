@@ -38,14 +38,33 @@
                     </select>
                 </div>
                 <div class="col-md-5">
-                    <label class="form-label">Danh sách IMEI *</label>
-                    <textarea name="imei" class="form-control" rows="3" required placeholder="860123456789012&#10;860123456789013"></textarea>
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <label class="form-label mb-0">Danh sách IMEI *</label>
+                        <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none fw-semibold" id="btnGenRandomImei">
+                            ⚡ Sinh ngẫu nhiên 5 IMEI
+                        </button>
+                    </div>
+                    <textarea name="imei" id="inputImeiList" class="form-control" rows="3" required placeholder="860123456789012&#10;860123456789013"></textarea>
                 </div>
             </div>
             <button type="submit" class="btn btn-primary mt-3">Thêm vào kho</button>
         </form>
     </div>
 </div>
+
+<script>
+document.getElementById('btnGenRandomImei')?.addEventListener('click', function () {
+    const list = [];
+    for (let i = 0; i < 5; i++) {
+        let rand = '86' + Math.floor(Math.random() * 10000000000003).toString().padStart(13, '0');
+        list.push(rand.substring(0, 15));
+    }
+    const txtArea = document.getElementById('inputImeiList');
+    if (txtArea) {
+        txtArea.value = list.join('\n');
+    }
+});
+</script>
 
 <form class="row g-2 mb-3" method="get">
     <div class="col-md-3">

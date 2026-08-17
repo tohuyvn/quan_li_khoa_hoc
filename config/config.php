@@ -106,6 +106,9 @@ return [
         'account_name' => Env::get('BANK_TRANSFER_ACCOUNT_NAME', 'TO QUANG HUY'),
         'account_name_display' => Env::get('BANK_TRANSFER_ACCOUNT_NAME_DISPLAY', 'Tô Quang Huy'),
         'template' => Env::get('BANK_TRANSFER_TEMPLATE', 'compact2'),
+        // SePay webhook: Authorization Apikey {SEPAY_WEBHOOK_API_KEY}
+        'sepay_api_key' => Env::get('SEPAY_WEBHOOK_API_KEY', ''),
+        'auto_confirm' => filter_var(Env::get('BANK_TRANSFER_AUTO_CONFIRM', 'true'), FILTER_VALIDATE_BOOLEAN),
     ],
 
     'jwt' => [

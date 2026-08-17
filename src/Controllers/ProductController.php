@@ -192,7 +192,7 @@ class ProductController
         $reviewModel = new \App\Models\Review();
         $orderId = $reviewModel->findEligibleOrderId((int) $user['id'], $id);
         if ($orderId === null) {
-            $respondError('Chỉ khách đã nhận đơn hàng có sản phẩm này mới có thể đánh giá.', 403);
+            $respondError('Chỉ khách đã thanh toán đơn chứa sản phẩm này mới có thể đánh giá.', 403);
         }
         if ($reviewModel->hasReviewed((int) $user['id'], $id)) {
             $respondError('Bạn đã đánh giá sản phẩm này rồi.', 409);

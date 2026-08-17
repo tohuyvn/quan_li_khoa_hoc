@@ -46,6 +46,18 @@ class CartController
             $variantId = isset($item['variant_id']) ? (int)$item['variant_id'] : 0;
             $variant = $variantId > 0 ? $variantModel->find($variantId) : null;
 
+            $isPreorder = (int) ($product['is_preorder'] ?? 0) === 1;
+            $stock = $variant ? (int) ($variant['stock'] ?? 0) : (int) ($product['stock'] ?? 0);
+
+            if (!$isPreorder) {
+                if ($stock <= 0) {
+                    continue; // Hết hàng -> loại khỏi giỏ hàng
+                }
+                if ($quantity > $stock) {
+                    $quantity = $stock; // Giới hạn số lượng không vượt quá kho
+                }
+            }
+
             $priced = PriceCalculator::resolve($product, $globalDiscount);
             $price = $priced['sale_price'];
             $originalPrice = $priced['original_price'];
@@ -74,6 +86,8 @@ class CartController
                 'price' => $price,
                 'original_price' => $originalPrice,
                 'quantity' => $quantity,
+                'max_stock' => $stock,
+                'is_preorder' => $isPreorder,
                 'image' => $product['image'] ?? '',
                 'has_discount' => $priced['has_discount'],
                 'discount_percent' => $priced['discount_percent'],
@@ -130,20 +144,54 @@ class CartController
         }
 
         $variantId = isset($_POST['variant_id']) ? (int)$_POST['variant_id'] : 0;
-        $cartKey = $variantId > 0 ? "{$productId}-{$variantId}" : (string)$productId;
+        $variantModel = new \App\Models\ProductVariant();
+        $variant = $variantId > 0 ? $variantModel->find($variantId) : null;
 
+        $isPreorder = (int) ($product['is_preorder'] ?? 0) === 1;
+        $stock = $variant ? (int) ($variant['stock'] ?? 0) : (int) ($product['stock'] ?? 0);
+
+        $cartKey = $variantId > 0 ? "{$productId}-{$variantId}" : (string)$productId;
         $color = trim($_POST['color'] ?? 'Tiêu chuẩn');
         $cart = $this->refreshCart($this->getCart());
 
+        $existingQty = isset($cart[$cartKey]) ? (int)$cart[$cartKey]['quantity'] : 0;
+        $requestedQty = max(1, (int)($_POST['quantity'] ?? 1));
+        $newQty = $existingQty + $requestedQty;
+
+        if (!$isPreorder) {
+            if ($stock <= 0) {
+                $msg = "Sản phẩm {$product['name']} hiện tại đã hết hàng trong kho.";
+                if ($this->isAjax()) {
+                    echo json_encode(['success' => false, 'message' => $msg]);
+                    exit;
+                }
+                flash('error', $msg);
+                redirect($_SERVER['HTTP_REFERER'] ?? '/');
+            }
+            if ($newQty > $stock) {
+                if ($existingQty >= $stock) {
+                    $msg = "Bạn đã có {$existingQty} sản phẩm trong giỏ hàng, đã đạt giới hạn tồn kho ({$stock} sp).";
+                } else {
+                    $msg = "Rất tiếc, sản phẩm {$product['name']} chỉ còn {$stock} sản phẩm trong kho.";
+                }
+                if ($this->isAjax()) {
+                    echo json_encode(['success' => false, 'message' => $msg]);
+                    exit;
+                }
+                flash('error', $msg);
+                redirect($_SERVER['HTTP_REFERER'] ?? '/');
+            }
+        }
+
         $added = false;
         if (isset($cart[$cartKey])) {
-            $cart[$cartKey]['quantity']++;
+            $cart[$cartKey]['quantity'] = $newQty;
         } else {
             $added = true;
             $cart[$cartKey] = [
                 'product_id' => $productId,
                 'variant_id' => $variantId,
-                'quantity' => 1,
+                'quantity' => $requestedQty,
                 'color' => $color,
             ];
         }
@@ -165,6 +213,9 @@ class CartController
     {
         $quantities = $_POST['quantity'] ?? [];
         $cart = $this->getCart();
+        $warningMsg = null;
+        $productModel = new Product();
+        $variantModel = new \App\Models\ProductVariant();
 
         foreach ($quantities as $cartKey => $qty) {
             $qty = (int) $qty;
@@ -175,7 +226,30 @@ class CartController
                 unset($cart[$cartKey]);
                 continue;
             }
-            $cart[$cartKey]['quantity'] = $qty;
+
+            $productId = (int) ($cart[$cartKey]['product_id'] ?? 0);
+            if ($productId <= 0 && is_numeric($cartKey)) {
+                $productId = (int) $cartKey;
+            }
+            $variantId = (int) ($cart[$cartKey]['variant_id'] ?? 0);
+
+            $product = $productModel->find($productId);
+            if ($product) {
+                $isPreorder = (int) ($product['is_preorder'] ?? 0) === 1;
+                $variant = $variantId > 0 ? $variantModel->find($variantId) : null;
+                $stock = $variant ? (int) ($variant['stock'] ?? 0) : (int) ($product['stock'] ?? 0);
+
+                if (!$isPreorder && $qty > $stock) {
+                    $qty = max(0, $stock);
+                    $warningMsg = "Số lượng sản phẩm {$product['name']} đã được điều chỉnh về giới hạn tồn kho ({$stock} sp).";
+                }
+            }
+
+            if ($qty <= 0) {
+                unset($cart[$cartKey]);
+            } else {
+                $cart[$cartKey]['quantity'] = $qty;
+            }
         }
 
         $cart = $this->refreshCart($cart);
@@ -192,10 +266,12 @@ class CartController
                 'cartCount' => count($cart),
                 'total' => $total,
                 'totalFormatted' => formatMoney($total),
+                'warning' => $warningMsg,
                 'items' => array_map(function ($key, $item) {
                     return [
                         'key' => $key,
                         'quantity' => $item['quantity'],
+                        'maxStock' => $item['max_stock'] ?? 999,
                         'price' => $item['price'],
                         'subtotalFormatted' => formatMoney($item['price'] * $item['quantity']),
                     ];
@@ -204,7 +280,11 @@ class CartController
             exit;
         }
 
-        flash('success', 'Cập nhật giỏ hàng thành công.');
+        if ($warningMsg) {
+            flash('warning', $warningMsg);
+        } else {
+            flash('success', 'Cập nhật giỏ hàng thành công.');
+        }
         redirect('/cart');
     }
 

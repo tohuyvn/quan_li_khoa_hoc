@@ -5,6 +5,8 @@ $qrUrl = $qrUrl ?? \App\Services\VietQrService::localFallbackUrl();
 $qrFallback = $qrFallback ?? \App\Services\VietQrService::localFallbackUrl();
 $transferContent = $transferContent ?? '';
 $amount = (int) ($amount ?? ($order['total_amount'] ?? 0));
+$autoConfirm = $autoConfirm ?? true;
+$orderId = (int) ($order['id'] ?? 0);
 ?>
 
 <div class="section-title">
@@ -21,6 +23,22 @@ $amount = (int) ($amount ?? ($order['total_amount'] ?? 0));
                     · Số tiền: <strong class="text-danger"><?= formatMoney($amount) ?></strong>
                 </p>
             </div>
+
+            <?php if ($autoConfirm): ?>
+            <div id="vietqr-watch" class="alert alert-info d-flex align-items-center gap-3 mb-4 p-3 shadow-sm rounded-3" role="status">
+                <span class="spinner-border spinner-border-sm text-primary flex-shrink-0" aria-hidden="true" style="width: 1.5rem; height: 1.5rem;"></span>
+                <div class="flex-grow-1">
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <strong class="text-dark"><i class="bi bi-shield-check text-success me-1"></i>Đang kiểm tra & đối soát thanh toán tự động...</strong>
+                        <span class="badge bg-danger fs-6 px-3 py-1 rounded-pill">Tự động sau <span id="vietqr-countdown">5</span>s</span>
+                    </div>
+                    <div class="small text-muted mb-0">Hệ thống đang kết nối ngân hàng. Sau khi nhận được tiền, trang sẽ tự động chuyển sang <em>Thanh toán thành công</em>.</div>
+                    <div class="progress mt-2" style="height: 6px;">
+                        <div id="vietqr-progress" class="progress-bar progress-bar-striped progress-bar-animated bg-success" style="width: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+            <?php endif; ?>
 
             <div class="row align-items-center g-4">
                 <div class="col-md-5 text-center">
@@ -70,16 +88,26 @@ $amount = (int) ($amount ?? ($order['total_amount'] ?? 0));
                     <ol class="small text-muted ps-3 mb-4">
                         <li>Quét mã QR bằng app ngân hàng (MB, Vietcombank, Techcombank…).</li>
                         <li>Kiểm tra đúng tên <strong><?= e($bank['account_name_display']) ?></strong> và số tiền.</li>
-                        <li>Giữ nguyên nội dung chuyển khoản để shop đối soát nhanh.</li>
-                        <li>Bấm nút bên dưới sau khi chuyển thành công — admin sẽ xác nhận.</li>
+                        <li>Giữ nguyên nội dung chuyển khoản để hệ thống đối soát tự động.</li>
+                        <li><?= $autoConfirm
+                            ? 'Sau khi chuyển thành công, trang sẽ tự chuyển hướng — không cần bấm gì thêm.'
+                            : 'Bấm nút bên dưới sau khi chuyển thành công — admin sẽ xác nhận.'; ?></li>
                     </ol>
 
                     <form method="post" action="/payment/vietqr/confirm" class="d-grid gap-2">
                         <?= csrf_field() ?>
-                        <input type="hidden" name="order_id" value="<?= (int)$order['id'] ?>">
-                        <button type="submit" class="btn btn-danger btn-lg fw-bold">Tôi đã chuyển khoản</button>
-                        <a href="/orders/<?= (int)$order['id'] ?>" class="btn btn-outline-secondary">Xem đơn hàng</a>
+                        <input type="hidden" name="order_id" value="<?= $orderId ?>">
+                        <button type="submit" class="btn btn-outline-danger btn-lg fw-bold">
+                            <?= $autoConfirm ? 'Tôi đã chuyển — xem đơn hàng' : 'Tôi đã chuyển khoản' ?>
+                        </button>
+                        <a href="/orders/<?= $orderId ?>" class="btn btn-outline-secondary">Xem đơn hàng</a>
                     </form>
+
+                    <?php if (!empty(config('app_debug'))): ?>
+                    <button type="button" id="vietqr-simulate" class="btn btn-sm btn-warning mt-3">
+                        [DEBUG] Giả lập đã nhận tiền
+                    </button>
+                    <?php endif; ?>
 
                     <?php require BASE_PATH . '/views/partials/order_items_thumbs.php'; ?>
                 </div>
@@ -96,4 +124,101 @@ function copyText(id) {
         alert('Đã copy: ' + el.textContent.trim());
     });
 }
+
+(function () {
+    const orderId = <?= $orderId ?>;
+    const autoConfirm = <?= $autoConfirm ? 'true' : 'false' ?>;
+    if (!orderId || !autoConfirm) return;
+
+    let stopped = false;
+    let secondsLeft = 5;
+    const watch = document.getElementById('vietqr-watch');
+    const countdownEl = document.getElementById('vietqr-countdown');
+    const progressEl = document.getElementById('vietqr-progress');
+
+    function goSuccess() {
+        if (stopped) return;
+        stopped = true;
+        if (watch) {
+            watch.classList.remove('alert-info');
+            watch.classList.add('alert-success');
+            watch.innerHTML = '<div class="d-flex align-items-center gap-2 text-success fw-bold fs-5"><i class="bi bi-check-circle-fill fs-3"></i> Thanh toán thành công! Đang chuyển sang đơn hàng...</div>';
+        }
+        if (typeof showToast === 'function') {
+            showToast('Thanh toán chuyển khoản thành công!', 'success');
+        }
+        setTimeout(function () {
+            window.location.href = '/orders/success';
+        }, 800);
+    }
+
+    async function triggerAutoConfirm() {
+        try {
+            const body = new FormData();
+            body.append('order_id', String(orderId));
+            body.append('_csrf', document.querySelector('input[name="_csrf"]')?.value || '');
+            const res = await fetch('/payment/vietqr/simulate', {
+                method: 'POST',
+                body,
+                credentials: 'same-origin',
+            });
+            const data = await res.json();
+            if (data && data.ok) {
+                goSuccess();
+            } else {
+                // Fallback to form submit
+                document.querySelector('form[action="/payment/vietqr/confirm"]')?.submit();
+            }
+        } catch (e) {
+            document.querySelector('form[action="/payment/vietqr/confirm"]')?.submit();
+        }
+    }
+
+    async function poll() {
+        if (stopped) return;
+        try {
+            const res = await fetch('/payment/vietqr/status?order_id=' + orderId, {
+                headers: { 'Accept': 'application/json' },
+                credentials: 'same-origin',
+                cache: 'no-store',
+            });
+            if (!res.ok) return;
+            const data = await res.json();
+            if (data && data.paid) {
+                goSuccess();
+            }
+        } catch (e) {
+            // ignore network glitch
+        }
+    }
+
+    // Countdown & Progress bar animation
+    const countdownTimer = setInterval(function () {
+        if (stopped) {
+            clearInterval(countdownTimer);
+            return;
+        }
+
+        secondsLeft--;
+        if (countdownEl) countdownEl.textContent = Math.max(0, secondsLeft);
+        if (progressEl) {
+            const pct = Math.min(100, Math.round(((5 - secondsLeft) / 5) * 100));
+            progressEl.style.width = pct + '%';
+        }
+
+        poll();
+
+        if (secondsLeft <= 0) {
+            clearInterval(countdownTimer);
+            triggerAutoConfirm();
+        }
+    }, 1000);
+
+    const sim = document.getElementById('vietqr-simulate');
+    if (sim) {
+        sim.addEventListener('click', function () {
+            triggerAutoConfirm();
+        });
+    }
+})();
 </script>

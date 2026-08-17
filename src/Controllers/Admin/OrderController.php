@@ -23,10 +23,11 @@ class OrderController
         $statusFilter = trim($_GET['status'] ?? '');
         $paymentMethodFilter = trim($_GET['payment_method'] ?? '');
         $paymentStatusFilter = trim($_GET['payment_status'] ?? '');
+        $periodFilter = trim($_GET['period'] ?? '');
         $dateFromFilter = trim($_GET['date_from'] ?? '');
         $dateToFilter = trim($_GET['date_to'] ?? '');
 
-        $ordersList = $this->getFilteredOrders($search, $statusFilter, $paymentMethodFilter, $paymentStatusFilter, $dateFromFilter, $dateToFilter);
+        $ordersList = $this->getFilteredOrders($search, $statusFilter, $paymentMethodFilter, $paymentStatusFilter, $periodFilter, $dateFromFilter, $dateToFilter);
 
         view('admin.orders.index', [
             'orders' => $ordersList,
@@ -34,6 +35,7 @@ class OrderController
             'statusFilter' => $statusFilter,
             'paymentMethodFilter' => $paymentMethodFilter,
             'paymentStatusFilter' => $paymentStatusFilter,
+            'periodFilter' => $periodFilter,
             'dateFromFilter' => $dateFromFilter,
             'dateToFilter' => $dateToFilter,
         ]);
@@ -49,10 +51,11 @@ class OrderController
         $statusFilter = trim($_GET['status'] ?? '');
         $paymentMethodFilter = trim($_GET['payment_method'] ?? '');
         $paymentStatusFilter = trim($_GET['payment_status'] ?? '');
+        $periodFilter = trim($_GET['period'] ?? '');
         $dateFromFilter = trim($_GET['date_from'] ?? '');
         $dateToFilter = trim($_GET['date_to'] ?? '');
 
-        $ordersList = $this->getFilteredOrders($search, $statusFilter, $paymentMethodFilter, $paymentStatusFilter, $dateFromFilter, $dateToFilter);
+        $ordersList = $this->getFilteredOrders($search, $statusFilter, $paymentMethodFilter, $paymentStatusFilter, $periodFilter, $dateFromFilter, $dateToFilter);
 
         // Header for CSV download
         header('Content-Type: text/csv; charset=utf-8');
@@ -87,6 +90,7 @@ class OrderController
         string $statusFilter,
         string $paymentMethodFilter,
         string $paymentStatusFilter,
+        string $periodFilter,
         string $dateFromFilter,
         string $dateToFilter
     ): array {
@@ -114,6 +118,20 @@ class OrderController
         if ($paymentStatusFilter !== '') {
             $sql .= " AND payment_status = ?";
             $params[] = $paymentStatusFilter;
+        }
+
+        if ($periodFilter !== '') {
+            if ($periodFilter === 'day') {
+                $sql .= " AND DATE(created_at) = CURRENT_DATE()";
+            } elseif ($periodFilter === 'week') {
+                $sql .= " AND YEARWEEK(created_at, 1) = YEARWEEK(CURRENT_DATE(), 1)";
+            } elseif ($periodFilter === 'month') {
+                $sql .= " AND YEAR(created_at) = YEAR(CURRENT_DATE()) AND MONTH(created_at) = MONTH(CURRENT_DATE())";
+            } elseif ($periodFilter === 'quarter') {
+                $sql .= " AND YEAR(created_at) = YEAR(CURRENT_DATE()) AND QUARTER(created_at) = QUARTER(CURRENT_DATE())";
+            } elseif ($periodFilter === 'year') {
+                $sql .= " AND YEAR(created_at) = YEAR(CURRENT_DATE())";
+            }
         }
 
         if ($dateFromFilter !== '') {

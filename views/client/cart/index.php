@@ -225,6 +225,15 @@
                                                     <?php if (!empty($item['color'])): ?>
                                                         <div class="small text-muted mt-1" style="font-size: 11.5px;">Phân loại: <span class="badge bg-light text-dark border"><?= e($item['color']) ?></span></div>
                                                     <?php endif; ?>
+                                                    <?php if (empty($item['is_preorder'])): ?>
+                                                        <div class="small text-muted mt-1" style="font-size: 11px;">
+                                                            Kho khả dụng: <span class="fw-bold <?= ($item['max_stock'] ?? 999) <= 5 ? 'text-danger' : 'text-success' ?>"><?= (int) ($item['max_stock'] ?? 0) ?></span> sp
+                                                        </div>
+                                                    <?php else: ?>
+                                                        <div class="small text-primary mt-1" style="font-size: 11px;">
+                                                            <i class="bi bi-clock-history me-1"></i>Hàng Đặt Trước (Pre-order)
+                                                        </div>
+                                                    <?php endif; ?>
                                                 </div>
                                             </div>
                                         </td>
@@ -240,7 +249,8 @@
                                             <div class="qty-stepper-wrap mx-auto">
                                                 <button class="qty-stepper-btn btn-qty-minus" type="button" data-id="<?= e($id) ?>">-</button>
                                                 <input type="number" name="quantity[<?= e($id) ?>]" value="<?= (int) $item['quantity'] ?>"
-                                                       min="0" class="qty-stepper-input input-cart-qty" data-id="<?= e($id) ?>">
+                                                       min="0" max="<?= empty($item['is_preorder']) ? (int) ($item['max_stock'] ?? 999) : 999 ?>"
+                                                       class="qty-stepper-input input-cart-qty" data-id="<?= e($id) ?>" data-stock="<?= empty($item['is_preorder']) ? (int) ($item['max_stock'] ?? 999) : 999 ?>">
                                                 <button class="qty-stepper-btn btn-qty-plus" type="button" data-id="<?= e($id) ?>">+</button>
                                             </div>
                                         </td>
@@ -332,6 +342,13 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(res => res.json())
         .then(data => {
             if (data.success) {
+                if (data.warning) {
+                    if (typeof showToast === 'function') {
+                        showToast(data.warning, 'warning');
+                    } else {
+                        alert(data.warning);
+                    }
+                }
                 const totalEl = document.getElementById('cart-total-text');
                 const subtotalEl = document.getElementById('cart-subtotal-text');
                 if (totalEl) totalEl.textContent = data.totalFormatted;
@@ -342,6 +359,10 @@ document.addEventListener('DOMContentLoaded', function () {
                         const itemSubtotalEl = document.getElementById('subtotal-' + item.key);
                         if (itemSubtotalEl) {
                             itemSubtotalEl.textContent = item.subtotalFormatted;
+                        }
+                        const inputEl = document.querySelector(`.input-cart-qty[data-id="${item.key}"]`);
+                        if (inputEl) {
+                            inputEl.value = item.quantity;
                         }
                     });
                 }
@@ -382,7 +403,17 @@ document.addEventListener('DOMContentLoaded', function () {
             const id = this.dataset.id;
             const input = document.querySelector(`.input-cart-qty[data-id="${id}"]`);
             if (input) {
+                const maxStock = parseInt(input.dataset.stock || input.getAttribute('max') || '999', 10);
                 let val = parseInt(input.value || '0', 10) + 1;
+                if (val > maxStock) {
+                    const msg = 'Đã đạt số lượng tồn kho tối đa (' + maxStock + ' sp).';
+                    if (typeof showToast === 'function') {
+                        showToast(msg, 'warning');
+                    } else {
+                        alert(msg);
+                    }
+                    val = maxStock;
+                }
                 input.value = val;
                 triggerCartUpdate();
             }
@@ -390,7 +421,20 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     document.querySelectorAll('.input-cart-qty').forEach(input => {
-        input.addEventListener('change', triggerCartUpdate);
+        input.addEventListener('change', function () {
+            const maxStock = parseInt(this.dataset.stock || this.getAttribute('max') || '999', 10);
+            let val = parseInt(this.value || '0', 10);
+            if (val > maxStock) {
+                const msg = 'Đã vượt quá số lượng tồn kho khả dụng (' + maxStock + ' sp).';
+                if (typeof showToast === 'function') {
+                    showToast(msg, 'warning');
+                } else {
+                    alert(msg);
+                }
+                this.value = maxStock;
+            }
+            triggerCartUpdate();
+        });
     });
 
     document.querySelectorAll('.btn-remove-cart').forEach(function (btn) {

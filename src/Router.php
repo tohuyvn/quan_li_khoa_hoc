@@ -55,7 +55,7 @@ class Router
             ], true);
         }
 
-        if ($path === '/payment/momo/callback') {
+        if ($path === '/payment/momo/callback' || $path === '/payment/vietqr/webhook') {
             return false;
         }
 

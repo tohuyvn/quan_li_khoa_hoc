@@ -49,7 +49,11 @@ class DeviceUnitService
                     $unit = self::pickAvailable($db, $productId, $variantId, null);
                 }
                 if (!$unit) {
-                    continue;
+                    // Tự động sinh IMEI mới cho sản phẩm nếu chưa có trong kho
+                    $autoImei = self::generateFallbackImei($db);
+                    $ins = $db->prepare("INSERT INTO device_units (imei, product_id, variant_id, store_id, status, note) VALUES (?, ?, ?, ?, 'available', 'Tự sinh cho đơn hàng #" . $orderId . "')");
+                    $ins->execute([$autoImei, $productId, $variantId, $storeId]);
+                    $unit = ['id' => (int) $db->lastInsertId(), 'imei' => $autoImei];
                 }
 
                 $upd = $db->prepare("UPDATE device_units SET status = 'reserved', order_id = ?, store_id = COALESCE(store_id, ?) WHERE id = ? AND status = 'available'");

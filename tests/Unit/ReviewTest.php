@@ -45,7 +45,7 @@ class ReviewTest extends IntegrationTestCase
             'INSERT INTO orders
                 (user_id, customer_name, phone, email, payment_method, payment_status,
                  total_amount, status, created_at)
-             VALUES (?, ?, ?, ?, "cash", "paid", 12000000, "confirmed", NOW())'
+             VALUES (?, ?, ?, ?, "cash", "pending", 12000000, "pending", NOW())'
         );
         $stmt->execute([$this->userId, 'Review Test', '0900000000', "review-{$suffix}@shop.test"]);
         $this->orderId = (int) $this->db->lastInsertId();
@@ -70,13 +70,25 @@ class ReviewTest extends IntegrationTestCase
         parent::tearDown();
     }
 
-    public function test_only_completed_orders_are_eligible_for_review(): void
+    public function test_only_paid_active_orders_are_eligible_for_review(): void
     {
         $review = new Review();
+        // confirmed nhưng chưa paid → chưa đủ điều kiện
         $this->assertNull($review->findEligibleOrderId($this->userId, $this->productId));
 
-        $this->db->prepare('UPDATE orders SET status = "completed" WHERE id = ?')->execute([$this->orderId]);
+        $this->db->prepare('UPDATE orders SET payment_status = "paid", status = "confirmed" WHERE id = ?')
+            ->execute([$this->orderId]);
 
+        $this->assertSame(
+            $this->orderId,
+            $review->findEligibleOrderId($this->userId, $this->productId)
+        );
+
+        $this->db->prepare('UPDATE orders SET status = "cancelled" WHERE id = ?')->execute([$this->orderId]);
+        $this->assertNull($review->findEligibleOrderId($this->userId, $this->productId));
+
+        $this->db->prepare('UPDATE orders SET payment_status = "paid", status = "completed" WHERE id = ?')
+            ->execute([$this->orderId]);
         $this->assertSame(
             $this->orderId,
             $review->findEligibleOrderId($this->userId, $this->productId)
@@ -85,7 +97,8 @@ class ReviewTest extends IntegrationTestCase
 
     public function test_verified_review_is_linked_to_user_and_order(): void
     {
-        $this->db->prepare('UPDATE orders SET status = "completed" WHERE id = ?')->execute([$this->orderId]);
+        $this->db->prepare('UPDATE orders SET payment_status = "paid", status = "completed" WHERE id = ?')
+            ->execute([$this->orderId]);
         $review = new Review();
 
         $reviewId = $review->create([

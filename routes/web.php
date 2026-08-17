@@ -60,6 +60,9 @@ $router->get('/payment/momo/status', fn() => (new MoMoController())->status());
 $router->get('/payment/momo/return', fn() => (new MoMoController())->return());
 $router->post('/payment/momo/callback', fn() => (new MoMoController())->callback());
 $router->get('/payment/vietqr/pay', fn() => (new App\Controllers\VietQrController())->pay());
+$router->get('/payment/vietqr/status', fn() => (new App\Controllers\VietQrController())->status());
+$router->post('/payment/vietqr/webhook', fn() => (new App\Controllers\VietQrController())->webhook());
+$router->post('/payment/vietqr/simulate', fn() => (new App\Controllers\VietQrController())->simulatePaid());
 $router->post('/payment/vietqr/confirm', fn() => (new App\Controllers\VietQrController())->confirmTransferred());
 $router->get('/payment/vietqr', fn() => (new App\Controllers\VietQrController())->pay());
 

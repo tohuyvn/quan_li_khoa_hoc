@@ -27,9 +27,10 @@ class AuthController
 
         $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
         $limitKey = 'login:' . $ip;
-        if (!\App\Services\RateLimiter::check($limitKey, 10, 600)) {
+        if (!\App\Services\RateLimiter::check($limitKey, 10, 30)) {
             setOld($_POST);
-            flash('error', 'Bạn đăng nhập quá nhiều lần. Vui lòng thử lại sau vài phút.');
+            $seconds = \App\Services\RateLimiter::remainingSeconds($limitKey);
+            flash('error', "Bạn đang đăng nhập quá nhanh. Vui lòng thử lại sau {$seconds} giây.");
             redirect('/login');
         }
 
@@ -211,9 +212,9 @@ class AuthController
         // Gửi mã OTP xác minh qua Gmail khi đăng nhập bằng Google
         $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
         $limitKey = 'google_login_otp:' . $ip;
-        if (!\App\Services\RateLimiter::check($limitKey, 5, 600)) {
+        if (!\App\Services\RateLimiter::check($limitKey, 5, 30)) {
             $seconds = \App\Services\RateLimiter::remainingSeconds($limitKey);
-            flash('error', "Bạn đang gửi yêu cầu OTP quá nhanh. Vui lòng thử lại sau " . ceil($seconds / 60) . " phút.");
+            flash('error', "Bạn đang gửi yêu cầu OTP quá nhanh. Vui lòng thử lại sau {$seconds} giây.");
             redirect('/login');
         }
 
@@ -275,10 +276,10 @@ class AuthController
 
         $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
         $limitKey = 'register_otp:' . $ip;
-        if (!\App\Services\RateLimiter::check($limitKey, 3, 600)) {
+        if (!\App\Services\RateLimiter::check($limitKey, 3, 30)) {
             setOld($_POST);
             $seconds = \App\Services\RateLimiter::remainingSeconds($limitKey);
-            flash('error', "Bạn đang yêu cầu gửi OTP quá nhanh. Vui lòng thử lại sau " . ceil($seconds / 60) . " phút.");
+            flash('error', "Bạn đang yêu cầu gửi OTP quá nhanh. Vui lòng thử lại sau {$seconds} giây.");
             redirect('/register');
         }
 
@@ -525,10 +526,10 @@ class AuthController
 
         $ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
         $limitKey = 'forgot_password_otp:' . $ip;
-        if (!\App\Services\RateLimiter::check($limitKey, 3, 600)) {
+        if (!\App\Services\RateLimiter::check($limitKey, 3, 30)) {
             setOld($_POST);
             $seconds = \App\Services\RateLimiter::remainingSeconds($limitKey);
-            flash('error', "Bạn đang gửi yêu cầu quá nhanh. Vui lòng thử lại sau " . ceil($seconds / 60) . " phút.");
+            flash('error', "Bạn đang gửi yêu cầu quá nhanh. Vui lòng thử lại sau {$seconds} giây.");
             redirect('/forgot-password');
         }
 

@@ -50,13 +50,20 @@ class Review
         return $ratings;
     }
 
+    /**
+     * Đơn đủ điều kiện đánh giá: đã thanh toán và không bị hủy/chờ thanh toán.
+     * (confirmed → completed đều được — khớp luồng VietQR/MoMo đã markPaid)
+     */
     public function findEligibleOrderId(int $userId, int $productId): ?int
     {
         $stmt = $this->db->prepare(
             'SELECT o.id
              FROM orders o
              JOIN order_items oi ON oi.order_id = o.id
-             WHERE o.user_id = ? AND oi.product_id = ? AND o.status = "completed"
+             WHERE o.user_id = ?
+               AND oi.product_id = ?
+               AND o.payment_status = \'paid\'
+               AND o.status IN (\'confirmed\', \'packing\', \'shipping\', \'completed\')
              ORDER BY o.created_at DESC
              LIMIT 1'
         );

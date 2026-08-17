@@ -319,7 +319,8 @@ $ogImage = !empty($product['image']) ? imageUrl($product['image']) : '';
                     <?php else: ?>
                         <div class="alert alert-light border mb-0 small">
                             <i class="bi bi-shield-check me-1"></i>
-                            Bạn có thể đánh giá sau khi đơn chứa sản phẩm này được giao và hoàn thành.
+                            Bạn có thể đánh giá sau khi đã <strong>thanh toán thành công</strong> đơn chứa sản phẩm này
+                            (đơn không bị hủy).
                         </div>
                     <?php endif; ?>
                 </div>
