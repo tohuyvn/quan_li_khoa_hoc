@@ -65,6 +65,18 @@ $router->post('/payment/vietqr/webhook', fn() => (new App\Controllers\VietQrCont
 $router->post('/payment/vietqr/simulate', fn() => (new App\Controllers\VietQrController())->simulatePaid());
 $router->post('/payment/vietqr/confirm', fn() => (new App\Controllers\VietQrController())->confirmTransferred());
 $router->get('/payment/vietqr', fn() => (new App\Controllers\VietQrController())->pay());
+$router->post('/payment/cash/simulate-confirm', function() {
+    $orderId = (int) ($_POST['order_id'] ?? $_SESSION['last_order_id'] ?? 0);
+    $orderModel = new \App\Models\Order();
+    $order = $orderId > 0 ? $orderModel->find($orderId) : null;
+    if (!$order || ($order['payment_method'] ?? '') !== 'cash') {
+        flash('error', 'Không tìm thấy đơn hàng tiền mặt.');
+        redirect('/orders/success');
+    }
+    \App\PaymentService::markPaid($orderId);
+    flash('success', 'Thu ngân đã xác nhận nhận tiền mặt thành công! Khóa học đã được mở khóa.');
+    redirect('/orders/success');
+});
 
 $router->get('/orders', fn() => (new OrderController())->index());
 $router->get('/orders/track', fn() => (new OrderController())->trackForm());

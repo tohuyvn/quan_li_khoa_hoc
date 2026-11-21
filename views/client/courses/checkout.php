@@ -224,6 +224,37 @@
                         </div>
                     </div>
 
+                    <!-- Option 4: Thanh toán Tiền mặt Trực tiếp -->
+                    <div class="choice-list-option" id="opt-cash" onclick="selectPaymentMethod('cash')">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payment_method" id="pay_cash" value="cash">
+                            </div>
+                            <div class="flex-grow-1">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label class="fw-bold text-dark mb-0 cursor-pointer" for="pay_cash">
+                                        💵 Thanh toán Tiền mặt Trực tiếp
+                                    </label>
+                                    <span class="badge bg-secondary px-2 py-1" style="font-size: 11px;">Tại quầy / Văn phòng</span>
+                                </div>
+                                <div class="text-muted small mt-1">Hoàn tất học phí bằng tiền mặt trực tiếp tại văn phòng tuyển sinh hoặc cơ sở Hades Academy.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Expandable Cash Box -->
+                    <div id="box-cash" class="expandable-form-box" style="display:none">
+                        <h6 class="fw-bold text-success mb-2"><i class="bi bi-geo-alt-fill me-1"></i> Địa điểm nộp học phí tiền mặt trực tiếp:</h6>
+                        <div class="small text-dark mb-2">
+                            <div>• <strong>Trụ sở chính:</strong> Tầng 5, Tòa nhà Hades, Số 3 Duy Tân, Cầu Giấy, Hà Nội</div>
+                            <div>• <strong>Chi nhánh TP. HCM:</strong> Số 99 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh</div>
+                            <div>• <strong>Hotline hỗ trợ & thu ngân:</strong> <code class="fw-bold text-danger">0901.234.567</code> (8:00 - 21:00)</div>
+                        </div>
+                        <div class="alert alert-light border rounded-3 p-2 text-muted small mb-0">
+                            <i class="bi bi-info-circle-fill text-primary me-1"></i> Sau khi thu ngân nhận tiền và xuất biên lai, hệ thống sẽ xác nhận và phòng học sẽ được tự động mở khóa.
+                        </div>
+                    </div>
+
                 </div>
             </div>
 
@@ -276,7 +307,7 @@
 
 <script>
 function selectPaymentMethod(method) {
-    const methods = ['vietqr', 'vnpay', 'momo'];
+    const methods = ['vietqr', 'vnpay', 'momo', 'cash'];
     methods.forEach(m => {
         const opt = document.getElementById('opt-' + m);
         const radio = document.getElementById('pay_' + m);
@@ -300,6 +331,8 @@ function selectPaymentMethod(method) {
             submitBtn.innerHTML = '<i class="bi bi-credit-card me-2"></i> Chuyển tới cổng thanh toán VNPay';
         } else if (method === 'momo') {
             submitBtn.innerHTML = '<i class="bi bi-wallet2 me-2"></i> Mở cổng thanh toán MoMo';
+        } else if (method === 'cash') {
+            submitBtn.innerHTML = '<i class="bi bi-cash-coin me-2"></i> Đăng ký & Thanh toán tiền mặt tại quầy';
         }
     }
 }

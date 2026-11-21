@@ -272,4 +272,42 @@ class LmsFlowTest extends TestCase
         $db->exec("DELETE FROM order_items WHERE order_id = {$orderId}");
         $db->exec("DELETE FROM orders WHERE id = {$orderId}");
     }
+
+    public function testCashPaymentFlowForCourse(): void
+    {
+        $db = \App\DB::connection();
+        $enrollModel = new Enrollment();
+        $userId = 2;
+        $courseId = 2;
+
+        // Xóa enrollment nếu có sẵn
+        $db->exec("DELETE FROM enrollments WHERE user_id = {$userId} AND course_id = {$courseId}");
+        $this->assertFalse($enrollModel->isEnrolled($userId, $courseId));
+
+        // 1. Tạo order thanh toán tiền mặt (pending)
+        $orderCode = \App\Models\Order::generateCode();
+        $stmt = $db->prepare("INSERT INTO orders 
+            (user_id, customer_name, phone, email, payment_method, payment_status, total_amount, status, order_code, created_at)
+            VALUES (?, ?, ?, ?, 'cash', 'pending', 499000, 'pending', ?, NOW())");
+        $stmt->execute([$userId, 'Nguyễn Văn A', '0912345678', 'khach@shop.test', $orderCode]);
+        $orderId = (int) $db->lastInsertId();
+
+        $itemStmt = $db->prepare("INSERT INTO order_items (order_id, course_id, product_name, quantity, price) VALUES (?, ?, ?, 1, ?)");
+        $itemStmt->execute([$orderId, $courseId, 'Python AI Course', 499000]);
+
+        // 2. Kiểm tra: Khi chưa thanh toán tiền mặt thì học viên KHÔNG được vào học
+        $this->assertFalse($enrollModel->isEnrolled($userId, $courseId), "Chưa thanh toán tiền mặt thì không được ghi danh");
+
+        // 3. Thu ngân xác nhận thu tiền mặt thành công (markPaid)
+        $result = \App\PaymentService::markPaid($orderId, [], false);
+        $this->assertTrue($result['ok']);
+
+        // 4. Kiểm tra: Sau khi thu ngân xác nhận thì học viên ĐÃ được kích hoạt vào học
+        $this->assertTrue($enrollModel->isEnrolled($userId, $courseId), "Sau khi thu ngân xác nhận thì học viên được vào học");
+
+        // Dọn dẹp
+        $db->exec("DELETE FROM enrollments WHERE user_id = {$userId} AND course_id = {$courseId}");
+        $db->exec("DELETE FROM order_items WHERE order_id = {$orderId}");
+        $db->exec("DELETE FROM orders WHERE id = {$orderId}");
+    }
 }

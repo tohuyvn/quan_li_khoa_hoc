@@ -222,6 +222,7 @@ class LmsCourseController
         $paymentMethod = match ($rawMethod) {
             'vnpay' => 'vnpay',
             'momo' => 'momo',
+            'cash', 'direct', 'offline' => 'cash',
             default => 'bank_transfer',
         };
 
@@ -288,6 +289,13 @@ class LmsCourseController
         if ($paymentMethod === 'momo') {
             $_SESSION['pending_momo_order_id'] = $orderId;
             redirect('/payment/momo/pay');
+            return;
+        }
+
+        if ($paymentMethod === 'cash') {
+            $_SESSION['last_order_id'] = $orderId;
+            flash('info', "Đã tạo đơn đăng ký học #{$orderCode}! Vui lòng hoàn tất nộp học phí tiền mặt tại quầy tuyển sinh để mở khóa bài học.");
+            redirect('/orders/success');
             return;
         }
 
