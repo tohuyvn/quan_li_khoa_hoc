@@ -302,6 +302,7 @@ $router->get('/api/lms/setup', function () {
 // ==========================================
 $router->get('/courses', fn() => (new App\Controllers\LmsCourseController())->index());
 $router->get('/courses/{slug}', fn($slug) => (new App\Controllers\LmsCourseController())->show($slug));
+$router->get('/courses/{id}/enroll', fn($id) => (new App\Controllers\LmsCourseController())->enroll((int)$id));
 $router->post('/courses/{id}/enroll', fn($id) => (new App\Controllers\LmsCourseController())->enroll((int)$id));
 $router->get('/courses/{id}/checkout', fn($id) => (new App\Controllers\LmsCourseController())->checkout((int)$id));
 $router->get('/courses/{id}/payment', fn($id) => redirect('/courses/' . (int)$id . '/checkout'));

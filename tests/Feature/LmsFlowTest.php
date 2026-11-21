@@ -232,4 +232,39 @@ class LmsFlowTest extends TestCase
         $db->exec("DELETE FROM order_items WHERE order_id = {$orderId}");
         $db->exec("DELETE FROM orders WHERE id = {$orderId}");
     }
+
+    public function testPaymentServiceAutoEnrollsCourseOnMarkPaid(): void
+    {
+        $db = \App\DB::connection();
+        $enrollModel = new Enrollment();
+        $userId = 2;
+        $courseId = 3;
+
+        // Xóa enrollment nếu có sẵn
+        $db->exec("DELETE FROM enrollments WHERE user_id = {$userId} AND course_id = {$courseId}");
+        $this->assertFalse($enrollModel->isEnrolled($userId, $courseId));
+
+        // Tạo order pending
+        $orderCode = \App\Models\Order::generateCode();
+        $stmt = $db->prepare("INSERT INTO orders 
+            (user_id, customer_name, phone, email, payment_method, payment_status, total_amount, status, order_code, created_at)
+            VALUES (?, ?, ?, ?, 'bank_transfer', 'pending', 699000, 'pending', ?, NOW())");
+        $stmt->execute([$userId, 'Test Student 2', '0912345678', 'khach@shop.test', $orderCode]);
+        $orderId = (int) $db->lastInsertId();
+
+        $itemStmt = $db->prepare("INSERT INTO order_items (order_id, course_id, product_name, quantity, price) VALUES (?, ?, ?, 1, ?)");
+        $itemStmt->execute([$orderId, $courseId, 'DevOps Test Course', 699000]);
+
+        // Đánh dấu thanh toán thành công qua PaymentService::markPaid
+        $result = \App\PaymentService::markPaid($orderId, [], false);
+        $this->assertTrue($result['ok']);
+
+        // Xác nhận học viên đã được tự động kích hoạt ghi danh
+        $this->assertTrue($enrollModel->isEnrolled($userId, $courseId), "Học viên phải được ghi danh tự động khi PaymentService::markPaid kích hoạt");
+
+        // Dọn dẹp
+        $db->exec("DELETE FROM enrollments WHERE user_id = {$userId} AND course_id = {$courseId}");
+        $db->exec("DELETE FROM order_items WHERE order_id = {$orderId}");
+        $db->exec("DELETE FROM orders WHERE id = {$orderId}");
+    }
 }

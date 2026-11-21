@@ -174,10 +174,10 @@ class LmsCourseController
         }
 
         $price = ($course['sale_price'] !== null && $course['sale_price'] >= 0) ? (float) $course['sale_price'] : (float) $course['price'];
-        $orderCode = 'LMS' . date('ymd') . strtoupper(substr(md5(uniqid((string)mt_rand(), true)), 0, 6));
+        $orderCode = \App\Models\Order::generateCode();
 
         $vietQrConfig = \App\Services\VietQrService::config();
-        $vietQrInfo = "LMS " . $courseId . " " . $orderCode;
+        $vietQrInfo = \App\Services\VietQrService::sanitizeAddInfo('THANH TOAN ' . $orderCode);
         $vietQrUrl = \App\Services\VietQrService::imageUrl((int)$price, $vietQrInfo);
 
         view('client.courses.checkout', [
@@ -208,16 +208,16 @@ class LmsCourseController
         }
 
         $userId = (int) $user['id'];
-        $rawMethod = strtolower(trim($_POST['payment_method'] ?? 'bank_transfer'));
+        $rawMethod = strtolower(trim($_POST['payment_method'] ?? 'vietqr'));
         $price = ($course['sale_price'] !== null && $course['sale_price'] >= 0) ? (float) $course['sale_price'] : (float) $course['price'];
         $orderCode = trim($_POST['order_code'] ?? '');
         if ($orderCode === '') {
-            $orderCode = 'LMS' . date('ymd') . strtoupper(bin2hex(random_bytes(3)));
+            $orderCode = \App\Models\Order::generateCode();
         }
 
-        $customerName = trim($_POST['customer_name'] ?? ($user['name'] ?? 'Học viên LMS'));
-        $phone = trim($_POST['phone'] ?? ($user['phone'] ?? '0901234567'));
-        $email = trim($_POST['email'] ?? ($user['email'] ?? 'hocvien@lms.local'));
+        $customerName = trim($_POST['customer_name'] ?? '') ?: ($user['name'] ?? 'Học viên LMS');
+        $phone = trim($_POST['phone'] ?? '') ?: (!empty($user['phone']) ? $user['phone'] : '0912345678');
+        $email = trim($_POST['email'] ?? '') ?: (!empty($user['email']) ? $user['email'] : 'hocvien@shop.test');
 
         $isInstant = ($rawMethod === 'instant' || $rawMethod === 'direct' || $rawMethod === 'cash');
         $paymentMethod = match ($rawMethod) {
@@ -257,8 +257,13 @@ class LmsCourseController
             error_log('LMS Payment order insert warning: ' . $e->getMessage());
         }
 
-        // Tự động kích hoạt ghi danh khóa học ngay lập tức
-        $this->enrollmentModel->enroll($userId, $courseId);
+        if ($isInstant) {
+            // Tự động kích hoạt ghi danh khóa học ngay lập tức cho phương thức instant
+            $this->enrollmentModel->enroll($userId, $courseId);
+            flash('success', "Kích hoạt thành công! Khóa học '{$course['title']}' đã sẵn sàng trong tài khoản của bạn.");
+            redirect('/learn/' . $courseId);
+            return;
+        }
 
         // Chuyển hướng theo cổng thanh toán tương tự shop_hades
         if ($orderId > 0) {
@@ -267,16 +272,17 @@ class LmsCourseController
 
             if ($paymentMethod === 'bank_transfer') {
                 $_SESSION['pending_vietqr_order_id'] = $orderId;
-                flash('success', "Đã tạo đơn hàng thành công! Vui lòng quét mã VietQR MB Bank hoặc xác nhận đã chuyển khoản để hoàn tất.");
+                flash('success', "Đã tạo đơn hàng thành công! Vui lòng quét mã VietQR MB Bank hoặc xác nhận đã chuyển khoản.");
                 redirect('/payment/vietqr/pay?order_id=' . $orderId);
                 return;
             }
 
             if ($paymentMethod === 'vnpay') {
+                $bankCode = trim($_POST['bank'] ?? 'NCB');
                 $_SESSION['pending_vnpay_order_id'] = $orderId;
                 $_SESSION['vnpay_card'] = [
-                    'bank' => trim($_POST['bank'] ?? 'NCB'),
-                    'bank_name' => 'Ngân hàng Quốc Dân NCB (Test)',
+                    'bank' => $bankCode,
+                    'bank_name' => vnpayBankName($bankCode),
                     'card_number' => preg_replace('/\D+/', '', $_POST['card_number'] ?? '9704198526191432'),
                     'cardholder' => strtoupper(trim($_POST['card_holder'] ?? ($user['name'] ?? 'NGUYEN VAN A'))),
                     'issue_date' => trim($_POST['issue_date'] ?? '07/15'),
@@ -292,6 +298,7 @@ class LmsCourseController
             }
         }
 
+        $this->enrollmentModel->enroll($userId, $courseId);
         flash('success', "Thanh toán thành công! Khóa học '{$course['title']}' đã sẵn sàng trong tài khoản của bạn.");
         redirect('/learn/' . $courseId);
     }
