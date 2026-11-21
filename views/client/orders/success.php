@@ -140,9 +140,30 @@
     <?php endif; ?>
   <?php endif; ?>
 
+  <?php
+    $lmsCourseId = null;
+    if ($order && !empty($items)) {
+        foreach ($items as $it) {
+            if (!empty($it['course_id'])) {
+                $lmsCourseId = (int)$it['course_id'];
+                break;
+            }
+        }
+    }
+  ?>
+
   <div class="d-flex gap-2 justify-content-center flex-wrap mt-4">
-    <a href="/" class="btn btn-primary-hades" style="width:auto;display:inline-block;padding:12px 40px;">Tiếp tục mua sắm</a>
-    <a href="/cart" class="btn btn-outline-secondary" style="width:auto;display:inline-block;padding:12px 32px;">Xem giỏ hàng</a>
+    <?php if ($lmsCourseId): ?>
+      <a href="/learn/<?= $lmsCourseId ?>" class="btn btn-success btn-lg px-5 fw-bold shadow-sm" style="width:auto;display:inline-block;padding:14px 40px; border-radius:50px;">
+        🎓 Vào phòng học ngay
+      </a>
+      <a href="/my-courses" class="btn btn-outline-primary px-4 fw-bold" style="width:auto;display:inline-block;padding:14px 30px; border-radius:50px;">
+        📚 Khóa học của tôi
+      </a>
+    <?php else: ?>
+      <a href="/" class="btn btn-primary-hades" style="width:auto;display:inline-block;padding:12px 40px;">Tiếp tục mua sắm</a>
+      <a href="/cart" class="btn btn-outline-secondary" style="width:auto;display:inline-block;padding:12px 32px;">Xem giỏ hàng</a>
+    <?php endif; ?>
     <?php if ($order && !empty($order['vat_invoice_issued'])): ?>
       <a href="/orders/<?= (int) $order['id'] ?>/invoice?auto_print=1" class="btn btn-success" style="width:auto;display:inline-block;padding:12px 32px;">🖨️ In lại hóa đơn VAT</a>
     <?php endif; ?>
