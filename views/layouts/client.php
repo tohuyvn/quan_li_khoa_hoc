@@ -78,6 +78,10 @@ if (empty($categories)) {
                 <i class="bi bi-journal-bookmark-fill"></i>
                 <span>Khóa học của tôi</span>
             </a>
+            <a href="/orders" class="sidebar-nav-item <?= $isActive('/orders') ?>">
+                <i class="bi bi-receipt-cutoff"></i>
+                <span>Đơn hàng của tôi</span>
+            </a>
             <a href="/verify-certificate" class="sidebar-nav-item <?= $isActive('/verify-certificate') ?>">
                 <i class="bi bi-patch-check"></i>
                 <span>Tra cứu chứng chỉ QR</span>
@@ -108,13 +112,15 @@ if (empty($categories)) {
         <div class="sidebar-user-pill mt-auto pt-3">
             <?php if ($user = authUser()): ?>
                 <div class="d-flex align-items-center gap-2">
-                    <div class="user-avatar-circle">
-                        <?= strtoupper(substr($user['name'] ?? 'US', 0, 2)) ?>
-                    </div>
-                    <div class="user-info flex-grow-1 overflow-hidden">
-                        <div class="user-name text-truncate"><?= e($user['name']) ?></div>
-                        <div class="user-role text-truncate"><?= e($user['role'] ?? 'Student') ?></div>
-                    </div>
+                    <a href="/profile" class="text-decoration-none d-flex align-items-center gap-2 flex-grow-1 overflow-hidden" title="Xem hồ sơ cá nhân">
+                        <div class="user-avatar-circle flex-shrink-0">
+                            <?= strtoupper(substr($user['name'] ?? 'US', 0, 2)) ?>
+                        </div>
+                        <div class="user-info flex-grow-1 overflow-hidden">
+                            <div class="user-name text-truncate"><?= e($user['name']) ?></div>
+                            <div class="user-role text-truncate"><?= e($user['role'] ?? 'Student') ?></div>
+                        </div>
+                    </a>
                     <form method="post" action="/logout" class="m-0">
                         <?= csrf_field() ?>
                         <button type="submit" class="btn-logout-icon" title="Đăng xuất">
@@ -159,8 +165,48 @@ if (empty($categories)) {
                         </a>
                     <?php endif; ?>
 
-                    <div class="avatar-refract-pill">
-                        <?= strtoupper(substr($user['name'] ?? 'US', 0, 2)) ?>
+                    <!-- User Avatar with Dropdown Menu -->
+                    <div class="dropdown">
+                        <button class="avatar-refract-pill border-0 p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Tài khoản: <?= e($user['name']) ?>">
+                            <?= strtoupper(substr($user['name'] ?? 'US', 0, 2)) ?>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end refract-dropdown-menu">
+                            <li class="px-3 py-2 border-bottom border-white border-opacity-10 mb-1">
+                                <div class="fw-bold text-white small text-truncate"><?= e($user['name']) ?></div>
+                                <div class="text-muted small text-truncate" style="font-size: 11px;"><?= e($user['email']) ?></div>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/profile">
+                                    <i class="bi bi-person-gear text-info"></i> Hồ sơ cá nhân
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/orders">
+                                    <i class="bi bi-receipt-cutoff text-success"></i> Đơn hàng của tôi
+                                </a>
+                            </li>
+                            <li>
+                                <a class="dropdown-item" href="/my-courses">
+                                    <i class="bi bi-journal-bookmark-fill text-warning"></i> Khóa học của tôi
+                                </a>
+                            </li>
+                            <?php if (isAdmin()): ?>
+                                <li>
+                                    <a class="dropdown-item" href="/admin/lms/dashboard">
+                                        <i class="bi bi-shield-lock text-primary"></i> Trang quản trị Admin
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                            <li><hr class="dropdown-divider"></li>
+                            <li>
+                                <form method="post" action="/logout" class="m-0">
+                                    <?= csrf_field() ?>
+                                    <button type="submit" class="dropdown-item text-danger w-100 border-0 bg-transparent">
+                                        <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                                    </button>
+                                </form>
+                            </li>
+                        </ul>
                     </div>
                 <?php else: ?>
                     <a href="/register" class="btn-refract-action">

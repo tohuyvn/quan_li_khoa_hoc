@@ -361,12 +361,9 @@
                                 <i class="bi bi-play-fill"></i> Tiếp tục học ngay
                             </a>
                         <?php else: ?>
-                            <form method="post" action="/courses/<?= $course['id'] ?>/enroll">
-                                <?= csrf_field() ?>
-                                <button type="submit" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold">
-                                    <i class="bi bi-mortarboard-fill"></i> <?= $isFree ? 'Đăng ký học miễn phí' : 'Đăng ký khóa học ngay' ?>
-                                </button>
-                            </form>
+                            <a href="/courses/<?= (int) $course['id'] ?>/enroll" class="btn btn-primary btn-lg w-100 rounded-pill fw-bold">
+                                <i class="bi bi-mortarboard-fill"></i> <?= $isFree ? 'Đăng ký học miễn phí' : 'Đăng ký khóa học ngay' ?>
+                            </a>
                         <?php endif; ?>
                     </div>
 

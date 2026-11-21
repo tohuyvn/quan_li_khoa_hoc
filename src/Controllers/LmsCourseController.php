@@ -122,7 +122,7 @@ class LmsCourseController
         $user = authUser();
         if (!$user) {
             flash('error', 'Vui lòng đăng nhập để đăng ký khóa học.');
-            redirect('/login?redirect=' . urlencode('/courses/' . $courseId));
+            redirect('/login?redirect=' . urlencode('/courses/' . $courseId . '/checkout'));
         }
 
         $course = $this->courseModel->find($courseId);

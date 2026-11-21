@@ -135,8 +135,41 @@
                     <i class="bi bi-plus-lg me-1"></i> New course
                 </a>
 
-                <div class="avatar-refract-pill">
-                    <?= strtoupper(substr(authUser()['name'] ?? 'LM', 0, 2)) ?>
+                <!-- User Avatar with Dropdown Menu -->
+                <div class="dropdown">
+                    <button class="avatar-refract-pill border-0 p-0" type="button" data-bs-toggle="dropdown" aria-expanded="false" title="Tài khoản: <?= e(authUser()['name'] ?? 'Admin') ?>">
+                        <?= strtoupper(substr(authUser()['name'] ?? 'LM', 0, 2)) ?>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end refract-dropdown-menu">
+                        <li class="px-3 py-2 border-bottom border-white border-opacity-10 mb-1">
+                            <div class="fw-bold text-white small text-truncate"><?= e(authUser()['name'] ?? 'Admin') ?></div>
+                            <div class="text-muted small text-truncate" style="font-size: 11px;"><?= e(authUser()['email'] ?? 'admin@shop.test') ?></div>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/admin/profile">
+                                <i class="bi bi-person-gear text-info"></i> Hồ sơ quản trị
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/profile">
+                                <i class="bi bi-person-badge text-warning"></i> Hồ sơ học viên
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item" href="/">
+                                <i class="bi bi-mortarboard text-success"></i> Xem trang LMS
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <form method="post" action="/logout" class="m-0">
+                                <?= csrf_field() ?>
+                                <button type="submit" class="dropdown-item text-danger w-100 border-0 bg-transparent">
+                                    <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </header>

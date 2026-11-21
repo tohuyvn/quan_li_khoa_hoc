@@ -189,27 +189,87 @@ body {
 }
 
 /* 6. Refract Glass Table */
-.table {
+.table,
+.table-responsive .table {
+  --bs-table-bg: transparent !important;
+  --bs-table-accent-bg: transparent !important;
+  --bs-table-striped-bg: transparent !important;
+  --bs-table-hover-bg: rgba(255, 255, 255, 0.08) !important;
+  --bs-table-color: #f1f5f9 !important;
+  --bs-table-hover-color: #ffffff !important;
+  --bs-table-border-color: rgba(255, 255, 255, 0.08) !important;
   color: #f1f5f9 !important;
+  background-color: transparent !important;
   background: transparent !important;
 }
 
-.table thead th {
-  background: rgba(12, 14, 20, 0.7) !important;
+.table > :not(caption) > * > * {
+  background-color: transparent !important;
+  color: inherit !important;
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+.table thead th,
+.table thead.table-light th,
+.table-light {
+  --bs-table-bg: rgba(15, 17, 24, 0.75) !important;
+  --bs-table-color: var(--refract-accent-orange) !important;
+  background: rgba(15, 17, 24, 0.75) !important;
+  background-color: rgba(15, 17, 24, 0.75) !important;
   border-bottom: 2px solid rgba(255, 255, 255, 0.15) !important;
   color: var(--refract-accent-orange) !important;
   font-weight: 600 !important;
   text-transform: uppercase !important;
   font-size: 0.78rem !important;
+  letter-spacing: 0.04em !important;
 }
 
 .table tbody tr {
-  background: rgba(255, 255, 255, 0.03) !important;
+  background: rgba(255, 255, 255, 0.02) !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  transition: all 0.2s ease !important;
 }
 
-.table tbody tr:hover {
-  background: rgba(255, 255, 255, 0.09) !important;
+.table tbody tr:hover,
+.table-hover > tbody > tr:hover > * {
+  --bs-table-accent-bg: rgba(255, 255, 255, 0.08) !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #ffffff !important;
+}
+
+/* Badges styling on Glass Background */
+.badge.bg-light,
+.bg-light {
+  background: rgba(255, 255, 255, 0.08) !important;
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  color: #cbd5e1 !important;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(8px) !important;
+}
+
+.badge.bg-warning,
+.badge.bg-warning.text-dark {
+  background: rgba(245, 158, 11, 0.2) !important;
+  background-color: rgba(245, 158, 11, 0.2) !important;
+  color: #fbbf24 !important;
+  border: 1px solid rgba(245, 158, 11, 0.4) !important;
+  font-weight: 600 !important;
+}
+
+/* Button outline styling in Glass */
+.btn-outline-secondary {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: #cbd5e1 !important;
+  border-radius: 9999px !important;
+  backdrop-filter: blur(8px) !important;
+  transition: all 0.2s ease !important;
+}
+
+.btn-outline-secondary:hover {
+  background: rgba(255, 255, 255, 0.15) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  color: #ffffff !important;
 }
 
 /* Metric / Stat Boxes */
@@ -551,6 +611,56 @@ body {
   justify-content: center;
   font-size: 0.82rem;
   border: 1px solid rgba(255, 255, 255, 0.3);
+  text-decoration: none !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.avatar-refract-pill:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 16px rgba(217, 119, 6, 0.7);
+  color: #ffffff;
+}
+
+/* Glass Dropdown Menu */
+.dropdown-menu.refract-dropdown-menu {
+  background: rgba(18, 20, 29, 0.92) !important;
+  backdrop-filter: blur(28px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(200%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.25) !important;
+  padding: 8px !important;
+  min-width: 210px !important;
+  margin-top: 10px !important;
+}
+
+.refract-dropdown-menu .dropdown-item {
+  color: #e2e8f0 !important;
+  border-radius: 12px !important;
+  padding: 8px 14px !important;
+  font-size: 0.85rem !important;
+  font-weight: 500 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  transition: all 0.15s ease !important;
+}
+
+.refract-dropdown-menu .dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  transform: translateX(3px);
+}
+
+.refract-dropdown-menu .dropdown-item.text-danger:hover {
+  background: rgba(239, 68, 68, 0.18) !important;
+  color: #fca5a5 !important;
+}
+
+.refract-dropdown-menu .dropdown-divider {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  margin: 6px 0 !important;
 }
 
 /* Refract Cards */

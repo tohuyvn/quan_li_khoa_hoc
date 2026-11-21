@@ -77,6 +77,16 @@ class Router
             return '/warranty';
         }
 
+        if (preg_match('#^/courses/\d+/(enroll|checkout|payment)#', $path)) {
+            if (preg_match('#^/courses/(\d+)/#', $path, $m)) {
+                return '/courses/' . $m[1] . '/checkout';
+            }
+        }
+
+        if (preg_match('#^/courses/([^/]+)$#', $path, $m)) {
+            return '/courses/' . $m[1];
+        }
+
         return '/';
     }
 }

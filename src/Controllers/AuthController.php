@@ -17,11 +17,17 @@ class AuthController
 
     public function showLogin(): void
     {
-        view('auth.login', ['title' => 'Đăng nhập']);
+        remember_intended_redirect();
+        view('auth.login', [
+            'title' => 'Đăng nhập',
+            'redirectAfterLogin' => $_SESSION['_intended_redirect'] ?? '',
+        ]);
     }
 
     public function login(): void
     {
+        remember_intended_redirect($_POST['redirect'] ?? null);
+
         $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
 
@@ -57,7 +63,7 @@ class AuthController
         authenticate_session($user);
         clearOld();
         flash('success', 'Đăng nhập thành công!');
-        redirect('/');
+        redirect(pull_intended_redirect('/'));
     }
 
     public function redirectToGoogle(): void
@@ -362,7 +368,7 @@ class AuthController
         flash('success', str_contains($action, 'đăng ký')
             ? 'Đăng ký thành công! Chào mừng đến Shop Hades.'
             : 'Đăng nhập thành công!');
-        redirect('/');
+        redirect(pull_intended_redirect('/'));
     }
 
     public function resendOtp(): void

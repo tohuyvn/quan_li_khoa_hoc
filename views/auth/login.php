@@ -503,6 +503,9 @@
         <!-- Form Email & Password -->
         <form method="post" action="/login">
             <?= csrf_field() ?>
+            <?php if (!empty($redirectAfterLogin)): ?>
+                <input type="hidden" name="redirect" value="<?= e($redirectAfterLogin) ?>">
+            <?php endif; ?>
 
             <div class="form-floating-custom">
                 <input type="email" name="email" class="form-control-lamp" value="<?= old('email') ?>" required placeholder="Email học viên (name@example.com)">

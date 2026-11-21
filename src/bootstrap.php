@@ -98,6 +98,35 @@ function redirect(string $path): never
     exit;
 }
 
+/** Chỉ cho phép redirect nội bộ (tránh open redirect). */
+function safe_redirect_path(?string $path, string $default = '/'): string
+{
+    $path = trim((string) $path);
+    if ($path === '' || !str_starts_with($path, '/') || str_starts_with($path, '//')) {
+        return $default;
+    }
+
+    return $path;
+}
+
+function remember_intended_redirect(?string $path = null): void
+{
+    $fromQuery = $_GET['redirect'] ?? '';
+    $candidate = $path ?? $fromQuery;
+    $safe = safe_redirect_path($candidate, '');
+    if ($safe !== '') {
+        $_SESSION['_intended_redirect'] = $safe;
+    }
+}
+
+function pull_intended_redirect(string $default = '/'): string
+{
+    $path = $_SESSION['_intended_redirect'] ?? '';
+    unset($_SESSION['_intended_redirect']);
+
+    return safe_redirect_path($path, $default);
+}
+
 function flash(string $key, ?string $value = null): ?string
 {
     if ($value !== null) {
