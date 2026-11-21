@@ -89,13 +89,20 @@ class ClassroomController
 
         // Lấy danh sách thảo luận / hỏi đáp cho bài học này
         $db = \App\DB::connection();
-        $discStmt = $db->prepare("SELECT cd.*, u.name AS user_name, u.role AS user_role
+        $discStmt = $db->prepare("SELECT cd.*, u.name AS user_name, u.role AS user_role, u.avatar AS user_avatar
             FROM course_discussions cd
             INNER JOIN users u ON u.id = cd.user_id
             WHERE cd.lesson_id = ?
             ORDER BY cd.id ASC");
         $discStmt->execute([(int) ($currentLesson['id'] ?? 0)]);
         $discussions = $discStmt->fetchAll(\PDO::FETCH_ASSOC);
+
+        // Lấy danh sách ghi chú cá nhân của học viên cho bài học này
+        $notesStmt = $db->prepare("SELECT * FROM lesson_notes 
+            WHERE lesson_id = ? AND user_id = ?
+            ORDER BY timestamp_seconds ASC, id ASC");
+        $notesStmt->execute([(int) ($currentLesson['id'] ?? 0), $userId]);
+        $notes = $notesStmt->fetchAll(\PDO::FETCH_ASSOC);
 
         $enrollment = $this->enrollmentModel->find($userId, $courseId);
 
@@ -106,6 +113,7 @@ class ClassroomController
             'prevLesson' => $prevLesson,
             'nextLesson' => $nextLesson,
             'discussions' => $discussions,
+            'notes' => $notes,
             'enrollment' => $enrollment,
             'user' => $user,
             'title' => 'Phòng học: ' . $course['title'],
@@ -129,6 +137,65 @@ class ClassroomController
         }
 
         redirect("/learn/{$courseId}/lesson/{$lessonId}#discussionTab");
+    }
+
+    public function saveNote(int $lessonId): void
+    {
+        header('Content-Type: application/json; charset=UTF-8');
+        $user = authUser();
+        if (!$user) {
+            http_response_code(401);
+            echo json_encode(['ok' => false, 'error' => 'Chưa đăng nhập']);
+            return;
+        }
+
+        $payload = json_decode(file_get_contents('php://input'), true);
+        if (!$payload) {
+            $payload = $_POST;
+        }
+
+        $content = trim($payload['content'] ?? '');
+        $timestamp = max(0, (int) ($payload['timestamp_seconds'] ?? 0));
+
+        if ($content === '') {
+            http_response_code(400);
+            echo json_encode(['ok' => false, 'error' => 'Nội dung ghi chú không được để trống']);
+            return;
+        }
+
+        $db = \App\DB::connection();
+        $stmt = $db->prepare("INSERT INTO lesson_notes (lesson_id, user_id, timestamp_seconds, content, created_at) VALUES (?, ?, ?, ?, NOW())");
+        $stmt->execute([$lessonId, (int) $user['id'], $timestamp, $content]);
+        $noteId = (int) $db->lastInsertId();
+
+        echo json_encode([
+            'ok' => true,
+            'note' => [
+                'id' => $noteId,
+                'lesson_id' => $lessonId,
+                'timestamp_seconds' => $timestamp,
+                'content' => $content,
+                'created_at' => date('Y-m-d H:i:s'),
+                'time_formatted' => gmdate("i:s", $timestamp),
+            ]
+        ]);
+    }
+
+    public function deleteNote(int $noteId): void
+    {
+        header('Content-Type: application/json; charset=UTF-8');
+        $user = authUser();
+        if (!$user) {
+            http_response_code(401);
+            echo json_encode(['ok' => false, 'error' => 'Chưa đăng nhập']);
+            return;
+        }
+
+        $db = \App\DB::connection();
+        $stmt = $db->prepare("DELETE FROM lesson_notes WHERE id = ? AND user_id = ?");
+        $stmt->execute([$noteId, (int) $user['id']]);
+
+        echo json_encode(['ok' => true]);
     }
 
     public function updateProgress(): void

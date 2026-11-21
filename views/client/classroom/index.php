@@ -190,10 +190,50 @@
                     <div class="tab-pane fade" id="tabNotes">
                         <div class="card border-0 shadow-sm rounded-4 p-4">
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <h6 class="fw-bold mb-0">Ghi chú riêng cho bài học này</h6>
-                                <span id="noteSavedBadge" class="badge bg-success-subtle text-success small d-none">Đã tự động lưu</span>
+                                <div>
+                                    <h6 class="fw-bold mb-1">Ghi chú theo thời điểm video</h6>
+                                    <small class="text-muted">Ghi chú gắn liền với mốc thời gian bài học, được đồng bộ bảo mật lên tài khoản.</small>
+                                </div>
+                                <span id="noteSavedBadge" class="badge bg-success-subtle text-success small d-none">Đã lưu</span>
                             </div>
-                            <textarea id="personalNoteArea" class="form-control font-monospace" rows="6" placeholder="Ghi chú kiến thức quan trọng khi đang xem video... (Tự động lưu vào trình duyệt của bạn)"></textarea>
+
+                            <!-- Add Note Form -->
+                            <div class="p-3 bg-light rounded-3 mb-4 border">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <span class="badge bg-danger px-2 py-1"><i class="bi bi-clock-history me-1"></i> Tại: <strong id="noteCurrentTimestampText">00:00</strong></span>
+                                    <span class="text-muted small">Thời điểm hiện tại trên video</span>
+                                </div>
+                                <textarea id="newNoteInput" class="form-control" rows="2" placeholder="Nhập ghi chú quan trọng tại mốc thời gian này..."></textarea>
+                                <div class="text-end mt-2">
+                                    <button type="button" class="btn btn-dark btn-sm rounded-pill px-4 fw-bold" onclick="addNewNote()">
+                                        <i class="bi bi-plus-circle me-1"></i> Lưu ghi chú mốc này
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Notes List -->
+                            <div id="notesContainer" class="d-flex flex-column gap-2">
+                                <?php if (empty($notes)): ?>
+                                    <p id="emptyNoteNotice" class="text-muted small text-center my-3">Bạn chưa có ghi chú nào cho bài học này. Hãy ghi lại kiến thức trọng tâm!</p>
+                                <?php else: ?>
+                                    <?php foreach ($notes as $n): ?>
+                                        <div class="p-3 bg-white border rounded-3 d-flex justify-content-between align-items-start note-item-row" id="note-item-<?= $n['id'] ?>">
+                                            <div class="d-flex gap-3">
+                                                <button type="button" class="btn btn-sm btn-outline-danger font-monospace px-2 py-1 rounded-pill" onclick="jumpToVideoTime(<?= (int)$n['timestamp_seconds'] ?>)" title="Bấm để nhảy tới mốc video này">
+                                                    <i class="bi bi-play-fill"></i> <?= gmdate("i:s", (int)$n['timestamp_seconds']) ?>
+                                                </button>
+                                                <div class="small text-dark pt-1">
+                                                    <?= nl2br(e($n['content'])) ?>
+                                                    <div class="text-muted mt-1" style="font-size: 11px;"><?= date('H:i d/m/Y', strtotime($n['created_at'])) ?></div>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn btn-sm btn-link text-danger p-0 ms-2" onclick="deleteNoteItem(<?= $n['id'] ?>)" title="Xóa ghi chú">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </div>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -373,7 +413,102 @@ let playTrackingInterval = setInterval(() => {
     if (lessonDuration > 0 && currentWatchSecond < lessonDuration) {
         saveWatchProgress(currentWatchSecond + 1);
     }
+    const noteTimeEl = document.getElementById('noteCurrentTimestampText');
+    if (noteTimeEl) {
+        noteTimeEl.innerText = formatTime(currentWatchSecond);
+    }
 }, 1000);
+
+function jumpToVideoTime(seconds) {
+    currentWatchSecond = seconds;
+    const iframe = document.getElementById('videoIframe');
+    if (iframe && iframe.src) {
+        let baseSrc = iframe.src.split('?')[0];
+        iframe.src = baseSrc + '?start=' + seconds + '&autoplay=1';
+    }
+    saveWatchProgress(seconds);
+}
+
+function addNewNote() {
+    const input = document.getElementById('newNoteInput');
+    const content = input ? input.value.trim() : '';
+    if (!content) {
+        alert('Vui lòng nhập nội dung ghi chú.');
+        return;
+    }
+
+    fetch('/api/lessons/' + lessonId + '/notes', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '<?= csrf_token() ?>'
+        },
+        body: JSON.stringify({
+            content: content,
+            timestamp_seconds: currentWatchSecond
+        })
+    })
+    .then(r => r.json())
+    .then(res => {
+        if (res && res.ok && res.note) {
+            input.value = '';
+            const emptyNotice = document.getElementById('emptyNoteNotice');
+            if (emptyNotice) emptyNotice.remove();
+
+            const container = document.getElementById('notesContainer');
+            const row = document.createElement('div');
+            row.className = 'p-3 bg-white border rounded-3 d-flex justify-content-between align-items-start note-item-row';
+            row.id = 'note-item-' + res.note.id;
+            row.innerHTML = `
+                <div class="d-flex gap-3">
+                    <button type="button" class="btn btn-sm btn-outline-danger font-monospace px-2 py-1 rounded-pill" onclick="jumpToVideoTime(${res.note.timestamp_seconds})" title="Bấm để nhảy tới mốc video này">
+                        <i class="bi bi-play-fill"></i> ${res.note.time_formatted}
+                    </button>
+                    <div class="small text-dark pt-1">
+                        ${res.note.content.replace(/\n/g, '<br>')}
+                        <div class="text-muted mt-1" style="font-size: 11px;">Vừa xong</div>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-link text-danger p-0 ms-2" onclick="deleteNoteItem(${res.note.id})" title="Xóa ghi chú">
+                    <i class="bi bi-trash"></i>
+                </button>
+            `;
+            container.appendChild(row);
+
+            const badge = document.getElementById('noteSavedBadge');
+            if (badge) {
+                badge.classList.remove('d-none');
+                setTimeout(() => badge.classList.add('d-none'), 2500);
+            }
+        } else {
+            alert(res.error || 'Không thể lưu ghi chú');
+        }
+    })
+    .catch(err => {
+        console.error(err);
+        alert('Có lỗi xảy ra khi lưu ghi chú');
+    });
+}
+
+function deleteNoteItem(noteId) {
+    if (!confirm('Bạn có chắc muốn xóa ghi chú này?')) return;
+
+    fetch('/api/notes/' + noteId + '/delete', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '<?= csrf_token() ?>'
+        }
+    })
+    .then(r => r.json())
+    .then(res => {
+        if (res && res.ok) {
+            const el = document.getElementById('note-item-' + noteId);
+            if (el) el.remove();
+        }
+    })
+    .catch(err => console.error(err));
+}
 
 // Periodically sync progress to server every 5 seconds
 setInterval(() => {

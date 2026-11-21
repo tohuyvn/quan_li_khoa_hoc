@@ -224,24 +224,6 @@
                         </div>
                     </div>
 
-                    <!-- Option 4: Thanh toán Tiền mặt & Kích hoạt tức thì -->
-                    <div class="choice-list-option" id="opt-instant" onclick="selectPaymentMethod('instant')">
-                        <div class="d-flex align-items-start gap-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="payment_method" id="pay_instant" value="instant">
-                            </div>
-                            <div class="flex-grow-1">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <label class="fw-bold text-dark mb-0 cursor-pointer" for="pay_instant">
-                                        💵 Thanh toán Tiền mặt / Kích hoạt trực tiếp
-                                    </label>
-                                    <span class="badge bg-success px-2 py-1" style="font-size: 11px;">Thanh toán Tiền mặt</span>
-                                </div>
-                                <div class="text-muted small mt-1">Thanh toán trực tiếp bằng tiền mặt tại cơ sở / Kích hoạt học tập ngay lập tức.</div>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
             </div>
 
@@ -294,7 +276,7 @@
 
 <script>
 function selectPaymentMethod(method) {
-    const methods = ['vietqr', 'vnpay', 'momo', 'instant'];
+    const methods = ['vietqr', 'vnpay', 'momo'];
     methods.forEach(m => {
         const opt = document.getElementById('opt-' + m);
         const radio = document.getElementById('pay_' + m);
@@ -315,11 +297,9 @@ function selectPaymentMethod(method) {
         if (method === 'vietqr') {
             submitBtn.innerHTML = '<i class="bi bi-qr-code-scan me-2"></i> Mở cổng thanh toán VietQR';
         } else if (method === 'vnpay') {
-            submitBtn.innerHTML = '<i class="bi bi-credit-card me-2"></i> Xác nhận thẻ & Thanh toán VNPay';
+            submitBtn.innerHTML = '<i class="bi bi-credit-card me-2"></i> Chuyển tới cổng thanh toán VNPay';
         } else if (method === 'momo') {
             submitBtn.innerHTML = '<i class="bi bi-wallet2 me-2"></i> Mở cổng thanh toán MoMo';
-        } else if (method === 'instant') {
-            submitBtn.innerHTML = '<i class="bi bi-cash-stack me-2"></i> Xác nhận thanh toán tiền mặt & Vào học';
         }
     }
 }

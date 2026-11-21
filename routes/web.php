@@ -316,6 +316,9 @@ $router->get('/learn/{courseId}/lesson/{lessonId}', fn($courseId, $lessonId) => 
 $router->post('/api/progress/update', fn() => (new App\Controllers\ClassroomController())->updateProgress());
 $router->get('/learn/{courseId}/download/{materialId}', fn($courseId, $materialId) => (new App\Controllers\ClassroomController())->downloadMaterial((int)$courseId, (int)$materialId));
 $router->post('/learn/{courseId}/lesson/{lessonId}/discussion', fn($courseId, $lessonId) => (new App\Controllers\ClassroomController())->postDiscussion((int)$courseId, (int)$lessonId));
+$router->post('/api/lessons/{lessonId}/notes', fn($lessonId) => (new App\Controllers\ClassroomController())->saveNote((int)$lessonId));
+$router->post('/api/notes/{noteId}/delete', fn($noteId) => (new App\Controllers\ClassroomController())->deleteNote((int)$noteId));
+$router->delete('/api/notes/{noteId}', fn($noteId) => (new App\Controllers\ClassroomController())->deleteNote((int)$noteId));
 
 // Quiz
 $router->get('/quiz/{id}', fn($id) => (new App\Controllers\QuizController())->show((int)$id));
