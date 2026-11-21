@@ -219,12 +219,9 @@ class LmsCourseController
         $phone = trim($_POST['phone'] ?? '') ?: (!empty($user['phone']) ? $user['phone'] : '0912345678');
         $email = trim($_POST['email'] ?? '') ?: (!empty($user['email']) ? $user['email'] : 'hocvien@shop.test');
 
-        $isInstant = ($rawMethod === 'instant' || $rawMethod === 'direct' || $rawMethod === 'cash');
         $paymentMethod = match ($rawMethod) {
-            'vietqr', 'transfer', 'bank', 'bank_transfer' => 'bank_transfer',
             'vnpay' => 'vnpay',
             'momo' => 'momo',
-            'instant', 'direct', 'cash' => 'cash',
             default => 'bank_transfer',
         };
 
@@ -232,8 +229,8 @@ class LmsCourseController
         $orderId = 0;
 
         try {
-            $paymentStatus = $isInstant ? 'paid' : 'pending';
-            $orderStatus = $isInstant ? 'completed' : 'pending';
+            $paymentStatus = 'pending';
+            $orderStatus = 'pending';
 
             $stmt = $db->prepare("INSERT INTO orders 
                 (user_id, customer_name, phone, email, payment_method, payment_status, total_amount, status, order_code, created_at)
@@ -254,53 +251,48 @@ class LmsCourseController
             $itemStmt = $db->prepare("INSERT INTO order_items (order_id, course_id, product_name, quantity, price) VALUES (?, ?, ?, 1, ?)");
             $itemStmt->execute([$orderId, $courseId, $course['title'], (int) $price]);
         } catch (\Throwable $e) {
-            error_log('LMS Payment order insert warning: ' . $e->getMessage());
+            error_log('LMS Payment order insert error: ' . $e->getMessage());
         }
 
-        if ($isInstant) {
-            // Tự động kích hoạt ghi danh khóa học ngay lập tức cho phương thức instant
-            $this->enrollmentModel->enroll($userId, $courseId);
-            flash('success', "Kích hoạt thành công! Khóa học '{$course['title']}' đã sẵn sàng trong tài khoản của bạn.");
-            redirect('/learn/' . $courseId);
+        if ($orderId <= 0) {
+            flash('error', 'Không thể khởi tạo đơn thanh toán. Vui lòng thử lại.');
+            redirect("/courses/{$courseId}/checkout");
             return;
         }
 
-        // Chuyển hướng theo cổng thanh toán tương tự shop_hades
-        if ($orderId > 0) {
-            $_SESSION['last_order_id'] = $orderId;
-            $_SESSION['lms_pending_course_id'] = $courseId;
+        $_SESSION['last_order_id'] = $orderId;
+        $_SESSION['lms_pending_course_id'] = $courseId;
 
-            if ($paymentMethod === 'bank_transfer') {
-                $_SESSION['pending_vietqr_order_id'] = $orderId;
-                flash('success', "Đã tạo đơn hàng thành công! Vui lòng quét mã VietQR MB Bank hoặc xác nhận đã chuyển khoản.");
-                redirect('/payment/vietqr/pay?order_id=' . $orderId);
-                return;
-            }
-
-            if ($paymentMethod === 'vnpay') {
-                $bankCode = trim($_POST['bank'] ?? 'NCB');
-                $_SESSION['pending_vnpay_order_id'] = $orderId;
-                $_SESSION['vnpay_card'] = [
-                    'bank' => $bankCode,
-                    'bank_name' => vnpayBankName($bankCode),
-                    'card_number' => preg_replace('/\D+/', '', $_POST['card_number'] ?? '9704198526191432'),
-                    'cardholder' => strtoupper(trim($_POST['card_holder'] ?? ($user['name'] ?? 'NGUYEN VAN A'))),
-                    'issue_date' => trim($_POST['issue_date'] ?? '07/15'),
-                ];
-                redirect('/payment/vnpay/pay');
-                return;
-            }
-
-            if ($paymentMethod === 'momo') {
-                $_SESSION['pending_momo_order_id'] = $orderId;
-                redirect('/payment/momo/pay');
-                return;
-            }
+        // Chuyển hướng sang cổng thanh toán tương ứng
+        if ($paymentMethod === 'bank_transfer') {
+            $_SESSION['pending_vietqr_order_id'] = $orderId;
+            flash('info', "Vui lòng chuyển khoản đúng số tiền và nội dung để kích hoạt khóa học.");
+            redirect('/payment/vietqr/pay?order_id=' . $orderId);
+            return;
         }
 
-        $this->enrollmentModel->enroll($userId, $courseId);
-        flash('success', "Thanh toán thành công! Khóa học '{$course['title']}' đã sẵn sàng trong tài khoản của bạn.");
-        redirect('/learn/' . $courseId);
+        if ($paymentMethod === 'vnpay') {
+            $bankCode = trim($_POST['bank'] ?? 'NCB');
+            $_SESSION['pending_vnpay_order_id'] = $orderId;
+            $_SESSION['vnpay_card'] = [
+                'bank' => $bankCode,
+                'bank_name' => vnpayBankName($bankCode),
+                'card_number' => preg_replace('/\D+/', '', $_POST['card_number'] ?? '9704198526191432198'),
+                'cardholder' => strtoupper(trim($_POST['card_holder'] ?? ($user['name'] ?? 'NGUYEN VAN A'))),
+                'issue_date' => trim($_POST['issue_date'] ?? '07/15'),
+            ];
+            redirect('/payment/vnpay/pay');
+            return;
+        }
+
+        if ($paymentMethod === 'momo') {
+            $_SESSION['pending_momo_order_id'] = $orderId;
+            redirect('/payment/momo/pay');
+            return;
+        }
+
+        flash('error', 'Phương thức thanh toán không hợp lệ.');
+        redirect("/courses/{$courseId}/checkout");
     }
 
     public function storeReview(int $courseId): void

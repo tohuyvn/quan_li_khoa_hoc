@@ -334,6 +334,38 @@
     </div>
 </div>
 
+<!-- Modal Nhắc Nhở Kiểm Tra 15 Phút (15-Minute Study Checkpoint Test) -->
+<div class="modal fade" id="checkpointQuizModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 rounded-4 shadow-lg p-4 text-center" style="background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(251, 191, 36, 0.35); color: #ffffff;">
+            <div class="mb-3">
+                <div class="badge bg-warning bg-opacity-25 text-warning px-3 py-2 rounded-pill fw-bold fs-6 mb-2">
+                    <i class="bi bi-stopwatch-fill me-1"></i> Đã học 15 phút liên tục
+                </div>
+                <h3 class="fw-bold text-white mb-2">Đã Đến Giờ Kiểm Tra Kiến Thức!</h3>
+                <p class="text-secondary small mb-0">Hệ thống áp dụng phương pháp ngắt quãng (Spaced Repetition). Bạn đã tích lũy 15 phút học, hãy làm bài test nhanh để củng cố và ghi nhớ kiến thức nhé!</p>
+            </div>
+            <div class="card bg-dark bg-opacity-50 border border-secondary border-opacity-50 rounded-3 p-3 my-3 text-start">
+                <div class="d-flex align-items-center gap-3">
+                    <i class="bi bi-patch-question-fill text-warning fs-1"></i>
+                    <div>
+                        <div class="fw-bold text-white" id="checkpointQuizTitle">Bài kiểm tra trắc nghiệm 15 phút</div>
+                        <div class="small text-secondary">Thời gian: 15 phút • Cần đạt 80% để vượt qua</div>
+                    </div>
+                </div>
+            </div>
+            <div class="d-flex justify-content-center gap-3 mt-2">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">
+                    Để sau
+                </button>
+                <a id="btnGoToQuiz" href="/quiz/1" class="btn btn-warning rounded-pill px-4 fw-bold shadow">
+                    <i class="bi bi-pencil-square me-1"></i> Làm bài kiểm tra ngay
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 const courseId = <?= (int) $course['id'] ?>;
 const lessonId = <?= (int) $currentLesson['id'] ?>;
@@ -529,6 +561,40 @@ window.addEventListener('beforeunload', () => {
         navigator.sendBeacon('/api/progress/update', new Blob([payload], { type: 'application/json' }));
     }
 });
+
+// Theo dõi tổng thời gian học tích lũy (Cứ 15 phút học xong là hiển thị bài test)
+const studyTimeStorageKey = `lms_study_seconds_u${userId}_c${courseId}`;
+let totalStudySeconds = parseInt(localStorage.getItem(studyTimeStorageKey) || '0', 10);
+let studyInterval = setInterval(() => {
+    // Chỉ đếm thời gian khi đang học (tab đang mở và đang phát video)
+    totalStudySeconds++;
+    localStorage.setItem(studyTimeStorageKey, totalStudySeconds);
+
+    // 15 phút = 900 giây
+    if (totalStudySeconds > 0 && totalStudySeconds % 900 === 0) {
+        checkAndTrigger15MinQuiz();
+    }
+}, 1000);
+
+function checkAndTrigger15MinQuiz() {
+    // Tìm bài quiz tiếp theo hoặc bài quiz gần nhất của khóa học
+    const quizLinks = document.querySelectorAll('a[href^="/quiz/"]');
+    if (quizLinks.length > 0) {
+        const nextQuizHref = quizLinks[0].getAttribute('href');
+        const nextQuizTitle = quizLinks[0].innerText.trim() || 'Bài kiểm tra trắc nghiệm 15 phút';
+        
+        const titleEl = document.getElementById('checkpointQuizTitle');
+        const btnGo = document.getElementById('btnGoToQuiz');
+        if (titleEl) titleEl.innerText = nextQuizTitle;
+        if (btnGo) btnGo.href = nextQuizHref;
+
+        const modalEl = document.getElementById('checkpointQuizModal');
+        if (modalEl && !modalEl.classList.contains('show')) {
+            const modal = new bootstrap.Modal(modalEl);
+            modal.show();
+        }
+    }
+}
 
 function markLessonComplete() {
     isCompleted = true;

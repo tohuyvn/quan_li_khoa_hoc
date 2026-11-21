@@ -35,12 +35,17 @@ class ClassroomController
             redirect('/courses');
         }
 
-        // Kiểm tra quyền: Admin, Instructor của khóa học, hoặc học viên đã ghi danh
-        $isOwner = (isAdmin() || ((int) $course['instructor_id'] === $userId));
+        // Kiểm tra quyền: Giảng viên phụ trách khóa học, hoặc học viên đã thanh toán/ghi danh
+        $effectivePrice = ($course['sale_price'] !== null && $course['sale_price'] >= 0)
+            ? (float) $course['sale_price']
+            : (float) $course['price'];
+        $isFree = $effectivePrice <= 0;
+
+        $isInstructor = ((int) ($course['instructor_id'] ?? 0) === $userId);
         $isEnrolled = $this->enrollmentModel->isEnrolled($userId, $courseId);
 
-        if (!$isOwner && !$isEnrolled) {
-            flash('error', 'Bạn cần đăng ký khóa học này trước khi học.');
+        if (!$isFree && !$isInstructor && !$isEnrolled) {
+            flash('error', 'Khóa học này yêu cầu thanh toán để mở khóa bài học. Vui lòng hoàn tất thanh toán.');
             redirect('/courses/' . $courseId);
         }
 

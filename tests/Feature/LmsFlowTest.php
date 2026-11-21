@@ -51,6 +51,10 @@ class LmsFlowTest extends TestCase
         // 3. Tính % tiến độ
         $percent = $enrollModel->updateProgress($testUserId, $courseId);
         $this->assertGreaterThan(0.00, $percent, "Tiến độ phải lớn hơn 0%");
+
+        // Dọn dẹp
+        \App\DB::connection()->exec("DELETE FROM enrollments WHERE user_id = {$testUserId} AND course_id = {$courseId}");
+        \App\DB::connection()->exec("DELETE FROM lesson_progress WHERE user_id = {$testUserId} AND lesson_id = {$lessonId}");
     }
 
     public function testQuizTakingAndAutoGrading(): void
@@ -228,7 +232,8 @@ class LmsFlowTest extends TestCase
         $this->assertTrue($enrolled, "Ghi danh sau thanh toán phải thành công");
         $this->assertTrue($enrollModel->isEnrolled($userId, (int)$course['id']), "Kiểm tra isEnrolled phải trả về true");
 
-        // Dọn dẹp test order
+        // Dọn dẹp test order & enrollment
+        $db->exec("DELETE FROM enrollments WHERE user_id = {$userId} AND course_id = " . (int)$course['id']);
         $db->exec("DELETE FROM order_items WHERE order_id = {$orderId}");
         $db->exec("DELETE FROM orders WHERE id = {$orderId}");
     }
