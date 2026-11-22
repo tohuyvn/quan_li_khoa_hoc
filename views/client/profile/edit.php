@@ -67,13 +67,13 @@ $initial = mb_strtoupper(mb_substr($user['name'] ?? 'H', 0, 1, 'UTF-8'), 'UTF-8'
             </a>
         </div>
         <div class="col-6 col-md-3">
-            <a href="/verify-certificate" class="refract-card p-3 d-block text-decoration-none h-100">
+            <a href="#tab-certs" onclick="document.getElementById('tab-certs-btn').click();" class="refract-card p-3 d-block text-decoration-none h-100">
                 <div class="d-flex justify-content-between align-items-center mb-1">
                     <span class="small text-muted fw-semibold">Chứng Chỉ Đạt Được</span>
                     <i class="bi bi-award-fill text-warning fs-5"></i>
                 </div>
                 <div class="fs-4 fw-bold text-warning"><?= number_format($certsCount) ?> <span class="fs-6 fw-normal text-muted">chứng chỉ</span></div>
-                <div class="small text-white-50" style="font-size: 11px;">Xác thực QR công khai</div>
+                <div class="small text-white-50" style="font-size: 11px;">Bấm để xem danh sách & mã</div>
             </a>
         </div>
         <div class="col-6 col-md-3">
