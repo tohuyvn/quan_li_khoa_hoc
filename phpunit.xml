@@ -23,7 +23,7 @@
         <env name="BCRYPT_ROUNDS" value="4"/>
         <env name="BROADCAST_CONNECTION" value="null"/>
         <env name="CACHE_STORE" value="array"/>
-        <env name="DB_HOST" value="172.18.0.5"/>
+        <env name="DB_HOST" value="172.18.0.2"/>
         <env name="DB_PORT" value="3306"/>
         <env name="DB_DATABASE" value="shop_hades"/>
         <env name="DB_USERNAME" value="hades_user"/>

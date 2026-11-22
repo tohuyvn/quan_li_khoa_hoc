@@ -1,92 +1,241 @@
--- =============================================================
--- FILE EXPORT TOÀN BỘ CSDL VÀ DỮ LIỆU LMS CHO PHPMYADMIN
--- Ngày tạo: 2026-11-21 21:15:33
--- =============================================================
+-- =========================================================
+-- HADES ACADEMY - E-LEARNING MANAGEMENT SYSTEM (LMS)
+-- Database Clean Export (Chỉ chứa bảng Quản lý khóa học & Auth)
+-- Ngày xuất: 2026-11-22 11:51:07
+-- =========================================================
 
 SET FOREIGN_KEY_CHECKS = 0;
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-SET time_zone = "+00:00";
+SET NAMES utf8mb4;
 
--- -------------------------------------------------------------
--- Bảng: `users`
--- -------------------------------------------------------------
-DROP TABLE IF EXISTS `users`;
-CREATE TABLE `users` (
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `admin_audit_logs`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `admin_audit_logs`;
+CREATE TABLE `admin_audit_logs` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `admin_id` int unsigned DEFAULT NULL,
+  `admin_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `action` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `details` text COLLATE utf8mb4_unicode_ci,
+  `ip_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dữ liệu bảng `admin_audit_logs`
+INSERT INTO `admin_audit_logs` (`id`, `admin_id`, `admin_name`, `action`, `details`, `ip_address`, `created_at`) VALUES
+('1', '1', 'Admin', 'update_trade_in_status', 'Cập nhật yêu cầu Trade-in #1 sang trạng thái: completed', NULL, '2026-07-10 20:38:10'),
+('2', '1', 'Admin', 'price_change', 'Price updated for product \'Cáp sạc nhanh USB-C bọc dù 60W\' (ID: 11): 190.000 đ -> 5.000 đ', '172.18.0.1', '2026-08-12 06:40:06');
+
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `api_otps`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `api_otps`;
+CREATE TABLE `api_otps` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
   `email` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `phone` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-  `avatar` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `role` enum('admin','customer','shipper','student','instructor') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'student',
-  `status` enum('active','inactive','banned') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
+  `code` varchar(10) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `action` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` text COLLATE utf8mb4_unicode_ci,
+  `expires_at` int unsigned NOT NULL,
   `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `failed_login_attempts` int unsigned NOT NULL DEFAULT '0',
-  `lockout_until` datetime DEFAULT NULL,
-  `loyalty_points` int unsigned NOT NULL DEFAULT '0',
-  `loyalty_tier` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Standard',
-  `two_factor_secret` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `two_factor_enabled` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `users_email_unique` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `api_otps_email_code` (`email`,`code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `users`
-INSERT INTO `users` (`id`, `name`, `email`, `phone`, `avatar`, `password`, `role`, `status`, `created_at`, `failed_login_attempts`, `lockout_until`, `loyalty_points`, `loyalty_tier`, `two_factor_secret`, `two_factor_enabled`) VALUES
-(1, 'Admin', 'admin@shop.test', '0901234567', NULL, '$2y$10$kdcd7bTl11qWkeuQlDjHd.wgsCUWuTjJnwtXad0WNKtB/9154yWwu', 'admin', 'active', '2026-06-16 01:46:26', 0, NULL, 0, 'Standard', NULL, 0),
-(2, 'Nguyễn Văn A', 'khach@shop.test', '0912345678', NULL, '$2y$10$Qrp7GX7/3abDVbnAZdVLX.1edRvM80TkGu4fyTWJPaFa27LA2WbAC', 'customer', 'active', '2026-06-16 01:46:26', 0, NULL, 17495, 'Diamond', NULL, 0),
-(4, 'huy', 'huy28072k5@gmail.com', '028282728', NULL, '$2y$10$TR6H/lL76w.sf6an91P4CONNyFezc3xRAf9dUyQqKPj5FEcw.BIGG', 'customer', 'active', '2026-06-21 08:42:25', 0, NULL, 166646, 'Diamond', NULL, 0),
-(21, 'Nguyễn Văn Shipper', 'shipper@shop.test', '0987654321', NULL, '$2y$10$Ad7KPM/fgPDwS9pfcemkVO.Rj33Co7FWQUtjX3faWjor3mIavORK6', 'shipper', 'active', '2026-07-10 20:00:06', 0, NULL, 0, 'Standard', NULL, 0),
-(22, 'Tài khoản Google', 'user.google@gmail.com', '', NULL, '$2y$10$yp30kH9E0kFiPmcL3z2/gu.QGbEMuIIdCjjrHo//Xi5MeMH7m/bna', 'customer', 'active', '2026-08-10 00:13:29', 0, NULL, 0, 'Standard', NULL, 0),
-(23, 'Google User', 'fanhinbenho@gmail.com', '', NULL, '$2y$10$KiESqwlXqDz72OJL1xu0PO/QHfnbMMVP9ylvgkTcUT0wo0Uruq2m6', 'customer', 'active', '2026-08-12 13:19:52', 0, NULL, 0, 'Standard', NULL, 0),
-(24, 'Google User', 'huy28072k5@gmail.comgmaigmai', '', NULL, '$2y$10$.xlA7djohqSRJxDSAxwaOe2bbiP9Jr2PyjCIrceWECc9KBd/agHxi', 'customer', 'active', '2026-08-12 14:35:25', 0, NULL, 0, 'Standard', NULL, 0),
-(25, 'ThS. Nguyễn Văn A', 'giangvien@lms.local', '', NULL, '$2y$10$DJs1JtsYS7c8XSc.//lW7OIj/ppI5T8vxyBzpERwKo/MDFB.t4z.6', 'instructor', 'active', '2026-11-21 11:19:27', 0, NULL, 0, 'Standard', NULL, 0),
-(26, 'TS. Trần Hoàng Minh', 'minh.tran@lms.local', '', NULL, '$2y$10$.algbcOerNda/HuOgNCyeOjEDlPqhF.g8FT7ryw3FsX3CUNTOzOTm', 'instructor', 'active', '2026-11-21 11:33:11', 0, NULL, 0, 'Standard', NULL, 0),
-(27, 'Lê Thị Mai Hương', 'huong.le@lms.local', '', NULL, '$2y$10$.algbcOerNda/HuOgNCyeOjEDlPqhF.g8FT7ryw3FsX3CUNTOzOTm', 'instructor', 'active', '2026-11-21 11:33:11', 0, NULL, 0, 'Standard', NULL, 0),
-(28, 'Hoàng Văn Đức', 'duc.hoang@lms.local', '', NULL, '$2y$10$.algbcOerNda/HuOgNCyeOjEDlPqhF.g8FT7ryw3FsX3CUNTOzOTm', 'instructor', 'active', '2026-11-21 11:33:11', 0, NULL, 0, 'Standard', NULL, 0),
-(40, 'ThS. Đặng Tuấn Anh', 'tuananh.dang@lms.local', '0912345678', NULL, '$2y$10$5G870H/L0syCspwd8XNQvez5jXU1X7iuDHPS3BHGMPHV4G/iv.2/m', 'instructor', 'active', '2026-11-21 11:47:30', 0, NULL, 0, 'Standard', NULL, 0),
-(41, 'KTS. Vũ Hải Nam', 'hainam.vu@lms.local', '0912345678', NULL, '$2y$10$5G870H/L0syCspwd8XNQvez5jXU1X7iuDHPS3BHGMPHV4G/iv.2/m', 'instructor', 'active', '2026-11-21 11:47:30', 0, NULL, 0, 'Standard', NULL, 0),
-(42, 'Bùi Quỳnh Chi', 'quynhchi.bui@lms.local', '0912345678', NULL, '$2y$10$5G870H/L0syCspwd8XNQvez5jXU1X7iuDHPS3BHGMPHV4G/iv.2/m', 'instructor', 'active', '2026-11-21 11:47:30', 0, NULL, 0, 'Standard', NULL, 0),
-(43, 'Nguyễn Đình Quân', 'quan.nguyen@gmail.com', '0988776655', NULL, '$2y$10$5G870H/L0syCspwd8XNQvez5jXU1X7iuDHPS3BHGMPHV4G/iv.2/m', 'student', 'active', '2026-11-21 11:47:30', 0, NULL, 0, 'Standard', NULL, 0),
-(44, 'Phạm Thuỳ Linh', 'linh.pham@gmail.com', '0988776655', NULL, '$2y$10$5G870H/L0syCspwd8XNQvez5jXU1X7iuDHPS3BHGMPHV4G/iv.2/m', 'student', 'active', '2026-11-21 11:47:30', 0, NULL, 0, 'Standard', NULL, 0),
-(45, 'Hoàng Minh Tuấn', 'tuan.hoang@gmail.com', '0988776655', NULL, '$2y$10$5G870H/L0syCspwd8XNQvez5jXU1X7iuDHPS3BHGMPHV4G/iv.2/m', 'student', 'active', '2026-11-21 11:47:30', 0, NULL, 0, 'Standard', NULL, 0),
-(46, 'Đỗ Phương Anh', 'anh.do@gmail.com', '0988776655', NULL, '$2y$10$5G870H/L0syCspwd8XNQvez5jXU1X7iuDHPS3BHGMPHV4G/iv.2/m', 'student', 'active', '2026-11-21 11:47:30', 0, NULL, 0, 'Standard', NULL, 0),
-(47, 'Trịnh Quốc Bảo', 'bao.trinh@gmail.com', '0988776655', NULL, '$2y$10$5G870H/L0syCspwd8XNQvez5jXU1X7iuDHPS3BHGMPHV4G/iv.2/m', 'student', 'active', '2026-11-21 11:47:30', 0, NULL, 0, 'Standard', NULL, 0),
-(48, 'Ngô Thị Cẩm Tú', 'tu.ngo@gmail.com', '0988776655', NULL, '$2y$10$5G870H/L0syCspwd8XNQvez5jXU1X7iuDHPS3BHGMPHV4G/iv.2/m', 'student', 'active', '2026-11-21 11:47:30', 0, NULL, 0, 'Standard', NULL, 0);
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `app_notifications`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `app_notifications`;
+CREATE TABLE `app_notifications` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int unsigned DEFAULT NULL,
+  `order_id` int unsigned DEFAULT NULL,
+  `title` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `body` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `is_read` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_notif_user_read` (`user_id`,`is_read`),
+  KEY `idx_notif_created` (`created_at`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- -------------------------------------------------------------
--- Bảng: `categories`
--- -------------------------------------------------------------
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `categories`
+-- ---------------------------------------------------------
 DROP TABLE IF EXISTS `categories`;
-CREATE TABLE `categories` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `slug` varchar(191) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `description` text COLLATE utf8mb4_unicode_ci,
-  `sort_order` int DEFAULT '0',
-  `is_active` tinyint(1) DEFAULT '1',
-  `status` enum('active','inactive') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `slug` (`slug`)
-) ENGINE=InnoDB AUTO_INCREMENT=104 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE ALGORITHM=UNDEFINED DEFINER=`hades_user`@`%` SQL SECURITY DEFINER VIEW `categories` AS select `course_categories`.`id` AS `id`,`course_categories`.`name` AS `name`,`course_categories`.`slug` AS `slug`,`course_categories`.`description` AS `description`,`course_categories`.`icon` AS `icon`,`course_categories`.`sort_order` AS `sort_order`,`course_categories`.`is_active` AS `is_active`,`course_categories`.`created_at` AS `created_at`,`course_categories`.`updated_at` AS `updated_at` from `course_categories`;
 
 -- Dữ liệu bảng `categories`
-INSERT INTO `categories` (`id`, `name`, `slug`, `description`, `sort_order`, `is_active`, `status`, `created_at`) VALUES
-(79, 'Lập trình & Phát triển Phần mềm', 'lap-trinh-phan-mem', NULL, 0, 1, 'active', '2026-11-21 11:40:52'),
-(80, 'Khoa học Dữ liệu & Trí tuệ Nhân tạo', 'khoa-hoc-du-lieu-ai', NULL, 0, 1, 'active', '2026-11-21 11:40:52'),
-(81, 'Thiết kế Đồ họa & UI/UX', 'thiet-ke-do-hoa-ui-ux', NULL, 0, 1, 'active', '2026-11-21 11:40:52'),
-(82, 'Quản trị Hệ thống, DevOps & Cloud', 'he-thong-devops-cloud', NULL, 0, 1, 'active', '2026-11-21 11:40:52'),
-(83, 'Kinh doanh & Marketing Kỹ thuật số', 'kinh-doanh-digital-marketing', NULL, 0, 1, 'active', '2026-11-21 11:40:52'),
-(84, 'Ngoại ngữ & Kỹ năng Mềm', 'ngoai-ngu-ky-nang-mem', NULL, 0, 1, 'active', '2026-11-21 11:40:52'),
-(87, 'Lập trình Web & Frontend', 'lap-trinh-web', 'HTML, CSS, JS, PHP, React, Next.js', 0, 1, 'active', '2026-11-21 11:42:31'),
-(88, 'Khoa học Dữ liệu & AI', 'data-ai', 'Python, Machine Learning, Deep Learning, SQL', 0, 1, 'active', '2026-11-21 11:42:31'),
-(89, 'Thiết kế UI/UX', 'ui-ux-design', 'Figma, Design System, User Research', 0, 1, 'active', '2026-11-21 11:42:31'),
-(90, 'Hệ thống & DevOps Cloud', 'devops-system', 'Docker, Kubernetes, Linux, CI/CD', 0, 1, 'active', '2026-11-21 11:42:31');
+INSERT INTO `categories` (`id`, `name`, `slug`, `description`, `icon`, `sort_order`, `is_active`, `created_at`, `updated_at`) VALUES
+('1', 'Lập trình Web & Mobile', 'lap-trinh-web-mobile', NULL, 'fas fa-code', '0', '1', '2026-11-22 04:51:01', '2026-11-22 04:51:01'),
+('2', 'Trí tuệ Nhân tạo & Data', 'ai-machine-learning-data', NULL, 'fas fa-brain', '0', '1', '2026-11-22 04:51:01', '2026-11-22 04:51:01'),
+('3', 'DevOps & Điện toán đám mây', 'devops-cloud-computing', NULL, 'fas fa-server', '0', '1', '2026-11-22 04:51:01', '2026-11-22 04:51:01'),
+('4', 'Thiết kế UI/UX', 'thiet-ke-ui-ux', NULL, 'fas fa-palette', '0', '1', '2026-11-22 04:51:01', '2026-11-22 04:51:01'),
+('5', 'Khoa học Máy tính', 'khoa-hoc-may-tinh', NULL, 'fas fa-laptop-code', '0', '1', '2026-11-22 04:51:01', '2026-11-22 04:51:01');
 
--- -------------------------------------------------------------
--- Bảng: `courses`
--- -------------------------------------------------------------
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `certificates`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `certificates`;
+CREATE TABLE `certificates` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `certificate_code` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_id` int unsigned NOT NULL,
+  `course_id` int unsigned NOT NULL,
+  `issued_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `pdf_path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` enum('valid','revoked') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'valid',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `certificate_code` (`certificate_code`),
+  UNIQUE KEY `uq_user_course_cert` (`user_id`,`course_id`),
+  KEY `course_id` (`course_id`),
+  KEY `idx_cert_code` (`certificate_code`),
+  CONSTRAINT `certificates_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `certificates_ibfk_2` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dữ liệu bảng `certificates`
+INSERT INTO `certificates` (`id`, `certificate_code`, `user_id`, `course_id`, `issued_at`, `pdf_path`, `status`) VALUES
+('1', 'CERT-2026-X8B9K2', '2', '1', '2026-11-21 11:29:15', NULL, 'valid'),
+('2', 'CERT-2026-706CF3BC', '1', '1', '2026-11-21 11:38:44', NULL, 'valid'),
+('3', 'CERT-2026-882D3383', '43', '1', '2026-11-21 11:47:30', NULL, 'valid'),
+('4', 'CERT-2026-7B1F4939', '45', '3', '2026-11-21 11:51:24', NULL, 'valid'),
+('5', 'CERT-2026-2034C86F', '45', '4', '2026-11-21 11:51:24', NULL, 'valid'),
+('6', 'CERT-2026-CCA8C0B0', '45', '5', '2026-11-21 11:51:24', NULL, 'valid'),
+('7', 'CERT-2026-4AF648B6', '46', '4', '2026-11-21 11:51:24', NULL, 'valid'),
+('8', 'CERT-2026-07EE4BBD', '46', '5', '2026-11-21 11:51:24', NULL, 'valid'),
+('9', 'CERT-2026-8063B4BB', '46', '6', '2026-11-21 11:51:24', NULL, 'valid'),
+('10', 'CERT-2026-2AAA51BC', '47', '5', '2026-11-21 11:51:24', NULL, 'valid'),
+('11', 'CERT-2026-14FA3F86', '47', '6', '2026-11-21 11:51:24', NULL, 'valid'),
+('12', 'CERT-2026-C6D8B1D1', '47', '7', '2026-11-21 11:51:24', NULL, 'valid'),
+('13', 'CERT-2026-F0EB7673', '48', '6', '2026-11-21 11:51:24', NULL, 'valid'),
+('14', 'CERT-2026-C12FC5D8', '48', '7', '2026-11-21 11:51:24', NULL, 'valid'),
+('15', 'CERT-2026-82F61ACD', '48', '8', '2026-11-21 11:51:24', NULL, 'valid');
+
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `course_categories`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `course_categories`;
+CREATE TABLE `course_categories` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `slug` varchar(180) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `description` text COLLATE utf8mb4_unicode_ci,
+  `icon` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT 'fas fa-graduation-cap',
+  `sort_order` int NOT NULL DEFAULT '0',
+  `is_active` tinyint(1) NOT NULL DEFAULT '1',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `slug` (`slug`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dữ liệu bảng `course_categories`
+INSERT INTO `course_categories` (`id`, `name`, `slug`, `description`, `icon`, `sort_order`, `is_active`, `created_at`, `updated_at`) VALUES
+('1', 'Lập trình Web & Mobile', 'lap-trinh-web-mobile', NULL, 'fas fa-code', '0', '1', '2026-11-22 04:51:01', '2026-11-22 04:51:01'),
+('2', 'Trí tuệ Nhân tạo & Data', 'ai-machine-learning-data', NULL, 'fas fa-brain', '0', '1', '2026-11-22 04:51:01', '2026-11-22 04:51:01'),
+('3', 'DevOps & Điện toán đám mây', 'devops-cloud-computing', NULL, 'fas fa-server', '0', '1', '2026-11-22 04:51:01', '2026-11-22 04:51:01'),
+('4', 'Thiết kế UI/UX', 'thiet-ke-ui-ux', NULL, 'fas fa-palette', '0', '1', '2026-11-22 04:51:01', '2026-11-22 04:51:01'),
+('5', 'Khoa học Máy tính', 'khoa-hoc-may-tinh', NULL, 'fas fa-laptop-code', '0', '1', '2026-11-22 04:51:01', '2026-11-22 04:51:01');
+
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `course_discussions`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `course_discussions`;
+CREATE TABLE `course_discussions` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `lesson_id` int unsigned NOT NULL,
+  `user_id` int unsigned NOT NULL,
+  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `idx_lesson_discuss` (`lesson_id`),
+  CONSTRAINT `course_discussions_ibfk_1` FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `course_discussions_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dữ liệu bảng `course_discussions`
+INSERT INTO `course_discussions` (`id`, `lesson_id`, `user_id`, `content`, `created_at`) VALUES
+('1', '1', '2', 'Chào thầy, em đã hoàn thành xong bài 1 và cấu hình môi trường thành công! Em sẵn sàng sang bài tiếp theo.', '2026-11-21 11:45:35'),
+('2', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 11:47:06'),
+('3', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 11:47:30'),
+('4', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 11:47:35'),
+('5', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 11:48:19'),
+('6', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 11:53:59'),
+('7', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 11:54:34'),
+('8', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 11:54:48'),
+('9', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 12:06:40'),
+('10', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 12:14:27'),
+('11', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 13:10:30'),
+('12', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 13:36:15'),
+('13', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 13:36:38'),
+('14', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 13:42:34'),
+('15', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 14:07:17'),
+('16', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 14:08:37'),
+('17', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 14:09:50'),
+('18', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 14:09:56'),
+('19', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 14:15:27'),
+('20', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 14:17:07'),
+('21', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 14:18:15'),
+('22', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-22 04:47:15'),
+('23', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-22 04:49:51'),
+('24', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-22 04:51:04');
+
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `course_reviews`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `course_reviews`;
+CREATE TABLE `course_reviews` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `course_id` int unsigned NOT NULL,
+  `user_id` int unsigned NOT NULL,
+  `rating` tinyint unsigned NOT NULL DEFAULT '5',
+  `comment` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `idx_course_rating` (`course_id`,`rating`),
+  CONSTRAINT `course_reviews_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `course_reviews_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dữ liệu bảng `course_reviews`
+INSERT INTO `course_reviews` (`id`, `course_id`, `user_id`, `rating`, `comment`, `created_at`) VALUES
+('1', '1', '2', '5', 'Khóa học cực kỳ chi tiết! Giảng viên dạy rất có tâm, giải thích mô hình MVC và bảo mật dễ hiểu.', '2026-11-21 11:45:35'),
+('2', '1', '2', '5', 'Nhờ khóa học mà mình đã tự xây dựng được đồ án website hoàn chỉnh nộp tốt nghiệp.', '2026-11-21 11:45:35'),
+('3', '2', '2', '5', 'Lộ trình Machine Learning rất logic, bài tập thực hành sát với yêu cầu tuyển dụng.', '2026-11-21 11:45:35'),
+('4', '3', '2', '5', 'Phần React Hooks và Context API giảng rất sâu sắc, giải quyết triệt để vấn đề re-render.', '2026-11-21 11:45:35'),
+('5', '4', '2', '5', 'Tuyệt vời! Khóa học hoàn toàn miễn phí nhưng chất lượng còn hơn cả nhiều khóa có phí.', '2026-11-21 11:45:35'),
+('6', '5', '2', '5', 'Hướng dẫn Docker và CI/CD thực chiến, triển khai mượt mà lên server.', '2026-11-21 11:45:35'),
+('7', '6', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 11:47:06'),
+('8', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 11:47:30'),
+('9', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 11:47:35'),
+('10', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 11:48:19'),
+('11', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 11:53:59'),
+('12', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 11:54:34'),
+('13', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 11:54:48'),
+('14', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 12:06:40'),
+('15', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 12:14:27'),
+('16', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 13:10:30'),
+('17', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 13:36:15'),
+('18', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 13:36:38'),
+('19', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 13:42:34'),
+('20', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 14:07:17'),
+('21', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 14:08:37'),
+('22', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 14:09:50'),
+('23', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 14:09:56'),
+('24', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 14:15:27'),
+('25', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 14:17:07'),
+('26', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 14:18:15'),
+('27', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-22 04:47:14'),
+('28', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-22 04:51:04');
+
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `courses`
+-- ---------------------------------------------------------
 DROP TABLE IF EXISTS `courses`;
 CREATE TABLE `courses` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -117,59 +266,291 @@ CREATE TABLE `courses` (
 
 -- Dữ liệu bảng `courses`
 INSERT INTO `courses` (`id`, `instructor_id`, `category_id`, `title`, `slug`, `summary`, `description`, `thumbnail`, `price`, `sale_price`, `level`, `status`, `total_duration_minutes`, `total_lessons`, `created_at`, `updated_at`) VALUES
-(1, 25, 87, 'Khóa học Lập trình Web Fullstack từ Zero đến Hero', 'khoa-hoc-lap-trinh-web-fullstack-tu-zero-den-hero', 'Lộ trình toàn diện làm chủ PHP, MySQL, Frontend hiện đại và tư duy kiến trúc dự án thực tế.', '<h3>Chào mừng bạn đến với khóa học Lập trình Web Fullstack!</h3><p>Khóa học này sẽ đưa bạn từ người chưa biết gì tới khi có thể tự tay xây dựng một website hoàn chỉnh với đầy đủ tính năng xác thực, thanh toán, thi trắc nghiệm và cấp chứng chỉ.</p><h4>Bạn sẽ học được gì:</h4><ul><li>Cú pháp và tư duy lập trình web hiện đại</li><li>Mô hình MVC (Model-View-Controller) trong thực tế</li><li>Thiết kế Cơ sở dữ liệu chuẩn hóa 3NF với MySQL</li><li>Tích hợp các cổng thanh toán phổ biến: VNPay, MoMo, VietQR</li></ul>', '/image/courses/web_fullstack.jpg', '599000.00', '299000.00', 'beginner', 'published', 57, 6, '2026-11-21 11:19:46', '2026-11-21 14:07:38'),
-(2, 26, 88, 'Chinh Phục Python & Trí Tuệ Nhân Tạo (AI / Machine Learning)', 'chinh-phuc-python-va-tri-tue-nhan-tao', 'Học cú pháp Python từ căn bản, làm việc với thư viện Numpy/Pandas và huấn luyện mô hình Machine Learning thực tế.', '<h3>Trở thành kỹ sư AI với lộ trình bài bản</h3><p>Khóa học trang bị cho bạn tư duy toán học ứng dụng, kỹ năng xử lý dữ liệu lớn và thuật toán Machine Learning / Deep Learning từ căn bản đến nâng cao.</p><h4>Nội dung trọng tâm:</h4><ul><li>Lập trình Python chuyên sâu: Generators, Decorators, OOP</li><li>Xử lý và làm sạch dữ liệu lớn với Pandas & NumPy</li><li>Huấn luyện mô hình Hồi quy (Regression) và Phân loại (Classification)</li><li>Đánh giá độ chính xác Precision, Recall, F1-Score</li></ul>', '/image/courses/python_ai.jpg', '899000.00', '499000.00', 'intermediate', 'published', 28, 4, '2026-11-21 11:33:12', '2026-11-21 14:08:32'),
-(3, 25, 87, 'Lập trình Frontend Hiện đại với ReactJS & Next.js', 'lap-trinh-frontend-hien-dai-reactjs', 'Xây dựng Single Page Application (SPA), làm chủ React Hooks, Redux Toolkit và Server Components.', '<h3>Nâng cấp kỹ năng Frontend lên tầm Senior</h3><p>Khóa học đi sâu vào cơ chế Virtual DOM, cách tối ưu Render với React.memo, useMemo, useCallback và xây dựng ứng dụng chuẩn Production với Next.js.</p>', '/image/courses/reactjs.jpg', '650000.00', '320000.00', 'intermediate', 'published', 24, 4, '2026-11-21 11:33:12', '2026-11-21 14:08:32'),
-(4, 27, 89, 'Thiết kế Giao diện UI/UX Chuyên nghiệp với Figma', 'thiet-ke-giao-dien-uiux-chuyen-nghiep-figma', 'Học tư duy thiết kế lấy người dùng làm trung tâm (User-Centered Design), tạo Wireframe và Design System trên Figma.', '<h3>Khóa học thiết kế thực chiến từ Figma cơ bản đến nâng cao</h3><p>Dành cho các bạn muốn bước chân vào ngành Product Design, chuyển đổi từ Designer hoặc Developer muốn nâng cao tính thẩm mỹ của sản phẩm.</p>', '/image/courses/uiux_figma.jpg', '450000.00', '0.00', 'beginner', 'published', 24, 4, '2026-11-21 11:33:12', '2026-11-21 14:08:32'),
-(5, 28, 90, 'DevOps Toàn Diện: Docker, Kubernetes & CI/CD Pipeline', 'devops-toan-dien-docker-kubernetes-cicd', 'Đóng gói ứng dụng với Docker Container, điều phối cụm Kubernetes và tự động hóa triển khai CI/CD trên GitHub Actions.', '<h3>Chinh phục kỹ năng hạ tầng Cloud & Tự động hóa</h3><p>Khóa học thực chiến dành cho lập trình viên muốn tự chủ triển khai và mở rộng quy mô ứng dụng mà không phụ thuộc vào đội ngũ Sysadmin.</p>', '/image/courses/devops_docker.jpg', '1200000.00', '799000.00', 'advanced', 'published', 27, 4, '2026-11-21 11:33:12', '2026-11-21 14:08:32'),
-(6, 26, 88, 'Phân tích Dữ liệu Kinh doanh (Data Analytics & SQL Mastery)', 'phan-tich-du-lieu-kinh-doanh-sql-mastery', 'Truy vấn dữ liệu từ cơ bản tới nâng cao với SQL, tối ưu hóa Index triệu bản ghi và trực quan hóa Dashboard kinh doanh.', '<h3>Kỹ năng phân tích số liệu không thể thiếu trong kỷ nguyên số</h3><p>Khóa học giúp bạn đọc hiểu hành vi người dùng, tìm kiếm insight từ bảng số liệu thô và hỗ trợ ra quyết định kinh doanh chuẩn xác.</p>', '/image/courses/data_analytics.jpg', '0.00', '0.00', 'all', 'published', 23, 4, '2026-11-21 11:33:12', '2026-11-21 14:08:32'),
-(7, 40, 79, 'Chuyên Sâu Golang & Kiến Trúc Microservices Hiệu Năng Cao', 'chuyen-sau-golang-kien-truc-microservices-hieu-nang-cao', 'Nắm vững ngôn ngữ Go từ cơ bản đến nâng cao, thiết kế API gRPC, Docker hóa dịch vụ và tối ưu Goroutines.', '<p>Khóa học dẫn dắt bạn qua hành trình làm chủ ngôn ngữ lập trình Golang - sự lựa chọn hàng đầu cho các hệ thống backend chịu tải cao hiện nay.</p><h5>Bạn sẽ học được gì:</h5><ul><li>Cú pháp, Pointer, Interface và Concurrency trong Go (Channel, Goroutine).</li><li>Xây dựng RESTful API chuẩn và truyền thông tốc độ cao với gRPC / Protocol Buffers.</li><li>Quản trị kết nối CSDL PostgreSQL với GORM và caching Redis.</li><li>Triển khai kiến trúc Microservices và Event-Driven với Apache Kafka.</li></ul>', '/image/courses/golang_microservices.jpg', '890000.00', '450000.00', 'intermediate', 'published', 780, 8, '2026-11-21 11:47:30', '2026-11-21 11:47:30'),
-(8, 40, 79, 'Lập Trình Di Động Đa Nền Tảng với Flutter & Dart 2026', 'lap-trinh-di-dong-da-nen-tang-voi-flutter-dart-2026', 'Phát triển ứng dụng Android và iOS mượt mà với 1 mã nguồn duy nhất, quản lý State với Bloc / Riverpod.', '<p>Flutter là framework cross-platform số 1 của Google giúp bạn tiết kiệm thời gian phát triển và tối ưu hiệu suất native 60fps.</p><h5>Nội dung nổi bật:</h5><ul><li>Ngôn ngữ Dart 3 hiện đại, lập trình hướng đối tượng.</li><li>Widget Tree: Stateless, Stateful và Custom Canvas.</li><li>Quản lý trạng thái chuyên nghiệp với BLoC & Riverpod.</li><li>Tích hợp Firebase Auth, Firestore, Push Notifications và thanh toán in-app.</li></ul>', '/image/courses/flutter_mobile.jpg', '750000.00', '390000.00', 'beginner', 'published', 620, 6, '2026-11-21 11:47:30', '2026-11-21 11:47:30'),
-(9, 41, 82, 'Chinh Phục Điện Toán Đám Mây AWS Solutions Architect', 'chinh-phuc-dien-toan-dam-may-aws-solutions-architect', 'Luyện thi chứng chỉ quốc tế AWS SAA-C03 và thực hành thiết kế kiến trúc High Availability, Auto Scaling, Serverless.', '<p>Khóa học chuẩn hóa kiến thức điện toán đám mây Amazon Web Services theo lộ trình thi chứng chỉ quốc tế Solutions Architect Associate.</p><h5>Lợi ích khóa học:</h5><ul><li>Hiểu sâu các dịch vụ cốt lõi: EC2, VPC, S3, RDS, DynamoDB, IAM, Lambda.</li><li>Thiết kế hệ thống có tính sẵn sàng cao (Multi-AZ, Load Balancer, Route 53).</li><li>Tối ưu chi phí và bảo mật hạ tầng mạng đám mây.</li><li>Luyện bộ đề thi thử 400 câu hỏi sát với đề thi thực tế có đáp án chi tiết.</li></ul>', '/image/courses/aws_cloud_architect.jpg', '1290000.00', '690000.00', 'advanced', 'published', 950, 8, '2026-11-21 11:47:30', '2026-11-21 11:47:30'),
-(10, 41, 82, 'An Toàn Thông Tin & Thực Hành Ethical Hacking (Pentest Web)', 'an-toan-thong-tin-thuc-hanh-ethical-hacking-pentest-web', 'Tìm hiểu các lỗ hổng OWASP Top 10 (SQLi, XSS, CSRF, RCE), kỹ thuật tấn công & phòng thủ bảo vệ ứng dụng doanh nghiệp.', '<p>Khóa học trang bị tư duy của một chuyên gia đánh giá an ninh mạng (Penetration Tester) để bảo vệ hệ thống trước các nguy cơ tấn công mạng.</p>', '/image/courses/cybersecurity_ethical_hacking.jpg', '950000.00', '490000.00', 'intermediate', 'published', 540, 5, '2026-11-21 11:47:30', '2026-11-21 11:47:30'),
-(11, 42, 83, 'Digital Marketing Toàn Diện & Tăng Trưởng Doanh Thu với AI', 'digital-marketing-toan-dien-tang-truong-doanh-thu-voi-ai', 'Chiến lược chạy Ads Facebook, Google Ads, SEO Onpage/Offpage và tự động hóa sáng tạo nội dung tiếp thị bằng AI.', '<p>Khóa học thực chiến giúp bạn tự xây dựng phễu bán hàng, thiết lập chiến dịch quảng cáo ra đơn và đo lường ROI chuyển đổi chuẩn xác.</p>', '/image/courses/digital_marketing_growth.jpg', '550000.00', '0.00', 'all', 'published', 420, 5, '2026-11-21 11:47:30', '2026-11-21 11:47:30'),
-(12, 42, 84, 'Tiếng Anh Giao Tiếp & Phỏng Vấn Dành Cho Dân IT (Tech English)', 'tieng-anh-giao-tiep-phong-van-danh-cho-dan-it-tech-english', 'Nâng cao khả năng đọc tài liệu chuyên ngành, viết email chuyên nghiệp và tự tin đàm phán lương trong phỏng vấn công ty Global.', '<p>Trang bị trọn gói bộ kỹ năng giao tiếp tiếng Anh chuẩn môi trường làm việc công nghệ quốc tế (Agile/Scrum, Standup meeting, Code Review).</p>', '/image/courses/ielts_tech.jpg', '0.00', '0.00', 'beginner', 'published', 360, 4, '2026-11-21 11:47:30', '2026-11-21 11:47:30');
+('1', '25', '87', 'Khóa học Lập trình Web Fullstack từ Zero đến Hero', 'khoa-hoc-lap-trinh-web-fullstack-tu-zero-den-hero', 'Lộ trình toàn diện làm chủ PHP, MySQL, Frontend hiện đại và tư duy kiến trúc dự án thực tế.', '<h3>Chào mừng bạn đến với khóa học Lập trình Web Fullstack!</h3><p>Khóa học này sẽ đưa bạn từ người chưa biết gì tới khi có thể tự tay xây dựng một website hoàn chỉnh với đầy đủ tính năng xác thực, thanh toán, thi trắc nghiệm và cấp chứng chỉ.</p><h4>Bạn sẽ học được gì:</h4><ul><li>Cú pháp và tư duy lập trình web hiện đại</li><li>Mô hình MVC (Model-View-Controller) trong thực tế</li><li>Thiết kế Cơ sở dữ liệu chuẩn hóa 3NF với MySQL</li><li>Tích hợp các cổng thanh toán phổ biến: VNPay, MoMo, VietQR</li></ul>', '/image/courses/web_fullstack.jpg', '599000.00', '299000.00', 'beginner', 'published', '57', '6', '2026-11-21 11:19:46', '2026-11-21 14:07:38'),
+('2', '26', '88', 'Chinh Phục Python & Trí Tuệ Nhân Tạo (AI / Machine Learning)', 'chinh-phuc-python-va-tri-tue-nhan-tao', 'Học cú pháp Python từ căn bản, làm việc với thư viện Numpy/Pandas và huấn luyện mô hình Machine Learning thực tế.', '<h3>Trở thành kỹ sư AI với lộ trình bài bản</h3><p>Khóa học trang bị cho bạn tư duy toán học ứng dụng, kỹ năng xử lý dữ liệu lớn và thuật toán Machine Learning / Deep Learning từ căn bản đến nâng cao.</p><h4>Nội dung trọng tâm:</h4><ul><li>Lập trình Python chuyên sâu: Generators, Decorators, OOP</li><li>Xử lý và làm sạch dữ liệu lớn với Pandas & NumPy</li><li>Huấn luyện mô hình Hồi quy (Regression) và Phân loại (Classification)</li><li>Đánh giá độ chính xác Precision, Recall, F1-Score</li></ul>', '/image/courses/python_ai.jpg', '899000.00', '499000.00', 'intermediate', 'published', '28', '4', '2026-11-21 11:33:12', '2026-11-21 14:08:32'),
+('3', '25', '87', 'Lập trình Frontend Hiện đại với ReactJS & Next.js', 'lap-trinh-frontend-hien-dai-reactjs', 'Xây dựng Single Page Application (SPA), làm chủ React Hooks, Redux Toolkit và Server Components.', '<h3>Nâng cấp kỹ năng Frontend lên tầm Senior</h3><p>Khóa học đi sâu vào cơ chế Virtual DOM, cách tối ưu Render với React.memo, useMemo, useCallback và xây dựng ứng dụng chuẩn Production với Next.js.</p>', '/image/courses/reactjs.jpg', '650000.00', '320000.00', 'intermediate', 'published', '24', '4', '2026-11-21 11:33:12', '2026-11-21 14:08:32'),
+('4', '27', '89', 'Thiết kế Giao diện UI/UX Chuyên nghiệp với Figma', 'thiet-ke-giao-dien-uiux-chuyen-nghiep-figma', 'Học tư duy thiết kế lấy người dùng làm trung tâm (User-Centered Design), tạo Wireframe và Design System trên Figma.', '<h3>Khóa học thiết kế thực chiến từ Figma cơ bản đến nâng cao</h3><p>Dành cho các bạn muốn bước chân vào ngành Product Design, chuyển đổi từ Designer hoặc Developer muốn nâng cao tính thẩm mỹ của sản phẩm.</p>', '/image/courses/uiux_figma.jpg', '450000.00', '0.00', 'beginner', 'published', '24', '4', '2026-11-21 11:33:12', '2026-11-21 14:08:32'),
+('5', '28', '90', 'DevOps Toàn Diện: Docker, Kubernetes & CI/CD Pipeline', 'devops-toan-dien-docker-kubernetes-cicd', 'Đóng gói ứng dụng với Docker Container, điều phối cụm Kubernetes và tự động hóa triển khai CI/CD trên GitHub Actions.', '<h3>Chinh phục kỹ năng hạ tầng Cloud & Tự động hóa</h3><p>Khóa học thực chiến dành cho lập trình viên muốn tự chủ triển khai và mở rộng quy mô ứng dụng mà không phụ thuộc vào đội ngũ Sysadmin.</p>', '/image/courses/devops_docker.jpg', '1200000.00', '799000.00', 'advanced', 'published', '27', '4', '2026-11-21 11:33:12', '2026-11-21 14:08:32'),
+('6', '26', '88', 'Phân tích Dữ liệu Kinh doanh (Data Analytics & SQL Mastery)', 'phan-tich-du-lieu-kinh-doanh-sql-mastery', 'Truy vấn dữ liệu từ cơ bản tới nâng cao với SQL, tối ưu hóa Index triệu bản ghi và trực quan hóa Dashboard kinh doanh.', '<h3>Kỹ năng phân tích số liệu không thể thiếu trong kỷ nguyên số</h3><p>Khóa học giúp bạn đọc hiểu hành vi người dùng, tìm kiếm insight từ bảng số liệu thô và hỗ trợ ra quyết định kinh doanh chuẩn xác.</p>', '/image/courses/data_analytics.jpg', '0.00', '0.00', 'all', 'published', '23', '4', '2026-11-21 11:33:12', '2026-11-21 14:08:32'),
+('7', '40', '79', 'Chuyên Sâu Golang & Kiến Trúc Microservices Hiệu Năng Cao', 'chuyen-sau-golang-kien-truc-microservices-hieu-nang-cao', 'Nắm vững ngôn ngữ Go từ cơ bản đến nâng cao, thiết kế API gRPC, Docker hóa dịch vụ và tối ưu Goroutines.', '<p>Khóa học dẫn dắt bạn qua hành trình làm chủ ngôn ngữ lập trình Golang - sự lựa chọn hàng đầu cho các hệ thống backend chịu tải cao hiện nay.</p><h5>Bạn sẽ học được gì:</h5><ul><li>Cú pháp, Pointer, Interface và Concurrency trong Go (Channel, Goroutine).</li><li>Xây dựng RESTful API chuẩn và truyền thông tốc độ cao với gRPC / Protocol Buffers.</li><li>Quản trị kết nối CSDL PostgreSQL với GORM và caching Redis.</li><li>Triển khai kiến trúc Microservices và Event-Driven với Apache Kafka.</li></ul>', '/image/courses/golang_microservices.jpg', '890000.00', '450000.00', 'intermediate', 'published', '780', '8', '2026-11-21 11:47:30', '2026-11-21 11:47:30'),
+('8', '40', '79', 'Lập Trình Di Động Đa Nền Tảng với Flutter & Dart 2026', 'lap-trinh-di-dong-da-nen-tang-voi-flutter-dart-2026', 'Phát triển ứng dụng Android và iOS mượt mà với 1 mã nguồn duy nhất, quản lý State với Bloc / Riverpod.', '<p>Flutter là framework cross-platform số 1 của Google giúp bạn tiết kiệm thời gian phát triển và tối ưu hiệu suất native 60fps.</p><h5>Nội dung nổi bật:</h5><ul><li>Ngôn ngữ Dart 3 hiện đại, lập trình hướng đối tượng.</li><li>Widget Tree: Stateless, Stateful và Custom Canvas.</li><li>Quản lý trạng thái chuyên nghiệp với BLoC & Riverpod.</li><li>Tích hợp Firebase Auth, Firestore, Push Notifications và thanh toán in-app.</li></ul>', '/image/courses/flutter_mobile.jpg', '750000.00', '390000.00', 'beginner', 'published', '620', '6', '2026-11-21 11:47:30', '2026-11-21 11:47:30'),
+('9', '41', '82', 'Chinh Phục Điện Toán Đám Mây AWS Solutions Architect', 'chinh-phuc-dien-toan-dam-may-aws-solutions-architect', 'Luyện thi chứng chỉ quốc tế AWS SAA-C03 và thực hành thiết kế kiến trúc High Availability, Auto Scaling, Serverless.', '<p>Khóa học chuẩn hóa kiến thức điện toán đám mây Amazon Web Services theo lộ trình thi chứng chỉ quốc tế Solutions Architect Associate.</p><h5>Lợi ích khóa học:</h5><ul><li>Hiểu sâu các dịch vụ cốt lõi: EC2, VPC, S3, RDS, DynamoDB, IAM, Lambda.</li><li>Thiết kế hệ thống có tính sẵn sàng cao (Multi-AZ, Load Balancer, Route 53).</li><li>Tối ưu chi phí và bảo mật hạ tầng mạng đám mây.</li><li>Luyện bộ đề thi thử 400 câu hỏi sát với đề thi thực tế có đáp án chi tiết.</li></ul>', '/image/courses/aws_cloud_architect.jpg', '1290000.00', '690000.00', 'advanced', 'published', '950', '8', '2026-11-21 11:47:30', '2026-11-21 11:47:30'),
+('10', '41', '82', 'An Toàn Thông Tin & Thực Hành Ethical Hacking (Pentest Web)', 'an-toan-thong-tin-thuc-hanh-ethical-hacking-pentest-web', 'Tìm hiểu các lỗ hổng OWASP Top 10 (SQLi, XSS, CSRF, RCE), kỹ thuật tấn công & phòng thủ bảo vệ ứng dụng doanh nghiệp.', '<p>Khóa học trang bị tư duy của một chuyên gia đánh giá an ninh mạng (Penetration Tester) để bảo vệ hệ thống trước các nguy cơ tấn công mạng.</p>', '/image/courses/cybersecurity_ethical_hacking.jpg', '950000.00', '490000.00', 'intermediate', 'published', '540', '5', '2026-11-21 11:47:30', '2026-11-21 11:47:30'),
+('11', '42', '83', 'Digital Marketing Toàn Diện & Tăng Trưởng Doanh Thu với AI', 'digital-marketing-toan-dien-tang-truong-doanh-thu-voi-ai', 'Chiến lược chạy Ads Facebook, Google Ads, SEO Onpage/Offpage và tự động hóa sáng tạo nội dung tiếp thị bằng AI.', '<p>Khóa học thực chiến giúp bạn tự xây dựng phễu bán hàng, thiết lập chiến dịch quảng cáo ra đơn và đo lường ROI chuyển đổi chuẩn xác.</p>', '/image/courses/digital_marketing_growth.jpg', '550000.00', '0.00', 'all', 'published', '420', '5', '2026-11-21 11:47:30', '2026-11-21 11:47:30'),
+('12', '42', '84', 'Tiếng Anh Giao Tiếp & Phỏng Vấn Dành Cho Dân IT (Tech English)', 'tieng-anh-giao-tiep-phong-van-danh-cho-dan-it-tech-english', 'Nâng cao khả năng đọc tài liệu chuyên ngành, viết email chuyên nghiệp và tự tin đàm phán lương trong phỏng vấn công ty Global.', '<p>Trang bị trọn gói bộ kỹ năng giao tiếp tiếng Anh chuẩn môi trường làm việc công nghệ quốc tế (Agile/Scrum, Standup meeting, Code Review).</p>', '/image/courses/ielts_tech.jpg', '0.00', '0.00', 'beginner', 'published', '360', '4', '2026-11-21 11:47:30', '2026-11-21 11:47:30');
 
--- -------------------------------------------------------------
--- Bảng: `sections`
--- -------------------------------------------------------------
-DROP TABLE IF EXISTS `sections`;
-CREATE TABLE `sections` (
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `enrollments`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `enrollments`;
+CREATE TABLE `enrollments` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int unsigned NOT NULL,
   `course_id` int unsigned NOT NULL,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `sort_order` int unsigned NOT NULL DEFAULT '0',
+  `status` enum('active','expired','revoked') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
+  `progress_percent` decimal(5,2) NOT NULL DEFAULT '0.00',
+  `enrolled_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `completed_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_user_course` (`user_id`,`course_id`),
+  KEY `course_id` (`course_id`),
+  KEY `idx_enroll_user` (`user_id`),
+  CONSTRAINT `enrollments_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `enrollments_ibfk_2` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=92 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dữ liệu bảng `enrollments`
+INSERT INTO `enrollments` (`id`, `user_id`, `course_id`, `status`, `progress_percent`, `enrolled_at`, `completed_at`) VALUES
+('2', '1', '1', 'active', '0.00', '2026-11-21 11:38:44', NULL),
+('3', '2', '6', 'active', '25.00', '2026-11-21 11:39:21', NULL),
+('8', '43', '1', 'active', '100.00', '2026-11-21 11:47:30', '2026-11-21 18:47:30'),
+('9', '43', '2', 'active', '25.00', '2026-11-21 11:47:30', NULL),
+('10', '43', '3', 'active', '25.00', '2026-11-21 11:47:30', NULL),
+('14', '44', '2', 'active', '70.00', '2026-11-21 11:50:40', NULL),
+('15', '44', '3', 'active', '70.00', '2026-11-21 11:50:40', NULL),
+('16', '44', '4', 'active', '70.00', '2026-11-21 11:50:40', NULL),
+('17', '45', '3', 'active', '100.00', '2026-11-21 11:51:24', '2026-11-21 18:51:24'),
+('18', '45', '4', 'active', '100.00', '2026-11-21 11:51:24', '2026-11-21 18:51:24'),
+('19', '45', '5', 'active', '100.00', '2026-11-21 11:51:24', '2026-11-21 18:51:24'),
+('20', '46', '4', 'active', '100.00', '2026-11-21 11:51:24', '2026-11-21 18:51:24'),
+('21', '46', '5', 'active', '100.00', '2026-11-21 11:51:24', '2026-11-21 18:51:24'),
+('22', '46', '6', 'active', '100.00', '2026-11-21 11:51:24', '2026-11-21 18:51:24'),
+('23', '47', '5', 'active', '100.00', '2026-11-21 11:51:24', '2026-11-21 18:51:24'),
+('24', '47', '6', 'active', '100.00', '2026-11-21 11:51:24', '2026-11-21 18:51:24'),
+('25', '47', '7', 'active', '100.00', '2026-11-21 11:51:24', '2026-11-21 18:51:24'),
+('26', '48', '6', 'active', '100.00', '2026-11-21 11:51:24', '2026-11-21 18:51:24'),
+('27', '48', '7', 'active', '100.00', '2026-11-21 11:51:24', '2026-11-21 18:51:24'),
+('28', '48', '8', 'active', '100.00', '2026-11-21 11:51:24', '2026-11-21 18:51:24'),
+('36', '1', '8', 'active', '0.00', '2026-11-21 13:12:03', NULL),
+('39', '1', '5', 'active', '0.00', '2026-11-21 13:12:34', NULL),
+('67', '2', '11', 'active', '0.00', '2026-11-21 14:10:52', NULL);
+
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `instructor_profiles`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `instructor_profiles`;
+CREATE TABLE `instructor_profiles` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int unsigned NOT NULL,
+  `headline` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `bio` text COLLATE utf8mb4_unicode_ci,
+  `qualification` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `experience_years` tinyint unsigned DEFAULT '0',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `idx_section_sort` (`course_id`,`sort_order`),
-  CONSTRAINT `sections_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE
+  UNIQUE KEY `user_id` (`user_id`),
+  CONSTRAINT `instructor_profiles_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dữ liệu bảng `instructor_profiles`
+INSERT INTO `instructor_profiles` (`id`, `user_id`, `headline`, `bio`, `qualification`, `experience_years`, `created_at`) VALUES
+('1', '25', 'Senior Fullstack Engineer & Giảng viên Công nghệ', 'Hơn 8 năm kinh nghiệm phát triển hệ thống và giảng dạy cho hàng ngàn học viên.', 'Thạc sĩ Khoa học Máy tính', '8', '2026-11-21 11:19:27'),
+('2', '26', 'AI Research Scientist & Data Lead', 'Tiến sĩ Trí tuệ Nhân tạo tại ĐH Quốc gia, chuyên gia Machine Learning và phân tích dữ liệu lớn.', 'Tiến sĩ Trí tuệ Nhân tạo', '10', '2026-11-21 11:33:11'),
+('3', '27', 'Lead Product Designer & UX Specialist', 'Hơn 6 năm thiết kế sản phẩm số cho các tập đoàn công nghệ, chuyên sâu về Design System trên Figma.', 'Cử nhân Thiết kế Đồ họa & Tương tác', '6', '2026-11-21 11:33:11'),
+('4', '28', 'DevOps & Cloud Solutions Architect', 'Chuyên gia tư vấn hạ tầng đám mây, Kubernetes, Docker và tự động hóa quy trình CI/CD cho doanh nghiệp.', 'Kỹ sư Hệ thống & AWS Certified Solutions Architect', '7', '2026-11-21 11:33:11'),
+('5', '40', 'Senior Backend Engineer & Go Specialist tại VNG', 'Hơn 9 năm kinh nghiệm thiết kế hệ thống Microservices xử lý hàng chục triệu requests mỗi ngày với Golang, Docker, Kafka.', 'Thạc sĩ Khoa học Máy tính (ĐH Bách Khoa)', '9', '2026-11-21 11:47:30'),
+('6', '41', 'AWS Certified Solutions Architect - Professional', 'Từng tư vấn di chuyển hạ tầng đám mây cho hơn 40 tập đoàn lớn, chuyên sâu về Kubernetes, Terraform và kiến trúc Serverless.', 'Kỹ sư Hệ thống Viễn thông & Đám mây', '11', '2026-11-21 11:47:30'),
+('7', '42', 'Lead Growth Marketer & Digital Strategist', 'Chuyên gia tối ưu tỷ lệ chuyển đổi, quản lý ngân sách quảng cáo hơn 2 triệu USD/năm trên nền tảng Meta và Google Ads.', 'Cử nhân Kinh tế Đối ngoại (ĐH Ngoại Thương)', '7', '2026-11-21 11:47:30');
+
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `job_queue`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `job_queue`;
+CREATE TABLE `job_queue` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `queue` varchar(50) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'default',
+  `job_type` varchar(80) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `attempts` tinyint unsigned NOT NULL DEFAULT '0',
+  `available_at` datetime NOT NULL,
+  `reserved_at` datetime DEFAULT NULL,
+  `completed_at` datetime DEFAULT NULL,
+  `last_error` text COLLATE utf8mb4_unicode_ci,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_jobs_pending` (`queue`,`completed_at`,`available_at`),
+  KEY `idx_jobs_type` (`job_type`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `lesson_discussions`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `lesson_discussions`;
+CREATE TABLE `lesson_discussions` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `lesson_id` int unsigned NOT NULL,
+  `user_id` int unsigned NOT NULL,
+  `parent_id` int unsigned DEFAULT NULL,
+  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `parent_id` (`parent_id`),
+  KEY `idx_lesson_parent` (`lesson_id`,`parent_id`),
+  CONSTRAINT `lesson_discussions_ibfk_1` FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `lesson_discussions_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `lesson_discussions_ibfk_3` FOREIGN KEY (`parent_id`) REFERENCES `lesson_discussions` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dữ liệu bảng `lesson_discussions`
+INSERT INTO `lesson_discussions` (`id`, `lesson_id`, `user_id`, `parent_id`, `content`, `created_at`) VALUES
+('1', '1', '2', NULL, 'Em chào thầy, cho em hỏi thêm về cách cấu hình biến môi trường .env trên server ạ?', '2026-11-21 11:52:22');
+
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `lesson_materials`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `lesson_materials`;
+CREATE TABLE `lesson_materials` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `lesson_id` int unsigned NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `file_path` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `file_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `file_size_bytes` bigint unsigned DEFAULT '0',
+  `download_count` int unsigned DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `lesson_id` (`lesson_id`),
+  CONSTRAINT `lesson_materials_ibfk_1` FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `sections`
-INSERT INTO `sections` (`id`, `course_id`, `title`, `sort_order`, `created_at`) VALUES
-(1, 1, 'Chương 1: Tổng quan và Thiết lập môi trường', 1, '2026-11-21 11:19:46'),
-(2, 1, 'Chương 2: Kiến trúc Nâng cao & Lập trình Hướng đối tượng', 2, '2026-11-21 11:33:11'),
-(3, 2, 'Chương 1: Python Căn Bản & Cấu Trúc Dữ Liệu', 1, '2026-11-21 11:33:12'),
-(4, 3, 'Chương 1: Kiến trúc React Core & Tư duy Component', 1, '2026-11-21 11:33:12'),
-(5, 4, 'Chương 1: Công cụ Figma & Nguyên lý Visual Design', 1, '2026-11-21 11:33:12'),
-(6, 5, 'Chương 1: Đóng gói Ứng dụng với Docker', 1, '2026-11-21 11:33:12'),
-(7, 6, 'Chương 1: SQL Truy Vấn & Tối Ưu Hóa Dữ Liệu', 1, '2026-11-21 11:33:12'),
-(8, 7, 'Chương 1: Nền tảng kiến thức & Thiết lập môi trường', 1, '2026-11-21 11:47:30'),
-(9, 7, 'Chương 2: Thực chiến chuyên sâu & Kiểm tra đánh giá', 2, '2026-11-21 11:47:30'),
-(10, 8, 'Chương 1: Nền tảng kiến thức & Thiết lập môi trường', 1, '2026-11-21 11:47:30'),
-(11, 8, 'Chương 2: Thực chiến chuyên sâu & Kiểm tra đánh giá', 2, '2026-11-21 11:47:30'),
-(12, 9, 'Chương 1: Nền tảng kiến thức & Thiết lập môi trường', 1, '2026-11-21 11:47:30'),
-(13, 9, 'Chương 2: Thực chiến chuyên sâu & Kiểm tra đánh giá', 2, '2026-11-21 11:47:30'),
-(14, 10, 'Chương 1: Nền tảng kiến thức & Thiết lập môi trường', 1, '2026-11-21 11:47:30'),
-(15, 10, 'Chương 2: Thực chiến chuyên sâu & Kiểm tra đánh giá', 2, '2026-11-21 11:47:30'),
-(16, 11, 'Chương 1: Nền tảng kiến thức & Thiết lập môi trường', 1, '2026-11-21 11:47:30'),
-(17, 11, 'Chương 2: Thực chiến chuyên sâu & Kiểm tra đánh giá', 2, '2026-11-21 11:47:30'),
-(18, 12, 'Chương 1: Nền tảng kiến thức & Thiết lập môi trường', 1, '2026-11-21 11:47:30'),
-(19, 12, 'Chương 2: Thực chiến chuyên sâu & Kiểm tra đánh giá', 2, '2026-11-21 11:47:30');
+-- Dữ liệu bảng `lesson_materials`
+INSERT INTO `lesson_materials` (`id`, `lesson_id`, `title`, `file_path`, `file_type`, `file_size_bytes`, `download_count`, `created_at`) VALUES
+('1', '1', 'Giao_trinh_tong_quan_khoa_hoc.pdf', '/storage/materials/sample_doc.pdf', 'pdf', '1048576', '0', '2026-11-21 11:19:46'),
+('2', '3', 'Giao_trinh_tong_quan_fullstack.pdf', '/storage/materials/Giao_trinh_tong_quan_fullstack.pdf', 'pdf', '1048576', '0', '2026-11-21 11:33:11'),
+('3', '4', 'Source_code_oop_mvc.zip', '/storage/materials/Source_code_oop_mvc.zip', 'zip', '1048576', '0', '2026-11-21 11:33:12'),
+('4', '6', 'Python_CheatSheet_LMS.pdf', '/storage/materials/Python_CheatSheet_LMS.pdf', 'pdf', '1048576', '0', '2026-11-21 11:33:12'),
+('5', '7', 'Machine_Learning_Datasets.zip', '/storage/materials/Machine_Learning_Datasets.zip', 'zip', '1048576', '0', '2026-11-21 11:33:12'),
+('6', '9', 'React_Core_Slides.pdf', '/storage/materials/React_Core_Slides.pdf', 'pdf', '1048576', '0', '2026-11-21 11:33:12'),
+('7', '10', 'Hooks_Exercise_Starter.zip', '/storage/materials/Hooks_Exercise_Starter.zip', 'zip', '1048576', '0', '2026-11-21 11:33:12'),
+('8', '12', 'Figma_UI_Kit_Template.fig', '/storage/materials/Figma_UI_Kit_Template.fig', 'fig', '1048576', '0', '2026-11-21 11:33:12'),
+('9', '13', 'UX_Research_Framework.pdf', '/storage/materials/UX_Research_Framework.pdf', 'pdf', '1048576', '0', '2026-11-21 11:33:12'),
+('10', '15', 'Dockerfile_Best_Practices.pdf', '/storage/materials/Dockerfile_Best_Practices.pdf', 'pdf', '1048576', '0', '2026-11-21 11:33:12'),
+('11', '16', 'github-actions-workflow.yml', '/storage/materials/github-actions-workflow.yml', 'yml', '1048576', '0', '2026-11-21 11:33:12'),
+('12', '18', 'SQL_Practice_Database.sql', '/storage/materials/SQL_Practice_Database.sql', 'sql', '1048576', '0', '2026-11-21 11:33:12'),
+('13', '19', 'Query_Optimization_Guide.pdf', '/storage/materials/Query_Optimization_Guide.pdf', 'pdf', '1048576', '0', '2026-11-21 11:33:12'),
+('14', '22', 'Giao-trinh-thuc-hanh.pdf', '/storage/docs/sample.pdf', 'pdf', '2450000', '0', '2026-11-21 11:47:30'),
+('15', '26', 'Giao-trinh-thuc-hanh.pdf', '/storage/docs/sample.pdf', 'pdf', '2450000', '0', '2026-11-21 11:47:30'),
+('16', '30', 'Giao-trinh-thuc-hanh.pdf', '/storage/docs/sample.pdf', 'pdf', '2450000', '0', '2026-11-21 11:47:30'),
+('17', '34', 'Giao-trinh-thuc-hanh.pdf', '/storage/docs/sample.pdf', 'pdf', '2450000', '0', '2026-11-21 11:47:30'),
+('18', '38', 'Giao-trinh-thuc-hanh.pdf', '/storage/docs/sample.pdf', 'pdf', '2450000', '1', '2026-11-21 11:47:30'),
+('19', '42', 'Giao-trinh-thuc-hanh.pdf', '/storage/docs/sample.pdf', 'pdf', '2450000', '0', '2026-11-21 11:47:30');
 
--- -------------------------------------------------------------
--- Bảng: `lessons`
--- -------------------------------------------------------------
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `lesson_notes`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `lesson_notes`;
+CREATE TABLE `lesson_notes` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `lesson_id` int unsigned NOT NULL,
+  `user_id` int unsigned NOT NULL,
+  `timestamp_seconds` int unsigned NOT NULL DEFAULT '0',
+  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `lesson_id` (`lesson_id`),
+  KEY `idx_user_lesson` (`user_id`,`lesson_id`),
+  CONSTRAINT `lesson_notes_ibfk_1` FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `lesson_notes_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dữ liệu bảng `lesson_notes`
+INSERT INTO `lesson_notes` (`id`, `lesson_id`, `user_id`, `timestamp_seconds`, `content`, `created_at`, `updated_at`) VALUES
+('1', '1', '2', '45', 'Lưu ý về cấu trúc thư mục MVC và cách gọi Database connection.', '2026-11-21 11:52:22', '2026-11-21 11:52:22');
+
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `lesson_progress`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `lesson_progress`;
+CREATE TABLE `lesson_progress` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int unsigned NOT NULL,
+  `lesson_id` int unsigned NOT NULL,
+  `is_completed` tinyint(1) NOT NULL DEFAULT '0',
+  `last_watch_second` int unsigned NOT NULL DEFAULT '0',
+  `completed_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uq_user_lesson` (`user_id`,`lesson_id`),
+  KEY `lesson_id` (`lesson_id`),
+  CONSTRAINT `lesson_progress_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `lesson_progress_ibfk_2` FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=207 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dữ liệu bảng `lesson_progress`
+INSERT INTO `lesson_progress` (`id`, `user_id`, `lesson_id`, `is_completed`, `last_watch_second`, `completed_at`, `updated_at`) VALUES
+('1', '2', '18', '1', '120', '2026-11-21 18:39:21', '2026-11-21 11:39:21'),
+('2', '2', '5', '1', '0', '2026-11-21 18:39:21', '2026-11-21 11:39:21'),
+('23', '1', '41', '0', '450', NULL, '2026-11-21 11:54:48'),
+('29', '1', '1', '0', '76', NULL, '2026-11-21 12:32:45'),
+('51', '1', '2', '0', '9', NULL, '2026-11-21 12:32:54'),
+('58', '1', '25', '0', '8', NULL, '2026-11-21 13:12:25'),
+('63', '1', '15', '0', '5', NULL, '2026-11-21 13:14:38'),
+('69', '2', '15', '0', '6', NULL, '2026-11-21 13:28:45'),
+('72', '2', '6', '0', '4', NULL, '2026-11-21 14:11:49'),
+('73', '2', '21', '0', '29', NULL, '2026-11-21 13:29:39'),
+('93', '2', '33', '0', '3', NULL, '2026-11-21 14:01:58'),
+('110', '2', '37', '0', '193', NULL, '2026-11-22 04:45:42'),
+('112', '2', '46', '0', '0', NULL, '2026-11-21 14:11:42'),
+('129', '2', '50', '0', '0', NULL, '2026-11-22 04:40:37'),
+('174', '2', '38', '0', '108', NULL, '2026-11-22 04:47:30'),
+('206', '2', '41', '0', '180', NULL, '2026-11-22 04:51:04');
+
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `lesson_videos`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `lesson_videos`;
+CREATE TABLE `lesson_videos` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `lesson_id` int unsigned NOT NULL,
+  `provider` enum('local','youtube','vimeo','s3') COLLATE utf8mb4_unicode_ci DEFAULT 'local',
+  `video_url` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `duration_seconds` int unsigned NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `lesson_id` (`lesson_id`),
+  CONSTRAINT `lesson_videos_ibfk_1` FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dữ liệu bảng `lesson_videos`
+INSERT INTO `lesson_videos` (`id`, `lesson_id`, `provider`, `video_url`, `duration_seconds`, `created_at`) VALUES
+('1', '1', 'youtube', 'https://www.youtube.com/embed/zJSY8tbf_ys', '900', '2026-11-21 11:19:46'),
+('2', '3', 'youtube', 'https://www.youtube.com/embed/zJSY8tbf_ys', '600', '2026-11-21 11:33:11'),
+('3', '4', 'youtube', 'https://www.youtube.com/embed/2eebptXfEvw', '720', '2026-11-21 11:33:11'),
+('4', '6', 'youtube', 'https://www.youtube.com/embed/kqtD5dpn9C8', '750', '2026-11-21 11:33:12'),
+('5', '7', 'youtube', 'https://www.youtube.com/embed/i_LwzRVP7bg', '900', '2026-11-21 11:33:12'),
+('6', '9', 'youtube', 'https://www.youtube.com/embed/bMknfKXIFA8', '680', '2026-11-21 11:33:12'),
+('7', '10', 'youtube', 'https://www.youtube.com/embed/W6NZfCO5SIk', '750', '2026-11-21 11:33:12'),
+('8', '12', 'youtube', 'https://www.youtube.com/embed/FTFaQWZBqQ8', '640', '2026-11-21 11:33:12'),
+('9', '13', 'youtube', 'https://www.youtube.com/embed/c9Wg6Cb_YlU', '800', '2026-11-21 11:33:12'),
+('10', '15', 'youtube', 'https://www.youtube.com/embed/3c-iBn73dDE', '820', '2026-11-21 11:33:12'),
+('11', '16', 'youtube', 'https://www.youtube.com/embed/pg19Z8LL0vQ', '780', '2026-11-21 11:33:12'),
+('12', '18', 'youtube', 'https://www.youtube.com/embed/ua-CiDNNj30', '650', '2026-11-21 11:33:12'),
+('13', '19', 'youtube', 'https://www.youtube.com/embed/2eebptXfEvw', '700', '2026-11-21 11:33:12'),
+('14', '21', 'youtube', 'https://www.youtube.com/embed/YS4e4q9oBaU', '900', '2026-11-21 11:47:30'),
+('15', '23', 'youtube', 'https://www.youtube.com/embed/YS4e4q9oBaU', '1500', '2026-11-21 11:47:30'),
+('16', '25', 'youtube', 'https://www.youtube.com/embed/VPvVD8t02U8', '900', '2026-11-21 11:47:30'),
+('17', '27', 'youtube', 'https://www.youtube.com/embed/VPvVD8t02U8', '1500', '2026-11-21 11:47:30'),
+('18', '29', 'youtube', 'https://www.youtube.com/embed/Ia-UEYYR44s', '900', '2026-11-21 11:47:30'),
+('19', '31', 'youtube', 'https://www.youtube.com/embed/Ia-UEYYR44s', '1500', '2026-11-21 11:47:30'),
+('20', '33', 'youtube', 'https://www.youtube.com/embed/3Kq1MIfTWCE', '900', '2026-11-21 11:47:30'),
+('21', '35', 'youtube', 'https://www.youtube.com/embed/3Kq1MIfTWCE', '1500', '2026-11-21 11:47:30'),
+('22', '37', 'youtube', 'https://www.youtube.com/embed/nU-IIXBWlS4', '900', '2026-11-21 11:47:30'),
+('23', '39', 'youtube', 'https://www.youtube.com/embed/nU-IIXBWlS4', '1500', '2026-11-21 11:47:30'),
+('24', '41', 'youtube', 'https://www.youtube.com/embed/f02mOEt11OQ', '600', '2026-11-21 11:47:30'),
+('25', '43', 'youtube', 'https://www.youtube.com/embed/0fYi8SGA20k', '1500', '2026-11-21 11:47:30'),
+('26', '42', 'youtube', 'https://www.youtube.com/embed/8pDqJVdNa44', '900', '2026-11-21 12:05:36'),
+('27', '2', 'youtube', 'https://www.youtube.com/embed/2eebptXfEvw', '1200', '2026-11-21 12:05:36'),
+('28', '22', 'youtube', 'https://www.youtube.com/embed/YS4e4q9oBaU', '1200', '2026-11-21 12:05:36'),
+('29', '26', 'youtube', 'https://www.youtube.com/embed/VPvVD8t02U8', '1200', '2026-11-21 12:05:36'),
+('30', '30', 'youtube', 'https://www.youtube.com/embed/Ia-UEYYR44s', '1200', '2026-11-21 12:05:36'),
+('31', '34', 'youtube', 'https://www.youtube.com/embed/3Kq1MIfTWCE', '1200', '2026-11-21 12:05:36'),
+('32', '38', 'youtube', 'https://www.youtube.com/embed/nU-IIXBWlS4', '1200', '2026-11-21 12:05:36');
+
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `lessons`
+-- ---------------------------------------------------------
 DROP TABLE IF EXISTS `lessons`;
 CREATE TABLE `lessons` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -188,187 +569,910 @@ CREATE TABLE `lessons` (
 
 -- Dữ liệu bảng `lessons`
 INSERT INTO `lessons` (`id`, `section_id`, `title`, `slug`, `lesson_type`, `content`, `is_preview`, `sort_order`, `created_at`) VALUES
-(1, 1, 'Bài 1: Giới thiệu khóa học & Phương pháp học hiệu quả', 'bai-1-gioi-thieu-khoa-hoc', 'video', NULL, 1, 1, '2026-11-21 11:19:46'),
-(2, 1, 'Bài 2: Hiểu rõ mô hình MVC trong thực tế', 'bai-2-hieu-ro-mo-hinh-mvc', 'video', NULL, 1, 2, '2026-11-21 11:19:46'),
-(3, 2, 'Bài 1: Tổng quan lộ trình Fullstack & Thiết lập môi trường', 'b-i-1-t-ng-quan-l-tr-nh-fullstack-thi-t-l-p-m-i-tr-ng', 'video', NULL, 1, 1, '2026-11-21 11:33:11'),
-(4, 2, 'Bài 2: Làm chủ kiến trúc Backend MVC & Hướng đối tượng OOP', 'b-i-2-l-m-ch-ki-n-tr-c-backend-mvc-h-ng-i-t-ng-oop', 'video', NULL, 0, 2, '2026-11-21 11:33:11'),
-(5, 2, 'Bài 3: Bài kiểm tra đánh giá kiến thức Chương 1', 'b-i-3-b-i-ki-m-tra-nh-gi-ki-n-th-c-ch-ng-1', 'quiz', NULL, 0, 3, '2026-11-21 11:33:12'),
-(6, 3, 'Bài 1: Cú pháp Python, List, Dict và Hàm xử lý', 'b-i-1-c-ph-p-python-list-dict-v-h-m-x-l-', 'video', NULL, 1, 1, '2026-11-21 11:33:12'),
-(7, 3, 'Bài 2: Tổng quan về Machine Learning & Học có giám sát', 'b-i-2-t-ng-quan-v-machine-learning-h-c-c-gi-m-s-t', 'video', NULL, 0, 3, '2026-11-21 11:33:12'),
-(8, 3, 'Bài 3: Bài kiểm tra Kiến thức Python & Thuật toán Học máy', 'b-i-3-b-i-ki-m-tra-ki-n-th-c-python-thu-t-to-n-h-c-m-y', 'quiz', NULL, 0, 4, '2026-11-21 11:33:12'),
-(9, 4, 'Bài 1: JSX, Props, State và Vòng đời Component', 'b-i-1-jsx-props-state-v-v-ng-i-component', 'video', NULL, 1, 1, '2026-11-21 11:33:12'),
-(10, 4, 'Bài 2: Làm chủ React Hooks: useState, useEffect, useRef', 'b-i-2-l-m-ch-react-hooks-usestate-useeffect-useref', 'video', NULL, 0, 3, '2026-11-21 11:33:12'),
-(11, 4, 'Bài 3: Bài thi trắc nghiệm ReactJS & Virtual DOM', 'b-i-3-b-i-thi-tr-c-nghi-m-reactjs-virtual-dom', 'quiz', NULL, 0, 4, '2026-11-21 11:33:12'),
-(12, 5, 'Bài 1: Làm quen giao diện Figma, Frame, Auto Layout và Variants', 'b-i-1-l-m-quen-giao-di-n-figma-frame-auto-layout-v-variants', 'video', NULL, 1, 1, '2026-11-21 11:33:12'),
-(13, 5, 'Bài 2: Tư duy UX, Quy trình Phỏng vấn Người dùng & Wireframing', 'b-i-2-t-duy-ux-quy-tr-nh-ph-ng-v-n-ng-i-d-ng-wireframing', 'video', NULL, 0, 3, '2026-11-21 11:33:12'),
-(14, 5, 'Bài 3: Trắc nghiệm Kiến thức UI/UX & Nguyên lý Thiết kế', 'b-i-3-tr-c-nghi-m-ki-n-th-c-ui-ux-nguy-n-l-thi-t-k-', 'quiz', NULL, 0, 4, '2026-11-21 11:33:12'),
-(15, 6, 'Bài 1: Docker Architecture, Images, Containers & Viết Dockerfile', 'b-i-1-docker-architecture-images-containers-vi-t-dockerfile', 'video', NULL, 1, 1, '2026-11-21 11:33:12'),
-(16, 6, 'Bài 2: GitOps & Tự động hóa Pipeline CI/CD với GitHub Actions', 'b-i-2-gitops-t-ng-h-a-pipeline-ci-cd-v-i-github-actions', 'video', NULL, 0, 3, '2026-11-21 11:33:12'),
-(17, 6, 'Bài 3: Trắc nghiệm Kiến thức Docker & Containerization', 'b-i-3-tr-c-nghi-m-ki-n-th-c-docker-containerization', 'quiz', NULL, 0, 4, '2026-11-21 11:33:12'),
-(18, 7, 'Bài 1: Cú pháp SELECT, GROUP BY, HAVING & Kỹ thuật JOIN nhiều bảng', 'b-i-1-c-ph-p-select-group-by-having-k-thu-t-join-nhi-u-b-ng', 'video', NULL, 1, 1, '2026-11-21 11:33:12'),
-(19, 7, 'Bài 2: Đánh chỉ mục Index (B-Tree) & Tối ưu hiệu năng câu truy vấn', 'b-i-2-nh-ch-m-c-index-b-tree-t-i-u-hi-u-n-ng-c-u-truy-v-n', 'video', NULL, 0, 3, '2026-11-21 11:33:12'),
-(20, 7, 'Bài 3: Trắc nghiệm Kiến thức SQL & Phân tích Dữ liệu', 'b-i-3-tr-c-nghi-m-ki-n-th-c-sql-ph-n-t-ch-d-li-u', 'quiz', NULL, 0, 4, '2026-11-21 11:33:12'),
-(21, 8, '01. Giới thiệu tổng quan & Lộ trình học tập', 'chuyen-sau-golang-kien-truc-microservices-hieu-nang-cao-bai-1', 'video', 'Chào mừng các bạn đến với khóa học!', 1, 1, '2026-11-21 11:47:30'),
-(22, 8, '02. Cài đặt công cụ và Hướng dẫn thực hành', 'chuyen-sau-golang-kien-truc-microservices-hieu-nang-cao-bai-2', 'document', 'Tài liệu hướng dẫn chi tiết từng bước cài đặt.', 0, 2, '2026-11-21 11:47:30'),
-(23, 9, '03. Kỹ thuật nâng cao và Best Practices', 'chuyen-sau-golang-kien-truc-microservices-hieu-nang-cao-bai-3', 'video', 'Video phân tích chi tiết các kỹ thuật thực chiến trong dự án thực tế.', 0, 1, '2026-11-21 11:47:30'),
-(24, 9, '04. Bài kiểm tra trắc nghiệm đánh giá năng lực', 'chuyen-sau-golang-kien-truc-microservices-hieu-nang-cao-bai-4', 'quiz', 'Hoàn thành bài kiểm tra để đủ điều kiện nhận chứng chỉ.', 0, 2, '2026-11-21 11:47:30'),
-(25, 10, '01. Giới thiệu tổng quan & Lộ trình học tập', 'lap-trinh-di-dong-da-nen-tang-voi-flutter-dart-2026-bai-1', 'video', 'Chào mừng các bạn đến với khóa học!', 1, 1, '2026-11-21 11:47:30'),
-(26, 10, '02. Cài đặt công cụ và Hướng dẫn thực hành', 'lap-trinh-di-dong-da-nen-tang-voi-flutter-dart-2026-bai-2', 'document', 'Tài liệu hướng dẫn chi tiết từng bước cài đặt.', 0, 2, '2026-11-21 11:47:30'),
-(27, 11, '03. Kỹ thuật nâng cao và Best Practices', 'lap-trinh-di-dong-da-nen-tang-voi-flutter-dart-2026-bai-3', 'video', 'Video phân tích chi tiết các kỹ thuật thực chiến trong dự án thực tế.', 0, 1, '2026-11-21 11:47:30'),
-(28, 11, '04. Bài kiểm tra trắc nghiệm đánh giá năng lực', 'lap-trinh-di-dong-da-nen-tang-voi-flutter-dart-2026-bai-4', 'quiz', 'Hoàn thành bài kiểm tra để đủ điều kiện nhận chứng chỉ.', 0, 2, '2026-11-21 11:47:30'),
-(29, 12, '01. Giới thiệu tổng quan & Lộ trình học tập', 'chinh-phuc-dien-toan-dam-may-aws-solutions-architect-bai-1', 'video', 'Chào mừng các bạn đến với khóa học!', 1, 1, '2026-11-21 11:47:30'),
-(30, 12, '02. Cài đặt công cụ và Hướng dẫn thực hành', 'chinh-phuc-dien-toan-dam-may-aws-solutions-architect-bai-2', 'document', 'Tài liệu hướng dẫn chi tiết từng bước cài đặt.', 0, 2, '2026-11-21 11:47:30'),
-(31, 13, '03. Kỹ thuật nâng cao và Best Practices', 'chinh-phuc-dien-toan-dam-may-aws-solutions-architect-bai-3', 'video', 'Video phân tích chi tiết các kỹ thuật thực chiến trong dự án thực tế.', 0, 1, '2026-11-21 11:47:30'),
-(32, 13, '04. Bài kiểm tra trắc nghiệm đánh giá năng lực', 'chinh-phuc-dien-toan-dam-may-aws-solutions-architect-bai-4', 'quiz', 'Hoàn thành bài kiểm tra để đủ điều kiện nhận chứng chỉ.', 0, 2, '2026-11-21 11:47:30'),
-(33, 14, '01. Giới thiệu tổng quan & Lộ trình học tập', 'an-toan-thong-tin-thuc-hanh-ethical-hacking-pentest-web-bai-1', 'video', 'Chào mừng các bạn đến với khóa học!', 1, 1, '2026-11-21 11:47:30'),
-(34, 14, '02. Cài đặt công cụ và Hướng dẫn thực hành', 'an-toan-thong-tin-thuc-hanh-ethical-hacking-pentest-web-bai-2', 'document', 'Tài liệu hướng dẫn chi tiết từng bước cài đặt.', 0, 2, '2026-11-21 11:47:30'),
-(35, 15, '03. Kỹ thuật nâng cao và Best Practices', 'an-toan-thong-tin-thuc-hanh-ethical-hacking-pentest-web-bai-3', 'video', 'Video phân tích chi tiết các kỹ thuật thực chiến trong dự án thực tế.', 0, 1, '2026-11-21 11:47:30'),
-(36, 15, '04. Bài kiểm tra trắc nghiệm đánh giá năng lực', 'an-toan-thong-tin-thuc-hanh-ethical-hacking-pentest-web-bai-4', 'quiz', 'Hoàn thành bài kiểm tra để đủ điều kiện nhận chứng chỉ.', 0, 2, '2026-11-21 11:47:30'),
-(37, 16, '01. Giới thiệu tổng quan & Lộ trình học tập', 'digital-marketing-toan-dien-tang-truong-doanh-thu-voi-ai-bai-1', 'video', 'Chào mừng các bạn đến với khóa học!', 1, 1, '2026-11-21 11:47:30'),
-(38, 16, '02. Cài đặt công cụ và Hướng dẫn thực hành', 'digital-marketing-toan-dien-tang-truong-doanh-thu-voi-ai-bai-2', 'document', 'Tài liệu hướng dẫn chi tiết từng bước cài đặt.', 0, 2, '2026-11-21 11:47:30'),
-(39, 17, '03. Kỹ thuật nâng cao và Best Practices', 'digital-marketing-toan-dien-tang-truong-doanh-thu-voi-ai-bai-3', 'video', 'Video phân tích chi tiết các kỹ thuật thực chiến trong dự án thực tế.', 0, 1, '2026-11-21 11:47:30'),
-(40, 17, '04. Bài kiểm tra trắc nghiệm đánh giá năng lực', 'digital-marketing-toan-dien-tang-truong-doanh-thu-voi-ai-bai-4', 'quiz', 'Hoàn thành bài kiểm tra để đủ điều kiện nhận chứng chỉ.', 0, 2, '2026-11-21 11:47:30'),
-(41, 18, '01. Giới thiệu tổng quan & Lộ trình học tập', 'tieng-anh-giao-tiep-phong-van-danh-cho-dan-it-tech-english-bai-1', 'video', 'Chào mừng các bạn đến với khóa học!', 1, 1, '2026-11-21 11:47:30'),
-(42, 18, '02. Cài đặt công cụ và Hướng dẫn thực hành', 'tieng-anh-giao-tiep-phong-van-danh-cho-dan-it-tech-english-bai-2', 'document', 'Tài liệu hướng dẫn chi tiết từng bước cài đặt.', 0, 2, '2026-11-21 11:47:30'),
-(43, 19, '03. Kỹ thuật nâng cao và Best Practices', 'tieng-anh-giao-tiep-phong-van-danh-cho-dan-it-tech-english-bai-3', 'video', 'Video phân tích chi tiết các kỹ thuật thực chiến trong dự án thực tế.', 0, 1, '2026-11-21 11:47:30'),
-(44, 19, '04. Bài kiểm tra trắc nghiệm đánh giá năng lực', 'tieng-anh-giao-tiep-phong-van-danh-cho-dan-it-tech-english-bai-4', 'quiz', 'Hoàn thành bài kiểm tra để đủ điều kiện nhận chứng chỉ.', 0, 2, '2026-11-21 11:47:30'),
-(45, 1, 'Kiểm tra 15 phút: Kiến thức Nền tảng Web & Cấu trúc MVC', NULL, 'quiz', NULL, 0, 3, '2026-11-21 14:07:38'),
-(46, 3, 'Kiểm tra 15 phút: Cú pháp Python & Cấu trúc dữ liệu', NULL, 'quiz', NULL, 0, 2, '2026-11-21 14:08:32'),
-(47, 4, 'Kiểm tra 15 phút: JSX, Props và Component React', NULL, 'quiz', NULL, 0, 2, '2026-11-21 14:08:32'),
-(48, 5, 'Kiểm tra 15 phút: Auto Layout & Hệ thống Variants Figma', NULL, 'quiz', NULL, 0, 2, '2026-11-21 14:08:32'),
-(49, 6, 'Kiểm tra 15 phút: Khái niệm Docker, Image và Container', NULL, 'quiz', NULL, 0, 2, '2026-11-21 14:08:32'),
-(50, 7, 'Kiểm tra 15 phút: Kỹ thuật Truy vấn SQL & JOIN Bảng', NULL, 'quiz', NULL, 0, 2, '2026-11-21 14:08:32');
+('1', '1', 'Bài 1: Giới thiệu khóa học & Phương pháp học hiệu quả', 'bai-1-gioi-thieu-khoa-hoc', 'video', NULL, '1', '1', '2026-11-21 11:19:46'),
+('2', '1', 'Bài 2: Hiểu rõ mô hình MVC trong thực tế', 'bai-2-hieu-ro-mo-hinh-mvc', 'video', NULL, '1', '2', '2026-11-21 11:19:46'),
+('3', '2', 'Bài 1: Tổng quan lộ trình Fullstack & Thiết lập môi trường', 'b-i-1-t-ng-quan-l-tr-nh-fullstack-thi-t-l-p-m-i-tr-ng', 'video', NULL, '1', '1', '2026-11-21 11:33:11'),
+('4', '2', 'Bài 2: Làm chủ kiến trúc Backend MVC & Hướng đối tượng OOP', 'b-i-2-l-m-ch-ki-n-tr-c-backend-mvc-h-ng-i-t-ng-oop', 'video', NULL, '0', '2', '2026-11-21 11:33:11'),
+('5', '2', 'Bài 3: Bài kiểm tra đánh giá kiến thức Chương 1', 'b-i-3-b-i-ki-m-tra-nh-gi-ki-n-th-c-ch-ng-1', 'quiz', NULL, '0', '3', '2026-11-21 11:33:12'),
+('6', '3', 'Bài 1: Cú pháp Python, List, Dict và Hàm xử lý', 'b-i-1-c-ph-p-python-list-dict-v-h-m-x-l-', 'video', NULL, '1', '1', '2026-11-21 11:33:12'),
+('7', '3', 'Bài 2: Tổng quan về Machine Learning & Học có giám sát', 'b-i-2-t-ng-quan-v-machine-learning-h-c-c-gi-m-s-t', 'video', NULL, '0', '3', '2026-11-21 11:33:12'),
+('8', '3', 'Bài 3: Bài kiểm tra Kiến thức Python & Thuật toán Học máy', 'b-i-3-b-i-ki-m-tra-ki-n-th-c-python-thu-t-to-n-h-c-m-y', 'quiz', NULL, '0', '4', '2026-11-21 11:33:12'),
+('9', '4', 'Bài 1: JSX, Props, State và Vòng đời Component', 'b-i-1-jsx-props-state-v-v-ng-i-component', 'video', NULL, '1', '1', '2026-11-21 11:33:12'),
+('10', '4', 'Bài 2: Làm chủ React Hooks: useState, useEffect, useRef', 'b-i-2-l-m-ch-react-hooks-usestate-useeffect-useref', 'video', NULL, '0', '3', '2026-11-21 11:33:12'),
+('11', '4', 'Bài 3: Bài thi trắc nghiệm ReactJS & Virtual DOM', 'b-i-3-b-i-thi-tr-c-nghi-m-reactjs-virtual-dom', 'quiz', NULL, '0', '4', '2026-11-21 11:33:12'),
+('12', '5', 'Bài 1: Làm quen giao diện Figma, Frame, Auto Layout và Variants', 'b-i-1-l-m-quen-giao-di-n-figma-frame-auto-layout-v-variants', 'video', NULL, '1', '1', '2026-11-21 11:33:12'),
+('13', '5', 'Bài 2: Tư duy UX, Quy trình Phỏng vấn Người dùng & Wireframing', 'b-i-2-t-duy-ux-quy-tr-nh-ph-ng-v-n-ng-i-d-ng-wireframing', 'video', NULL, '0', '3', '2026-11-21 11:33:12'),
+('14', '5', 'Bài 3: Trắc nghiệm Kiến thức UI/UX & Nguyên lý Thiết kế', 'b-i-3-tr-c-nghi-m-ki-n-th-c-ui-ux-nguy-n-l-thi-t-k-', 'quiz', NULL, '0', '4', '2026-11-21 11:33:12'),
+('15', '6', 'Bài 1: Docker Architecture, Images, Containers & Viết Dockerfile', 'b-i-1-docker-architecture-images-containers-vi-t-dockerfile', 'video', NULL, '1', '1', '2026-11-21 11:33:12'),
+('16', '6', 'Bài 2: GitOps & Tự động hóa Pipeline CI/CD với GitHub Actions', 'b-i-2-gitops-t-ng-h-a-pipeline-ci-cd-v-i-github-actions', 'video', NULL, '0', '3', '2026-11-21 11:33:12'),
+('17', '6', 'Bài 3: Trắc nghiệm Kiến thức Docker & Containerization', 'b-i-3-tr-c-nghi-m-ki-n-th-c-docker-containerization', 'quiz', NULL, '0', '4', '2026-11-21 11:33:12'),
+('18', '7', 'Bài 1: Cú pháp SELECT, GROUP BY, HAVING & Kỹ thuật JOIN nhiều bảng', 'b-i-1-c-ph-p-select-group-by-having-k-thu-t-join-nhi-u-b-ng', 'video', NULL, '1', '1', '2026-11-21 11:33:12'),
+('19', '7', 'Bài 2: Đánh chỉ mục Index (B-Tree) & Tối ưu hiệu năng câu truy vấn', 'b-i-2-nh-ch-m-c-index-b-tree-t-i-u-hi-u-n-ng-c-u-truy-v-n', 'video', NULL, '0', '3', '2026-11-21 11:33:12'),
+('20', '7', 'Bài 3: Trắc nghiệm Kiến thức SQL & Phân tích Dữ liệu', 'b-i-3-tr-c-nghi-m-ki-n-th-c-sql-ph-n-t-ch-d-li-u', 'quiz', NULL, '0', '4', '2026-11-21 11:33:12'),
+('21', '8', '01. Giới thiệu tổng quan & Lộ trình học tập', 'chuyen-sau-golang-kien-truc-microservices-hieu-nang-cao-bai-1', 'video', 'Chào mừng các bạn đến với khóa học!', '1', '1', '2026-11-21 11:47:30'),
+('22', '8', '02. Cài đặt công cụ và Hướng dẫn thực hành', 'chuyen-sau-golang-kien-truc-microservices-hieu-nang-cao-bai-2', 'document', 'Tài liệu hướng dẫn chi tiết từng bước cài đặt.', '0', '2', '2026-11-21 11:47:30'),
+('23', '9', '03. Kỹ thuật nâng cao và Best Practices', 'chuyen-sau-golang-kien-truc-microservices-hieu-nang-cao-bai-3', 'video', 'Video phân tích chi tiết các kỹ thuật thực chiến trong dự án thực tế.', '0', '1', '2026-11-21 11:47:30'),
+('24', '9', '04. Bài kiểm tra trắc nghiệm đánh giá năng lực', 'chuyen-sau-golang-kien-truc-microservices-hieu-nang-cao-bai-4', 'quiz', 'Hoàn thành bài kiểm tra để đủ điều kiện nhận chứng chỉ.', '0', '2', '2026-11-21 11:47:30'),
+('25', '10', '01. Giới thiệu tổng quan & Lộ trình học tập', 'lap-trinh-di-dong-da-nen-tang-voi-flutter-dart-2026-bai-1', 'video', 'Chào mừng các bạn đến với khóa học!', '1', '1', '2026-11-21 11:47:30'),
+('26', '10', '02. Cài đặt công cụ và Hướng dẫn thực hành', 'lap-trinh-di-dong-da-nen-tang-voi-flutter-dart-2026-bai-2', 'document', 'Tài liệu hướng dẫn chi tiết từng bước cài đặt.', '0', '2', '2026-11-21 11:47:30'),
+('27', '11', '03. Kỹ thuật nâng cao và Best Practices', 'lap-trinh-di-dong-da-nen-tang-voi-flutter-dart-2026-bai-3', 'video', 'Video phân tích chi tiết các kỹ thuật thực chiến trong dự án thực tế.', '0', '1', '2026-11-21 11:47:30'),
+('28', '11', '04. Bài kiểm tra trắc nghiệm đánh giá năng lực', 'lap-trinh-di-dong-da-nen-tang-voi-flutter-dart-2026-bai-4', 'quiz', 'Hoàn thành bài kiểm tra để đủ điều kiện nhận chứng chỉ.', '0', '2', '2026-11-21 11:47:30'),
+('29', '12', '01. Giới thiệu tổng quan & Lộ trình học tập', 'chinh-phuc-dien-toan-dam-may-aws-solutions-architect-bai-1', 'video', 'Chào mừng các bạn đến với khóa học!', '1', '1', '2026-11-21 11:47:30'),
+('30', '12', '02. Cài đặt công cụ và Hướng dẫn thực hành', 'chinh-phuc-dien-toan-dam-may-aws-solutions-architect-bai-2', 'document', 'Tài liệu hướng dẫn chi tiết từng bước cài đặt.', '0', '2', '2026-11-21 11:47:30'),
+('31', '13', '03. Kỹ thuật nâng cao và Best Practices', 'chinh-phuc-dien-toan-dam-may-aws-solutions-architect-bai-3', 'video', 'Video phân tích chi tiết các kỹ thuật thực chiến trong dự án thực tế.', '0', '1', '2026-11-21 11:47:30'),
+('32', '13', '04. Bài kiểm tra trắc nghiệm đánh giá năng lực', 'chinh-phuc-dien-toan-dam-may-aws-solutions-architect-bai-4', 'quiz', 'Hoàn thành bài kiểm tra để đủ điều kiện nhận chứng chỉ.', '0', '2', '2026-11-21 11:47:30'),
+('33', '14', '01. Giới thiệu tổng quan & Lộ trình học tập', 'an-toan-thong-tin-thuc-hanh-ethical-hacking-pentest-web-bai-1', 'video', 'Chào mừng các bạn đến với khóa học!', '1', '1', '2026-11-21 11:47:30'),
+('34', '14', '02. Cài đặt công cụ và Hướng dẫn thực hành', 'an-toan-thong-tin-thuc-hanh-ethical-hacking-pentest-web-bai-2', 'document', 'Tài liệu hướng dẫn chi tiết từng bước cài đặt.', '0', '2', '2026-11-21 11:47:30'),
+('35', '15', '03. Kỹ thuật nâng cao và Best Practices', 'an-toan-thong-tin-thuc-hanh-ethical-hacking-pentest-web-bai-3', 'video', 'Video phân tích chi tiết các kỹ thuật thực chiến trong dự án thực tế.', '0', '1', '2026-11-21 11:47:30'),
+('36', '15', '04. Bài kiểm tra trắc nghiệm đánh giá năng lực', 'an-toan-thong-tin-thuc-hanh-ethical-hacking-pentest-web-bai-4', 'quiz', 'Hoàn thành bài kiểm tra để đủ điều kiện nhận chứng chỉ.', '0', '2', '2026-11-21 11:47:30'),
+('37', '16', '01. Giới thiệu tổng quan & Lộ trình học tập', 'digital-marketing-toan-dien-tang-truong-doanh-thu-voi-ai-bai-1', 'video', 'Chào mừng các bạn đến với khóa học!', '1', '1', '2026-11-21 11:47:30'),
+('38', '16', '02. Cài đặt công cụ và Hướng dẫn thực hành', 'digital-marketing-toan-dien-tang-truong-doanh-thu-voi-ai-bai-2', 'document', 'Tài liệu hướng dẫn chi tiết từng bước cài đặt.', '0', '2', '2026-11-21 11:47:30'),
+('39', '17', '03. Kỹ thuật nâng cao và Best Practices', 'digital-marketing-toan-dien-tang-truong-doanh-thu-voi-ai-bai-3', 'video', 'Video phân tích chi tiết các kỹ thuật thực chiến trong dự án thực tế.', '0', '1', '2026-11-21 11:47:30'),
+('40', '17', '04. Bài kiểm tra trắc nghiệm đánh giá năng lực', 'digital-marketing-toan-dien-tang-truong-doanh-thu-voi-ai-bai-4', 'quiz', 'Hoàn thành bài kiểm tra để đủ điều kiện nhận chứng chỉ.', '0', '2', '2026-11-21 11:47:30'),
+('41', '18', '01. Giới thiệu tổng quan & Lộ trình học tập', 'tieng-anh-giao-tiep-phong-van-danh-cho-dan-it-tech-english-bai-1', 'video', 'Chào mừng các bạn đến với khóa học!', '1', '1', '2026-11-21 11:47:30'),
+('42', '18', '02. Cài đặt công cụ và Hướng dẫn thực hành', 'tieng-anh-giao-tiep-phong-van-danh-cho-dan-it-tech-english-bai-2', 'document', 'Tài liệu hướng dẫn chi tiết từng bước cài đặt.', '0', '2', '2026-11-21 11:47:30'),
+('43', '19', '03. Kỹ thuật nâng cao và Best Practices', 'tieng-anh-giao-tiep-phong-van-danh-cho-dan-it-tech-english-bai-3', 'video', 'Video phân tích chi tiết các kỹ thuật thực chiến trong dự án thực tế.', '0', '1', '2026-11-21 11:47:30'),
+('44', '19', '04. Bài kiểm tra trắc nghiệm đánh giá năng lực', 'tieng-anh-giao-tiep-phong-van-danh-cho-dan-it-tech-english-bai-4', 'quiz', 'Hoàn thành bài kiểm tra để đủ điều kiện nhận chứng chỉ.', '0', '2', '2026-11-21 11:47:30'),
+('45', '1', 'Kiểm tra 15 phút: Kiến thức Nền tảng Web & Cấu trúc MVC', NULL, 'quiz', NULL, '0', '3', '2026-11-21 14:07:38'),
+('46', '3', 'Kiểm tra 15 phút: Cú pháp Python & Cấu trúc dữ liệu', NULL, 'quiz', NULL, '0', '2', '2026-11-21 14:08:32'),
+('47', '4', 'Kiểm tra 15 phút: JSX, Props và Component React', NULL, 'quiz', NULL, '0', '2', '2026-11-21 14:08:32'),
+('48', '5', 'Kiểm tra 15 phút: Auto Layout & Hệ thống Variants Figma', NULL, 'quiz', NULL, '0', '2', '2026-11-21 14:08:32'),
+('49', '6', 'Kiểm tra 15 phút: Khái niệm Docker, Image và Container', NULL, 'quiz', NULL, '0', '2', '2026-11-21 14:08:32'),
+('50', '7', 'Kiểm tra 15 phút: Kỹ thuật Truy vấn SQL & JOIN Bảng', NULL, 'quiz', NULL, '0', '2', '2026-11-21 14:08:32');
 
--- -------------------------------------------------------------
--- Bảng: `lesson_videos`
--- -------------------------------------------------------------
-DROP TABLE IF EXISTS `lesson_videos`;
-CREATE TABLE `lesson_videos` (
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `order_items`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `order_items`;
+CREATE TABLE `order_items` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `lesson_id` int unsigned NOT NULL,
-  `provider` enum('local','youtube','vimeo','s3') COLLATE utf8mb4_unicode_ci DEFAULT 'local',
-  `video_url` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `duration_seconds` int unsigned NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `order_id` int unsigned NOT NULL,
+  `product_id` int unsigned DEFAULT NULL,
+  `course_id` int unsigned DEFAULT NULL,
+  `product_name` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `quantity` int unsigned NOT NULL DEFAULT '1',
+  `price` bigint unsigned NOT NULL DEFAULT '0',
+  `variant_id` int unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `lesson_id` (`lesson_id`),
-  CONSTRAINT `lesson_videos_ibfk_1` FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `order_items_order_id` (`order_id`),
+  KEY `order_items_product_id` (`product_id`),
+  CONSTRAINT `order_items_order_fk` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `order_items_product_fk` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=173 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `lesson_videos`
-INSERT INTO `lesson_videos` (`id`, `lesson_id`, `provider`, `video_url`, `duration_seconds`, `created_at`) VALUES
-(1, 1, 'youtube', 'https://www.youtube.com/embed/zJSY8tbf_ys', 900, '2026-11-21 11:19:46'),
-(2, 3, 'youtube', 'https://www.youtube.com/embed/zJSY8tbf_ys', 600, '2026-11-21 11:33:11'),
-(3, 4, 'youtube', 'https://www.youtube.com/embed/2eebptXfEvw', 720, '2026-11-21 11:33:11'),
-(4, 6, 'youtube', 'https://www.youtube.com/embed/kqtD5dpn9C8', 750, '2026-11-21 11:33:12'),
-(5, 7, 'youtube', 'https://www.youtube.com/embed/i_LwzRVP7bg', 900, '2026-11-21 11:33:12'),
-(6, 9, 'youtube', 'https://www.youtube.com/embed/bMknfKXIFA8', 680, '2026-11-21 11:33:12'),
-(7, 10, 'youtube', 'https://www.youtube.com/embed/W6NZfCO5SIk', 750, '2026-11-21 11:33:12'),
-(8, 12, 'youtube', 'https://www.youtube.com/embed/FTFaQWZBqQ8', 640, '2026-11-21 11:33:12'),
-(9, 13, 'youtube', 'https://www.youtube.com/embed/c9Wg6Cb_YlU', 800, '2026-11-21 11:33:12'),
-(10, 15, 'youtube', 'https://www.youtube.com/embed/3c-iBn73dDE', 820, '2026-11-21 11:33:12'),
-(11, 16, 'youtube', 'https://www.youtube.com/embed/pg19Z8LL0vQ', 780, '2026-11-21 11:33:12'),
-(12, 18, 'youtube', 'https://www.youtube.com/embed/ua-CiDNNj30', 650, '2026-11-21 11:33:12'),
-(13, 19, 'youtube', 'https://www.youtube.com/embed/2eebptXfEvw', 700, '2026-11-21 11:33:12'),
-(14, 21, 'youtube', 'https://www.youtube.com/embed/YS4e4q9oBaU', 900, '2026-11-21 11:47:30'),
-(15, 23, 'youtube', 'https://www.youtube.com/embed/YS4e4q9oBaU', 1500, '2026-11-21 11:47:30'),
-(16, 25, 'youtube', 'https://www.youtube.com/embed/VPvVD8t02U8', 900, '2026-11-21 11:47:30'),
-(17, 27, 'youtube', 'https://www.youtube.com/embed/VPvVD8t02U8', 1500, '2026-11-21 11:47:30'),
-(18, 29, 'youtube', 'https://www.youtube.com/embed/Ia-UEYYR44s', 900, '2026-11-21 11:47:30'),
-(19, 31, 'youtube', 'https://www.youtube.com/embed/Ia-UEYYR44s', 1500, '2026-11-21 11:47:30'),
-(20, 33, 'youtube', 'https://www.youtube.com/embed/3Kq1MIfTWCE', 900, '2026-11-21 11:47:30'),
-(21, 35, 'youtube', 'https://www.youtube.com/embed/3Kq1MIfTWCE', 1500, '2026-11-21 11:47:30'),
-(22, 37, 'youtube', 'https://www.youtube.com/embed/nU-IIXBWlS4', 900, '2026-11-21 11:47:30'),
-(23, 39, 'youtube', 'https://www.youtube.com/embed/nU-IIXBWlS4', 1500, '2026-11-21 11:47:30'),
-(24, 41, 'youtube', 'https://www.youtube.com/embed/f02mOEt11OQ', 600, '2026-11-21 11:47:30'),
-(25, 43, 'youtube', 'https://www.youtube.com/embed/0fYi8SGA20k', 1500, '2026-11-21 11:47:30'),
-(26, 42, 'youtube', 'https://www.youtube.com/embed/8pDqJVdNa44', 900, '2026-11-21 12:05:36'),
-(27, 2, 'youtube', 'https://www.youtube.com/embed/2eebptXfEvw', 1200, '2026-11-21 12:05:36'),
-(28, 22, 'youtube', 'https://www.youtube.com/embed/YS4e4q9oBaU', 1200, '2026-11-21 12:05:36'),
-(29, 26, 'youtube', 'https://www.youtube.com/embed/VPvVD8t02U8', 1200, '2026-11-21 12:05:36'),
-(30, 30, 'youtube', 'https://www.youtube.com/embed/Ia-UEYYR44s', 1200, '2026-11-21 12:05:36'),
-(31, 34, 'youtube', 'https://www.youtube.com/embed/3Kq1MIfTWCE', 1200, '2026-11-21 12:05:36'),
-(32, 38, 'youtube', 'https://www.youtube.com/embed/nU-IIXBWlS4', 1200, '2026-11-21 12:05:36');
+-- Dữ liệu bảng `order_items`
+INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `course_id`, `product_name`, `quantity`, `price`, `variant_id`) VALUES
+('1', '1', '1', NULL, 'iPhone 15', '1', '22000000', NULL),
+('2', '1', '6', NULL, 'Tai nghe Bluetooth', '1', '5500000', NULL),
+('3', '2', '2', NULL, 'iPhone 17', '3', '28990000', NULL),
+('4', '2', '6', NULL, 'Tai nghe Bluetooth', '1', '5500000', NULL),
+('5', '3', '2', NULL, 'iPhone 17', '1', '28990000', NULL),
+('6', '4', '2', NULL, 'iPhone 17', '1', '28990000', NULL),
+('7', '4', '1', NULL, 'iPhone 15', '1', '22000000', NULL),
+('8', '5', '2', NULL, 'iPhone 17', '1', '28990000', NULL),
+('9', '6', '7', NULL, 'Dây sạc nhanh USB-C', '1', '450000', NULL),
+('10', '7', '2', NULL, 'iPhone 17', '1', '28990000', NULL),
+('11', '8', '11', NULL, 'Cáp sạc nhanh USB-C bọc dù 60W', '1', '190000', NULL),
+('12', '9', '33', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
+('13', '10', '34', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
+('14', '11', '35', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
+('15', '12', '36', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
+('16', '13', '37', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
+('17', '14', '39', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
+('18', '15', '41', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
+('19', '16', '43', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
+('20', '17', '45', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
+('21', '18', '47', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
+('22', '19', '49', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
+('23', '20', '51', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
+('26', '23', '55', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
+('29', '26', '59', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
+('32', '29', '63', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
+('35', '32', '67', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
+('38', '35', '71', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
+('41', '38', '75', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
+('44', '41', '79', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
+('47', '44', '83', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
+('48', '45', '30', NULL, 'iPad Gen 10 64GB WiFi', '1', '9490000', NULL),
+('49', '46', '27', NULL, 'iPad Air 5 M1 Cũ 64GB WiFi', '1', '11490000', NULL),
+('50', '47', '28', NULL, 'iPad Pro M4 11 inch 256GB', '1', '25990000', NULL),
+('51', '47', '26', NULL, 'Dell XPS 13 Cũ Giá Tốt', '1', '18900000', NULL),
+('52', '47', '29', NULL, 'iPad Air 6 M2 2026', '1', '16490000', NULL),
+('53', '47', '24', NULL, 'iPhone 15 Pro 128GB Cũ Đẹp', '1', '21490000', NULL),
+('54', '47', '8', NULL, 'ThinkPad X1 Carbon Gen 13', '60', '45990000', NULL),
+('55', '48', '8', NULL, 'ThinkPad X1 Carbon Gen 13', '30', '45990000', NULL),
+('56', '49', '84', NULL, 'Ô tô nè', '1', '999999999999999', NULL),
+('57', '50', '26', NULL, 'Dell XPS 13 Cũ Giá Tốt', '1', '18900000', NULL),
+('58', '51', '23', NULL, 'G-Shock GA-2100 \"CasiOak\"', '1', '3120000', NULL),
+('59', '52', '23', NULL, 'G-Shock GA-2100 \"CasiOak\"', '1', '3120000', NULL),
+('60', '53', '23', NULL, 'G-Shock GA-2100 \"CasiOak\"', '1', '3120000', NULL),
+('61', '54', '30', NULL, 'iPad Gen 10 64GB WiFi', '1', '9490000', NULL),
+('62', '55', '29', NULL, 'iPad Air 6 M2 2026', '1', '16490000', NULL),
+('63', '56', '29', NULL, 'iPad Air 6 M2 2026', '1', '16490000', NULL),
+('64', '57', '29', NULL, 'iPad Air 6 M2 2026', '1', '16490000', NULL),
+('65', '58', '29', NULL, 'iPad Air 6 M2 2026', '1', '16490000', NULL),
+('66', '59', '11', NULL, 'Cáp sạc nhanh USB-C bọc dù 60W', '1', '5000', NULL),
+('67', '60', '11', NULL, 'Cáp sạc nhanh USB-C bọc dù 60W', '1', '5000', NULL),
+('68', '61', '11', NULL, 'Cáp sạc nhanh USB-C bọc dù 60W', '1', '5000', NULL),
+('69', '62', '24', NULL, 'iPhone 15 Pro 128GB Cũ Đẹp', '3', '21490000', NULL),
+('70', '62', '29', NULL, 'iPad Air 6 M2 2026', '1', '16490000', NULL),
+('71', '63', '28', NULL, 'iPad Pro M4 11 inch 256GB', '1', '25990000', NULL),
+('72', '63', '27', NULL, 'iPad Air 5 M1 Cũ 64GB WiFi', '1', '11490000', NULL),
+('73', '64', '26', NULL, 'Dell XPS 13 Cũ Giá Tốt', '1', '18900000', NULL),
+('74', '65', '26', NULL, 'Dell XPS 13 Cũ Giá Tốt', '1', '18900000', NULL),
+('75', '66', '28', NULL, 'iPad Pro M4 11 inch 256GB', '1', '25990000', NULL),
+('76', '67', '29', NULL, 'iPad Air 6 M2 2026', '1', '16490000', NULL),
+('77', '67', '30', NULL, 'iPad Gen 10 64GB WiFi', '1', '9490000', NULL),
+('78', '67', '28', NULL, 'iPad Pro M4 11 inch 256GB', '1', '25990000', NULL),
+('79', '68', '28', NULL, 'iPad Pro M4 11 inch 256GB', '1', '25990000', NULL),
+('80', '69', '28', NULL, 'iPad Pro M4 11 inch 256GB', '1', '25990000', NULL),
+('81', '70', '27', NULL, 'iPad Air 5 M1 Cũ 64GB WiFi', '1', '11490000', NULL),
+('82', '71', '24', NULL, 'iPhone 15 Pro 128GB Cũ Đẹp', '1', '21490000', NULL),
+('83', '72', '28', NULL, 'iPad Pro M4 11 inch 256GB', '1', '25990000', NULL),
+('84', '73', '30', NULL, 'iPad Gen 10 64GB WiFi', '1', '9490000', NULL),
+('85', '74', '30', NULL, 'iPad Gen 10 64GB WiFi', '1', '9490000', NULL),
+('86', '74', '29', NULL, 'iPad Air 6 M2 2026', '1', '16490000', NULL),
+('87', '74', '27', NULL, 'iPad Air 5 M1 Cũ 64GB WiFi', '1', '11490000', NULL),
+('88', '75', '30', NULL, 'iPad Gen 10 64GB WiFi', '1', '9490000', NULL),
+('89', '75', '29', NULL, 'iPad Air 6 M2 2026', '1', '16490000', NULL),
+('90', '75', '27', NULL, 'iPad Air 5 M1 Cũ 64GB WiFi', '1', '11490000', NULL),
+('91', '76', '25', NULL, 'MacBook Air M1 Cũ Likenew', '1', '13990000', NULL),
+('92', '76', '24', NULL, 'iPhone 15 Pro 128GB Cũ Đẹp', '1', '21490000', NULL),
+('93', '76', '23', NULL, 'G-Shock GA-2100 \"CasiOak\"', '1', '3120000', NULL),
+('94', '77', '25', NULL, 'MacBook Air M1 Cũ Likenew', '1', '13990000', NULL),
+('95', '77', '23', NULL, 'G-Shock GA-2100 \"CasiOak\"', '1', '3120000', NULL),
+('96', '78', '30', NULL, 'iPad Gen 10 64GB WiFi', '1', '9490000', NULL),
+('97', '78', '29', NULL, 'iPad Air 6 M2 2026', '1', '16490000', NULL),
+('98', '78', '27', NULL, 'iPad Air 5 M1 Cũ 64GB WiFi', '1', '11490000', NULL),
+('103', '83', '90', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
+('104', '84', '91', NULL, 'Máy thiếu IMEI Test', '1', '12000000', NULL),
+('113', '93', '99', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
+('114', '94', '100', NULL, 'Máy thiếu IMEI Test', '1', '12000000', NULL),
+('119', '99', '106', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
+('120', '100', '107', NULL, 'Máy thiếu IMEI Test', '1', '12000000', NULL),
+('123', '105', NULL, '3', 'Lập trình Frontend Hiện đại với ReactJS & Next.js', '1', '320000', NULL),
+('124', '106', NULL, '4', 'Thiết kế Giao diện UI/UX Chuyên nghiệp với Figma', '1', '450000', NULL),
+('125', '107', NULL, '5', 'DevOps Toàn Diện: Docker, Kubernetes & CI/CD Pipeline', '1', '799000', NULL),
+('126', '108', NULL, '6', 'Phân tích Dữ liệu Kinh doanh (Data Analytics & SQL Mastery)', '1', '0', NULL),
+('129', '111', NULL, '8', 'Lập Trình Di Động Đa Nền Tảng với Flutter & Dart 2026', '1', '390000', NULL),
+('130', '114', NULL, '5', 'DevOps Toàn Diện: Docker, Kubernetes & CI/CD Pipeline', '1', '799000', NULL),
+('131', '115', NULL, '5', 'DevOps Toàn Diện: Docker, Kubernetes & CI/CD Pipeline', '1', '799000', NULL),
+('132', '116', NULL, '2', 'Chinh Phục Python & Trí Tuệ Nhân Tạo (AI / Machine Learning)', '1', '499000', NULL),
+('133', '117', NULL, '7', 'Chuyên Sâu Golang & Kiến Trúc Microservices Hiệu Năng Cao', '1', '450000', NULL),
+('137', '121', NULL, '2', 'Chinh Phục Python & Trí Tuệ Nhân Tạo (AI / Machine Learning)', '1', '499000', NULL),
+('138', '122', NULL, '3', 'Lập trình Frontend Hiện đại với ReactJS & Next.js', '1', '320000', NULL),
+('139', '123', NULL, '3', 'Lập trình Frontend Hiện đại với ReactJS & Next.js', '1', '320000', NULL),
+('142', '126', NULL, '10', 'An Toàn Thông Tin & Thực Hành Ethical Hacking (Pentest Web)', '1', '490000', NULL),
+('145', '129', NULL, '10', 'An Toàn Thông Tin & Thực Hành Ethical Hacking (Pentest Web)', '1', '490000', NULL),
+('153', '137', NULL, '2', 'Chinh Phục Python & Trí Tuệ Nhân Tạo (AI / Machine Learning)', '1', '499000', NULL);
 
--- -------------------------------------------------------------
--- Bảng: `lesson_materials`
--- -------------------------------------------------------------
-DROP TABLE IF EXISTS `lesson_materials`;
-CREATE TABLE `lesson_materials` (
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `order_status_logs`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `order_status_logs`;
+CREATE TABLE `order_status_logs` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `order_id` int unsigned NOT NULL,
+  `from_status` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `to_status` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `actor_type` enum('admin','shipper','system','customer') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `actor_id` int unsigned DEFAULT NULL,
+  `note` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `idx_order_created` (`order_id`,`created_at`),
+  CONSTRAINT `order_status_logs_fk` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=156 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dữ liệu bảng `order_status_logs`
+INSERT INTO `order_status_logs` (`id`, `order_id`, `from_status`, `to_status`, `actor_type`, `actor_id`, `note`, `created_at`) VALUES
+('1', '9', 'pending', 'confirmed', 'system', NULL, NULL, '2026-07-10 04:22:01'),
+('2', '9', 'confirmed', 'packing', 'system', NULL, NULL, '2026-07-10 04:22:01'),
+('3', '9', 'packing', 'shipping', 'system', NULL, NULL, '2026-07-10 04:22:01'),
+('4', '9', 'shipping', 'completed', 'system', NULL, NULL, '2026-07-10 04:22:02'),
+('5', '10', 'pending', 'confirmed', 'system', NULL, NULL, '2026-07-10 04:24:55'),
+('6', '10', 'confirmed', 'packing', 'system', NULL, NULL, '2026-07-10 04:24:55'),
+('7', '10', 'packing', 'shipping', 'system', NULL, NULL, '2026-07-10 04:24:55'),
+('8', '10', 'shipping', 'completed', 'system', NULL, NULL, '2026-07-10 04:24:55'),
+('9', '11', 'pending', 'confirmed', 'system', NULL, NULL, '2026-07-10 04:26:03'),
+('10', '11', 'confirmed', 'packing', 'system', NULL, NULL, '2026-07-10 04:26:03'),
+('11', '11', 'packing', 'shipping', 'system', NULL, NULL, '2026-07-10 04:26:03'),
+('12', '11', 'shipping', 'completed', 'system', NULL, NULL, '2026-07-10 04:26:03'),
+('13', '12', 'pending', 'confirmed', 'system', NULL, NULL, '2026-07-10 04:26:54'),
+('14', '12', 'confirmed', 'packing', 'system', NULL, NULL, '2026-07-10 04:26:54'),
+('15', '12', 'packing', 'shipping', 'system', NULL, NULL, '2026-07-10 04:26:54'),
+('16', '12', 'shipping', 'completed', 'system', NULL, NULL, '2026-07-10 04:26:54'),
+('17', '13', 'pending', 'confirmed', 'system', NULL, NULL, '2026-07-10 04:32:11'),
+('18', '13', 'confirmed', 'packing', 'system', NULL, NULL, '2026-07-10 04:32:11'),
+('19', '13', 'packing', 'shipping', 'system', NULL, NULL, '2026-07-10 04:32:11'),
+('20', '13', 'shipping', 'completed', 'system', NULL, NULL, '2026-07-10 04:32:11'),
+('21', '14', 'pending', 'confirmed', 'system', NULL, NULL, '2026-07-10 04:32:29'),
+('22', '14', 'confirmed', 'packing', 'system', NULL, NULL, '2026-07-10 04:32:29'),
+('23', '14', 'packing', 'shipping', 'system', NULL, NULL, '2026-07-10 04:32:30'),
+('24', '14', 'shipping', 'completed', 'system', NULL, NULL, '2026-07-10 04:32:30'),
+('25', '15', 'pending', 'confirmed', 'system', NULL, NULL, '2026-07-10 04:46:57'),
+('26', '15', 'confirmed', 'packing', 'system', NULL, NULL, '2026-07-10 04:46:57'),
+('27', '15', 'packing', 'shipping', 'system', NULL, NULL, '2026-07-10 04:46:57'),
+('28', '15', 'shipping', 'completed', 'system', NULL, NULL, '2026-07-10 04:46:57'),
+('29', '16', 'pending', 'confirmed', 'system', NULL, NULL, '2026-07-10 04:47:12'),
+('30', '16', 'confirmed', 'packing', 'system', NULL, NULL, '2026-07-10 04:47:12'),
+('31', '16', 'packing', 'shipping', 'system', NULL, NULL, '2026-07-10 04:47:12'),
+('32', '16', 'shipping', 'completed', 'system', NULL, NULL, '2026-07-10 04:47:12'),
+('33', '17', 'pending', 'confirmed', 'system', NULL, NULL, '2026-07-10 04:49:43'),
+('34', '17', 'confirmed', 'packing', 'system', NULL, NULL, '2026-07-10 04:49:43'),
+('35', '17', 'packing', 'shipping', 'system', NULL, NULL, '2026-07-10 04:49:43'),
+('36', '17', 'shipping', 'completed', 'system', NULL, NULL, '2026-07-10 04:49:43'),
+('37', '18', 'pending', 'confirmed', 'system', NULL, NULL, '2026-07-10 04:52:29'),
+('38', '18', 'confirmed', 'packing', 'system', NULL, NULL, '2026-07-10 04:52:29'),
+('39', '18', 'packing', 'shipping', 'system', NULL, NULL, '2026-07-10 04:52:29'),
+('40', '18', 'shipping', 'completed', 'system', NULL, NULL, '2026-07-10 04:52:29'),
+('41', '19', 'pending', 'confirmed', 'system', NULL, NULL, '2026-07-10 04:58:10'),
+('42', '19', 'confirmed', 'packing', 'system', NULL, NULL, '2026-07-10 04:58:10'),
+('43', '19', 'packing', 'shipping', 'system', NULL, NULL, '2026-07-10 04:58:10'),
+('44', '19', 'shipping', 'completed', 'system', NULL, NULL, '2026-07-10 04:58:10'),
+('45', '20', 'pending', 'confirmed', 'system', NULL, NULL, '2026-07-10 05:00:23'),
+('46', '20', 'confirmed', 'packing', 'system', NULL, NULL, '2026-07-10 05:00:23'),
+('47', '20', 'packing', 'shipping', 'system', NULL, NULL, '2026-07-10 05:00:23'),
+('48', '20', 'shipping', 'completed', 'system', NULL, NULL, '2026-07-10 05:00:23'),
+('49', '23', 'pending', 'confirmed', 'system', NULL, NULL, '2026-07-10 05:01:08'),
+('50', '23', 'confirmed', 'packing', 'system', NULL, NULL, '2026-07-10 05:01:08'),
+('51', '23', 'packing', 'shipping', 'system', NULL, NULL, '2026-07-10 05:01:08'),
+('52', '23', 'shipping', 'completed', 'system', NULL, NULL, '2026-07-10 05:01:08'),
+('53', '26', 'pending', 'confirmed', 'system', NULL, NULL, '2026-07-10 05:02:38'),
+('54', '26', 'confirmed', 'packing', 'system', NULL, NULL, '2026-07-10 05:02:38'),
+('55', '26', 'packing', 'shipping', 'system', NULL, NULL, '2026-07-10 05:02:38'),
+('56', '26', 'shipping', 'completed', 'system', NULL, NULL, '2026-07-10 05:02:38'),
+('57', '29', 'pending', 'confirmed', 'system', NULL, NULL, '2026-07-10 05:03:08'),
+('58', '29', 'confirmed', 'packing', 'system', NULL, NULL, '2026-07-10 05:03:08'),
+('59', '29', 'packing', 'shipping', 'system', NULL, NULL, '2026-07-10 05:03:08'),
+('60', '29', 'shipping', 'completed', 'system', NULL, NULL, '2026-07-10 05:03:08'),
+('61', '32', 'pending', 'confirmed', 'system', NULL, NULL, '2026-07-10 19:35:54'),
+('62', '32', 'confirmed', 'packing', 'system', NULL, NULL, '2026-07-10 19:35:54'),
+('63', '32', 'packing', 'shipping', 'system', NULL, NULL, '2026-07-10 19:35:54'),
+('64', '32', 'shipping', 'completed', 'system', NULL, NULL, '2026-07-10 19:35:54'),
+('65', '35', 'pending', 'confirmed', 'system', NULL, NULL, '2026-07-10 19:42:45'),
+('66', '35', 'confirmed', 'packing', 'system', NULL, NULL, '2026-07-10 19:42:45'),
+('67', '35', 'packing', 'shipping', 'system', NULL, NULL, '2026-07-10 19:42:45'),
+('68', '35', 'shipping', 'completed', 'system', NULL, NULL, '2026-07-10 19:42:45'),
+('69', '38', 'pending', 'confirmed', 'system', NULL, NULL, '2026-07-10 19:43:35'),
+('70', '38', 'confirmed', 'packing', 'system', NULL, NULL, '2026-07-10 19:43:35'),
+('71', '38', 'packing', 'shipping', 'system', NULL, NULL, '2026-07-10 19:43:35'),
+('72', '38', 'shipping', 'completed', 'system', NULL, NULL, '2026-07-10 19:43:35'),
+('73', '41', 'pending', 'confirmed', 'system', NULL, NULL, '2026-07-10 19:45:04'),
+('74', '41', 'confirmed', 'packing', 'system', NULL, NULL, '2026-07-10 19:45:04'),
+('75', '41', 'packing', 'shipping', 'system', NULL, NULL, '2026-07-10 19:45:04'),
+('76', '41', 'shipping', 'completed', 'system', NULL, NULL, '2026-07-10 19:45:04'),
+('77', '44', 'pending', 'confirmed', 'system', NULL, NULL, '2026-07-10 19:51:25'),
+('78', '44', 'confirmed', 'packing', 'system', NULL, NULL, '2026-07-10 19:51:25'),
+('79', '44', 'packing', 'shipping', 'system', NULL, NULL, '2026-07-10 19:51:25'),
+('80', '44', 'shipping', 'completed', 'system', NULL, NULL, '2026-07-10 19:51:25'),
+('81', '45', NULL, 'pending', 'customer', '1', 'Hồ sơ trả góp 12 tháng, cọc 1898000', '2026-07-10 20:04:08'),
+('82', '45', 'pending', 'confirmed', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-07-10 20:05:14'),
+('83', '46', NULL, 'pending', 'customer', '1', 'Tạo đơn hàng mới (Chuyển khoản VietQR MB Bank)', '2026-07-10 20:05:48'),
+('84', '47', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Chuyển khoản VietQR MB Bank)', '2026-07-10 20:10:19'),
+('85', '47', 'pending', 'confirmed', 'admin', '1', 'Admin xác nhận đã nhận chuyển khoản VietQR', '2026-07-10 20:13:02'),
+('86', '47', 'confirmed', 'packing', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-07-10 20:14:58'),
+('87', '47', 'packing', 'shipping', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-07-10 20:17:18'),
+('88', '48', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (Chuyển khoản VietQR MB Bank)', '2026-07-10 20:23:30'),
+('89', '48', 'pending', 'confirmed', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-07-10 20:24:36'),
+('90', '48', 'confirmed', 'confirmed', 'admin', '1', 'Admin xác nhận đã nhận chuyển khoản VietQR', '2026-07-10 20:25:12'),
+('91', '49', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (COD)', '2026-07-10 20:29:03'),
+('92', '49', 'confirmed', 'packing', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-07-10 20:31:01'),
+('93', '49', 'packing', 'cancelled', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-07-10 20:32:06'),
+('94', '6', 'pending', 'confirmed', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-07-10 20:36:12'),
+('95', '50', NULL, 'pending', 'customer', '1', 'Tạo đơn hàng mới (Chuyển khoản VietQR MB Bank)', '2026-08-09 16:52:36'),
+('96', '51', NULL, 'pending', 'customer', '1', 'Tạo đơn hàng mới (Thanh toán qua MoMo)', '2026-08-09 16:53:22'),
+('97', '52', NULL, 'pending', 'customer', '1', 'Tạo đơn hàng mới (Thanh toán qua MoMo)', '2026-08-09 17:26:29'),
+('98', '53', NULL, 'pending', 'customer', '1', 'Tạo đơn hàng mới (Chuyển khoản VietQR MB Bank)', '2026-08-09 17:27:00'),
+('99', '54', NULL, 'pending', 'customer', '1', 'Tạo đơn hàng mới (Chuyển khoản VietQR MB Bank)', '2026-08-09 17:27:20'),
+('100', '55', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Thanh toán qua MoMo)', '2026-08-12 06:25:13'),
+('101', '56', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Thanh toán qua MoMo)', '2026-08-12 06:25:20'),
+('102', '57', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Thanh toán qua MoMo)', '2026-08-12 06:25:20'),
+('103', '58', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Chuyển khoản VietQR MB Bank)', '2026-08-12 06:26:20'),
+('104', '59', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Chuyển khoản VietQR MB Bank)', '2026-08-12 06:41:07'),
+('105', '59', 'pending', 'cancelled', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-08-12 06:49:22'),
+('106', '59', 'cancelled', 'cancelled', 'system', NULL, 'SePay webhook xác nhận chuyển khoản VietQR (ref: TESTREF123)', '2026-08-12 06:50:19'),
+('107', '58', 'pending', 'confirmed', 'system', NULL, 'SePay webhook xác nhận chuyển khoản VietQR (ref: OK)', '2026-08-12 06:50:35'),
+('108', '58', 'confirmed', 'cancelled', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-08-12 06:51:12'),
+('109', '60', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Chuyển khoản VietQR MB Bank)', '2026-08-12 06:53:52'),
+('110', '61', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Chuyển khoản VietQR MB Bank)', '2026-08-12 06:56:29'),
+('111', '61', 'pending', 'confirmed', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-08-12 07:00:36'),
+('112', '57', 'pending', 'confirmed', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-08-12 07:01:10'),
+('113', '62', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-08-12 07:38:28'),
+('114', '63', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 09:59:09'),
+('115', '64', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 10:11:20'),
+('116', '65', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 10:12:11'),
+('117', '66', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 10:19:29'),
+('118', '67', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 10:29:46'),
+('119', '67', 'confirmed', 'packing', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-09-25 10:33:25'),
+('120', '67', 'packing', 'shipping', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-09-25 10:33:34'),
+('121', '67', 'shipping', 'completed', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-09-25 10:33:57'),
+('122', '68', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 10:38:00'),
+('123', '69', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 10:40:22'),
+('124', '70', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 10:41:09'),
+('125', '71', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 10:47:07'),
+('126', '72', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (COD)', '2026-09-25 10:49:58'),
+('127', '73', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 10:52:01'),
+('128', '74', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 11:00:57'),
+('129', '75', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 11:02:38'),
+('130', '76', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 11:34:47'),
+('131', '77', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 11:35:13'),
+('132', '78', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 11:35:57'),
+('133', '83', 'pending', 'confirmed', 'system', NULL, NULL, '2026-11-21 11:37:44'),
+('134', '83', 'confirmed', 'packing', 'system', NULL, NULL, '2026-11-21 11:37:44'),
+('135', '83', 'packing', 'shipping', 'system', NULL, NULL, '2026-11-21 11:37:44'),
+('136', '83', 'shipping', 'completed', 'system', NULL, NULL, '2026-11-21 11:37:49'),
+('137', '84', 'pending', 'confirmed', 'system', NULL, NULL, '2026-11-21 11:37:49'),
+('138', '84', 'confirmed', 'packing', 'system', NULL, NULL, '2026-11-21 11:37:49'),
+('139', '85', 'pending', 'cancelled', 'system', NULL, NULL, '2026-11-21 11:37:50'),
+('140', '89', 'pending', 'cancelled', 'system', NULL, NULL, '2026-11-21 11:38:47'),
+('141', '93', 'pending', 'confirmed', 'system', NULL, NULL, '2026-11-21 11:42:14'),
+('142', '93', 'confirmed', 'packing', 'system', NULL, NULL, '2026-11-21 11:42:14'),
+('143', '93', 'packing', 'shipping', 'system', NULL, NULL, '2026-11-21 11:42:14'),
+('144', '93', 'shipping', 'completed', 'system', NULL, NULL, '2026-11-21 11:42:20'),
+('145', '94', 'pending', 'confirmed', 'system', NULL, NULL, '2026-11-21 11:42:20'),
+('146', '94', 'confirmed', 'packing', 'system', NULL, NULL, '2026-11-21 11:42:20'),
+('147', '99', 'pending', 'confirmed', 'system', NULL, NULL, '2026-11-21 11:47:25'),
+('148', '99', 'confirmed', 'packing', 'system', NULL, NULL, '2026-11-21 11:47:25'),
+('149', '99', 'packing', 'shipping', 'system', NULL, NULL, '2026-11-21 11:47:25'),
+('150', '99', 'shipping', 'completed', 'system', NULL, NULL, '2026-11-21 11:47:30'),
+('151', '100', 'pending', 'confirmed', 'system', NULL, NULL, '2026-11-21 11:47:30'),
+('152', '100', 'confirmed', 'packing', 'system', NULL, NULL, '2026-11-21 11:47:30'),
+('153', '101', 'pending', 'cancelled', 'system', NULL, NULL, '2026-11-21 11:47:30'),
+('154', '121', 'pending', 'confirmed', 'system', NULL, 'SePay webhook xác nhận chuyển khoản VietQR (ref: SIMULATE-1795268283)', '2026-11-21 13:38:07');
+
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `orders`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `orders`;
+CREATE TABLE `orders` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `lesson_id` int unsigned NOT NULL,
-  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `file_path` varchar(500) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `file_type` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `file_size_bytes` bigint unsigned DEFAULT '0',
-  `download_count` int unsigned DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `user_id` int unsigned DEFAULT NULL,
+  `customer_name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `phone` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `email` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `contact_address` text COLLATE utf8mb4_unicode_ci,
+  `shipping_address` text COLLATE utf8mb4_unicode_ci,
+  `payment_method` enum('cash','vnpay','momo','installment','bank_transfer') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'cash',
+  `payment_status` enum('pending','paid','refunded') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `total_amount` bigint unsigned NOT NULL DEFAULT '0',
+  `status` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'pending',
+  `vnpay_txn_ref` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vnpay_transaction_no` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vnpay_bank_code` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vnpay_pay_date` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `coupon_code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `discount_amount` bigint unsigned NOT NULL DEFAULT '0',
+  `shipper_id` int unsigned DEFAULT NULL,
+  `shipping_lat` decimal(10,8) DEFAULT NULL,
+  `shipping_lng` decimal(11,8) DEFAULT NULL,
+  `user_address_id` int unsigned DEFAULT NULL,
+  `order_code` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `wallet_amount` bigint unsigned NOT NULL DEFAULT '0',
+  `user_voucher_code` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `store_id` int unsigned DEFAULT NULL,
+  `address_province` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address_district` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address_ward` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `address_street` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `preferred_time_slot` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `shipping_fee` bigint unsigned NOT NULL DEFAULT '0',
+  `shipping_distance_km` decimal(8,2) DEFAULT NULL,
+  `estimated_delivery_from` date DEFAULT NULL,
+  `estimated_delivery_to` date DEFAULT NULL,
+  `loyalty_discount_amount` bigint unsigned NOT NULL DEFAULT '0',
+  `loyalty_tier` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `earned_points` int unsigned NOT NULL DEFAULT '0',
+  `points_awarded` tinyint(1) NOT NULL DEFAULT '0',
+  `delivery_proof_path` varchar(500) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `shipper_assigned_at` datetime DEFAULT NULL,
+  `installment_months` tinyint unsigned DEFAULT NULL,
+  `installment_deposit_amount` bigint unsigned NOT NULL DEFAULT '0',
+  `installment_status` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `is_preorder` tinyint(1) NOT NULL DEFAULT '0',
+  `preorder_deposit_paid` bigint unsigned NOT NULL DEFAULT '0',
+  `preorder_status` varchar(30) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vat_company_name` varchar(200) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vat_tax_code` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vat_address` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vat_email` varchar(150) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vat_invoice_no` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `vat_invoice_issued` tinyint(1) NOT NULL DEFAULT '0',
+  `vat_invoice_issued_at` datetime DEFAULT NULL,
+  `stock_reserved` tinyint(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
-  KEY `lesson_id` (`lesson_id`),
-  CONSTRAINT `lesson_materials_ibfk_1` FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  UNIQUE KEY `uq_orders_order_code` (`order_code`),
+  KEY `orders_user_id` (`user_id`),
+  KEY `orders_payment_status` (`payment_status`),
+  KEY `orders_created_at` (`created_at`),
+  KEY `idx_orders_user_id` (`user_id`),
+  KEY `idx_orders_store_id` (`store_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=159 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `lesson_materials`
-INSERT INTO `lesson_materials` (`id`, `lesson_id`, `title`, `file_path`, `file_type`, `file_size_bytes`, `download_count`, `created_at`) VALUES
-(1, 1, 'Giao_trinh_tong_quan_khoa_hoc.pdf', '/storage/materials/sample_doc.pdf', 'pdf', 1048576, 0, '2026-11-21 11:19:46'),
-(2, 3, 'Giao_trinh_tong_quan_fullstack.pdf', '/storage/materials/Giao_trinh_tong_quan_fullstack.pdf', 'pdf', 1048576, 0, '2026-11-21 11:33:11'),
-(3, 4, 'Source_code_oop_mvc.zip', '/storage/materials/Source_code_oop_mvc.zip', 'zip', 1048576, 0, '2026-11-21 11:33:12'),
-(4, 6, 'Python_CheatSheet_LMS.pdf', '/storage/materials/Python_CheatSheet_LMS.pdf', 'pdf', 1048576, 0, '2026-11-21 11:33:12'),
-(5, 7, 'Machine_Learning_Datasets.zip', '/storage/materials/Machine_Learning_Datasets.zip', 'zip', 1048576, 0, '2026-11-21 11:33:12'),
-(6, 9, 'React_Core_Slides.pdf', '/storage/materials/React_Core_Slides.pdf', 'pdf', 1048576, 0, '2026-11-21 11:33:12'),
-(7, 10, 'Hooks_Exercise_Starter.zip', '/storage/materials/Hooks_Exercise_Starter.zip', 'zip', 1048576, 0, '2026-11-21 11:33:12'),
-(8, 12, 'Figma_UI_Kit_Template.fig', '/storage/materials/Figma_UI_Kit_Template.fig', 'fig', 1048576, 0, '2026-11-21 11:33:12'),
-(9, 13, 'UX_Research_Framework.pdf', '/storage/materials/UX_Research_Framework.pdf', 'pdf', 1048576, 0, '2026-11-21 11:33:12'),
-(10, 15, 'Dockerfile_Best_Practices.pdf', '/storage/materials/Dockerfile_Best_Practices.pdf', 'pdf', 1048576, 0, '2026-11-21 11:33:12'),
-(11, 16, 'github-actions-workflow.yml', '/storage/materials/github-actions-workflow.yml', 'yml', 1048576, 0, '2026-11-21 11:33:12'),
-(12, 18, 'SQL_Practice_Database.sql', '/storage/materials/SQL_Practice_Database.sql', 'sql', 1048576, 0, '2026-11-21 11:33:12'),
-(13, 19, 'Query_Optimization_Guide.pdf', '/storage/materials/Query_Optimization_Guide.pdf', 'pdf', 1048576, 0, '2026-11-21 11:33:12'),
-(14, 22, 'Giao-trinh-thuc-hanh.pdf', '/storage/docs/sample.pdf', 'pdf', 2450000, 0, '2026-11-21 11:47:30'),
-(15, 26, 'Giao-trinh-thuc-hanh.pdf', '/storage/docs/sample.pdf', 'pdf', 2450000, 0, '2026-11-21 11:47:30'),
-(16, 30, 'Giao-trinh-thuc-hanh.pdf', '/storage/docs/sample.pdf', 'pdf', 2450000, 0, '2026-11-21 11:47:30'),
-(17, 34, 'Giao-trinh-thuc-hanh.pdf', '/storage/docs/sample.pdf', 'pdf', 2450000, 0, '2026-11-21 11:47:30'),
-(18, 38, 'Giao-trinh-thuc-hanh.pdf', '/storage/docs/sample.pdf', 'pdf', 2450000, 0, '2026-11-21 11:47:30'),
-(19, 42, 'Giao-trinh-thuc-hanh.pdf', '/storage/docs/sample.pdf', 'pdf', 2450000, 0, '2026-11-21 11:47:30');
+-- Dữ liệu bảng `orders`
+INSERT INTO `orders` (`id`, `user_id`, `customer_name`, `phone`, `email`, `contact_address`, `shipping_address`, `payment_method`, `payment_status`, `total_amount`, `status`, `vnpay_txn_ref`, `vnpay_transaction_no`, `vnpay_bank_code`, `vnpay_pay_date`, `created_at`, `coupon_code`, `discount_amount`, `shipper_id`, `shipping_lat`, `shipping_lng`, `user_address_id`, `order_code`, `wallet_amount`, `user_voucher_code`, `store_id`, `address_province`, `address_district`, `address_ward`, `address_street`, `preferred_time_slot`, `shipping_fee`, `shipping_distance_km`, `estimated_delivery_from`, `estimated_delivery_to`, `loyalty_discount_amount`, `loyalty_tier`, `earned_points`, `points_awarded`, `delivery_proof_path`, `shipper_assigned_at`, `installment_months`, `installment_deposit_amount`, `installment_status`, `is_preorder`, `preorder_deposit_paid`, `preorder_status`, `vat_company_name`, `vat_tax_code`, `vat_address`, `vat_email`, `vat_invoice_no`, `vat_invoice_issued`, `vat_invoice_issued_at`, `stock_reserved`) VALUES
+('1', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', '123 Lê Lợi, Hà Nội', '123 Lê Lợi, Hà Nội', 'cash', 'paid', '27500000', 'confirmed', NULL, NULL, NULL, NULL, '2026-06-16 10:00:00', NULL, '0', NULL, NULL, NULL, NULL, 'HD260616-IDGK0', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('2', '3', 'huy', '0781278321', 'huy28072k5@gmail.com', 'hn', 'hn', 'vnpay', 'paid', '92470000', 'completed', '2_1781583234', '52388410', 'NCB', '20260616111354', '2026-06-16 11:13:49', NULL, '0', NULL, NULL, NULL, NULL, 'HD260616-VXKV8', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('3', '3', 'huy', '0781278321', 'huy28072k5@gmail.com', 'hhh', 'hhh', 'vnpay', 'paid', '28990000', 'completed', '3_1781583345', '16708927', 'NCB', '20260616111545', '2026-06-16 11:15:41', NULL, '0', NULL, NULL, NULL, NULL, 'HD260616-CXEXL', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('4', '3', 'huy', '0781278321', 'huy28072k5@gmail.com', 'aa', 'aa', 'cash', 'pending', '50990000', 'completed', NULL, NULL, NULL, NULL, '2026-06-16 11:17:01', NULL, '0', NULL, NULL, NULL, NULL, 'HD260616-3CCH0', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('5', '4', 'huy', '0788415516', 'huy28072k5@gmail.com', 'hn', 'hn', 'momo', 'pending', '28990000', 'pending', NULL, NULL, NULL, NULL, '2026-06-21 08:43:40', NULL, '0', NULL, NULL, NULL, NULL, 'HD260621-BTFKA', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('6', '4', 'huy', '0788415516', 'huy28072k5@gmail.com', 'hn', 'hn', 'momo', 'pending', '450000', 'confirmed', NULL, NULL, NULL, NULL, '2026-06-21 08:50:54', NULL, '0', NULL, NULL, NULL, NULL, 'HD260621-QM6D0', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('7', '4', 'huy', '0788415516', 'huy28072k5@gmail.com', 'hn', 'hn', 'cash', 'pending', '28990000', 'pending', NULL, NULL, NULL, NULL, '2026-06-22 00:33:13', NULL, '0', NULL, NULL, NULL, NULL, 'HD260622-8D8J7', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('8', NULL, 'Test Customer', '0912345678', 'test@example.com', '123 Test Street', '123 Test Street', 'cash', 'pending', '152000', 'pending', NULL, NULL, NULL, NULL, '2026-06-22 01:43:39', 'SIEUOFFER', '38000', NULL, NULL, NULL, NULL, 'HD260622-D3N8X', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('45', '1', 'Admin', '0901234567', 'admin@shop.test', 'UBND phường Bưởi, 10A, Ngõ Cống Xanh, Yên Thái, Kẻ Bưởi, Phường Tây Hồ, Hà Nội, 11214, Việt Nam', 'UBND phường Bưởi, 10A, Ngõ Cống Xanh, Yên Thái, Kẻ Bưởi, Phường Tây Hồ, Hà Nội, 11214, Việt Nam', 'installment', 'pending', '9490000', 'confirmed', NULL, NULL, NULL, NULL, '2026-07-10 20:04:07', NULL, '0', NULL, '21.05085250', '105.81004360', NULL, 'HD260710-9WGCN', '0', NULL, '1', 'Hà Nội', 'Phường Tây Hồ', 'Kẻ Bưởi', 'Ngõ Cống Xanh', 'any', '0', '0.43', '2026-07-10', '2026-07-10', '0', 'Standard', '0', '0', NULL, NULL, '12', '1898000', 'pending_review', '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('46', '1', 'Admin', '0901234567', 'admin@shop.test', 'UBND phường Bưởi, 10A, Ngõ Cống Xanh, Yên Thái, Kẻ Bưởi, Phường Tây Hồ, Hà Nội, 11214, Việt Nam', 'UBND phường Bưởi, 10A, Ngõ Cống Xanh, Yên Thái, Kẻ Bưởi, Phường Tây Hồ, Hà Nội, 11214, Việt Nam', 'bank_transfer', 'pending', '11490000', 'pending', NULL, NULL, NULL, NULL, '2026-07-10 20:05:48', NULL, '0', NULL, '21.05087150', '105.81000870', NULL, 'HD260710-IWCB1', '0', NULL, '1', 'Hà Nội', 'Phường Tây Hồ', 'Kẻ Bưởi', 'Ngõ Cống Xanh', 'any', '0', '0.43', '2026-07-10', '2026-07-10', '0', 'Standard', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('47', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', 'FLC Complex, 36, Đường Phạm Hùng, Xuân Phong, Phường Từ Liêm, Hà Nội, 10051, Việt Nam', 'FLC Complex, 36, Đường Phạm Hùng, Xuân Phong, Phường Từ Liêm, Hà Nội, 10051, Việt Nam', 'bank_transfer', 'refunded', '2842270000', 'cancelled', NULL, NULL, NULL, NULL, '2026-07-10 20:10:19', NULL, '0', '21', '21.02722560', '105.77838080', NULL, 'HD260710-QG62M', '0', NULL, '2', 'Hà Nội', 'Xuân Phong', NULL, 'Đường Phạm Hùng', 'any', '0', '0.49', '2026-07-10', '2026-07-10', '0', 'Standard', '0', '0', NULL, '2026-07-10 20:14:58', NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('48', '4', 'huy', '0788415516', 'huy28072k5@gmail.com', 'UBND phường Bưởi, 10A, Ngõ Cống Xanh, Yên Thái, Kẻ Bưởi, Phường Tây Hồ, Hà Nội, 11214, Việt Nam', 'UBND phường Bưởi, 10A, Ngõ Cống Xanh, Yên Thái, Kẻ Bưởi, Phường Tây Hồ, Hà Nội, 11214, Việt Nam', 'bank_transfer', 'paid', '1379700000', 'confirmed', NULL, NULL, NULL, NULL, '2026-07-10 20:23:30', NULL, '0', NULL, '21.05087330', '105.81000790', NULL, 'HD260710-7ILB9', '0', NULL, '1', 'Hà Nội', 'Phường Tây Hồ', 'Kẻ Bưởi', 'Ngõ Cống Xanh', 'any', '0', '0.43', '2026-07-10', '2026-07-10', '0', 'Standard', '137970', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('49', '4', 'huy', '0788415516', 'huy28072k5@gmail.com', 'UBND phường Bưởi, 10A, Ngõ Cống Xanh, Yên Thái, Kẻ Bưởi, Phường Tây Hồ, Hà Nội, 11214, Việt Nam', 'UBND phường Bưởi, 10A, Ngõ Cống Xanh, Yên Thái, Kẻ Bưởi, Phường Tây Hồ, Hà Nội, 11214, Việt Nam', 'cash', 'refunded', '100000000000000', 'cancelled', NULL, NULL, NULL, NULL, '2026-07-10 20:29:03', NULL, '100000000000000', '21', '21.05087330', '105.81000790', NULL, 'HD260710-KTCKS', '0', NULL, '1', 'Hà Nội', 'Phường Tây Hồ', 'Kẻ Bưởi', 'Ngõ Cống Xanh', 'any', '0', '0.43', '2026-07-10', '2026-07-10', '100000000000000', 'Diamond', '0', '0', NULL, '2026-07-10 20:31:00', NULL, '0', NULL, '1', '0', 'completed', NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('50', '1', 'Admin', '0901234567', 'admin@shop.test', 'Mễ Trì Thượng, Mễ Trì, Phường Từ Liêm, Hà Nội, 10070, Việt Nam', 'Mễ Trì Thượng, Mễ Trì, Phường Từ Liêm, Hà Nội, 10070, Việt Nam', 'bank_transfer', 'pending', '18900000', 'pending', NULL, NULL, NULL, NULL, '2026-08-09 23:52:36', NULL, '0', NULL, '21.00428800', '105.77838080', NULL, 'HD260809-LZIG5', '0', NULL, '2', 'Hà Nội', 'Phường Từ Liêm', 'Mễ Trì', NULL, 'any', '0', '2.82', '2026-08-09', '2026-08-09', '0', 'Standard', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('51', '1', 'Admin', '0901234567', 'admin@shop.test', 'Mễ Trì Thượng, Mễ Trì, Phường Từ Liêm, Hà Nội, 10070, Việt Nam', 'Mễ Trì Thượng, Mễ Trì, Phường Từ Liêm, Hà Nội, 10070, Việt Nam', 'momo', 'pending', '3120000', 'pending', NULL, NULL, NULL, NULL, '2026-08-09 23:53:22', NULL, '0', NULL, '21.00428800', '105.77838080', NULL, 'HD260809-2NMNJ', '0', NULL, '2', 'Hà Nội', 'Phường Từ Liêm', 'Mễ Trì', NULL, 'any', '0', '2.82', '2026-08-09', '2026-08-09', '0', 'Standard', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('52', '1', 'Admin', '0901234567', 'admin@shop.test', 'Phường Tùng Thiện, Hà Nội, Việt Nam', 'Phường Tùng Thiện, Hà Nội, Việt Nam', 'momo', 'pending', '3285000', 'pending', NULL, NULL, NULL, NULL, '2026-08-10 00:26:29', NULL, '0', NULL, '21.11300340', '105.43413670', NULL, 'HD260810-ICRLM', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '165000', '37.32', '2026-08-11', '2026-08-11', '0', 'Standard', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('53', '1', 'Admin', '0901234567', 'admin@shop.test', 'Phường Tùng Thiện, Hà Nội, Việt Nam', 'Phường Tùng Thiện, Hà Nội, Việt Nam', 'bank_transfer', 'pending', '3285000', 'pending', NULL, NULL, NULL, NULL, '2026-08-10 00:27:00', NULL, '0', NULL, '21.11300340', '105.43413670', NULL, 'HD260810-PSXQG', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '165000', '37.32', '2026-08-11', '2026-08-11', '0', 'Standard', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('54', '1', 'Admin', '0901234567', 'admin@shop.test', 'Phường Tùng Thiện, Hà Nội, Việt Nam', 'Phường Tùng Thiện, Hà Nội, Việt Nam', 'bank_transfer', 'pending', '9655000', 'pending', NULL, NULL, NULL, NULL, '2026-08-10 00:27:20', NULL, '0', NULL, '21.11300340', '105.43413670', NULL, 'HD260810-G8QFJ', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '165000', '37.32', '2026-08-11', '2026-08-11', '0', 'Standard', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('55', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', 'Ngách 18 Ngõ 575 Kim Mã, Ngọc Khánh, Phường Giảng Võ, Hà Nội, 11110, Việt Nam', 'Ngách 18 Ngõ 575 Kim Mã, Ngọc Khánh, Phường Giảng Võ, Hà Nội, 11110, Việt Nam', 'momo', 'pending', '16490000', 'pending', NULL, NULL, NULL, NULL, '2026-08-12 13:25:13', NULL, '0', NULL, '21.02877493', '105.80912018', NULL, 'HD260812-CUGXO', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '0', '2.76', '2026-08-12', '2026-08-12', '0', 'Standard', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('56', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', 'Ngách 18 Ngõ 575 Kim Mã, Ngọc Khánh, Phường Giảng Võ, Hà Nội, 11110, Việt Nam', 'Ngách 18 Ngõ 575 Kim Mã, Ngọc Khánh, Phường Giảng Võ, Hà Nội, 11110, Việt Nam', 'momo', 'pending', '16490000', 'pending', NULL, NULL, NULL, NULL, '2026-08-12 13:25:20', NULL, '0', NULL, '21.02877493', '105.80912018', NULL, 'HD260812-ZZJYW', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '0', '2.76', '2026-08-12', '2026-08-12', '0', 'Standard', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('57', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', 'Ngách 18 Ngõ 575 Kim Mã, Ngọc Khánh, Phường Giảng Võ, Hà Nội, 11110, Việt Nam', 'Ngách 18 Ngõ 575 Kim Mã, Ngọc Khánh, Phường Giảng Võ, Hà Nội, 11110, Việt Nam', 'momo', 'pending', '16490000', 'confirmed', NULL, NULL, NULL, NULL, '2026-08-12 13:25:20', NULL, '0', NULL, '21.02877493', '105.80912018', NULL, 'HD260812-TSFIG', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '0', '2.76', '2026-08-12', '2026-08-12', '0', 'Standard', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('58', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', 'Trường Đại học Lao động - Xã hội, 43, Đường Trần Duy Hưng, Trung Kính Thượng, Kẻ Giàn, Phường Yên Hòa, Hà Nội, 11312, Việt Nam', 'Trường Đại học Lao động - Xã hội, 43, Đường Trần Duy Hưng, Trung Kính Thượng, Kẻ Giàn, Phường Yên Hòa, Hà Nội, 11312, Việt Nam', 'bank_transfer', 'refunded', '16490000', 'cancelled', NULL, NULL, NULL, NULL, '2026-08-12 13:26:20', NULL, '0', NULL, '21.01199950', '105.80265800', NULL, 'HD260812-433QP', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '0', '2.85', '2026-08-12', '2026-08-12', '0', 'Standard', '1649', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('59', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', 'Khách sạn Fortuna, 6B, Phố Láng Hạ, Nhược Công, Phường Giảng Võ, Hà Nội, 11110, Việt Nam', 'Khách sạn Fortuna, 6B, Phố Láng Hạ, Nhược Công, Phường Giảng Võ, Hà Nội, 11110, Việt Nam', 'bank_transfer', 'paid', '30000', 'confirmed', NULL, NULL, NULL, NULL, '2026-08-12 13:41:07', NULL, '0', NULL, '21.02067200', '105.81770240', NULL, 'HD260812-XZ3IU', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '25000', '3.78', '2026-08-12', '2026-08-12', '0', 'Standard', '3', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('60', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', 'Trường Đại học Lao động - Xã hội, 43, Đường Trần Duy Hưng, Trung Kính Thượng, Kẻ Giàn, Phường Yên Hòa, Hà Nội, 11312, Việt Nam', 'Trường Đại học Lao động - Xã hội, 43, Đường Trần Duy Hưng, Trung Kính Thượng, Kẻ Giàn, Phường Yên Hòa, Hà Nội, 11312, Việt Nam', 'bank_transfer', 'pending', '4900', 'pending', NULL, NULL, NULL, NULL, '2026-08-12 13:53:52', NULL, '100', NULL, '21.01200390', '105.80264940', NULL, 'HD260812-ITDDK', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '0', '2.85', '2026-08-12', '2026-08-12', '100', 'Silver', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('61', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', 'Khách sạn Fortuna, 6B, Phố Láng Hạ, Nhược Công, Phường Giảng Võ, Hà Nội, 11110, Việt Nam', 'Khách sạn Fortuna, 6B, Phố Láng Hạ, Nhược Công, Phường Giảng Võ, Hà Nội, 11110, Việt Nam', 'bank_transfer', 'pending', '29400', 'confirmed', NULL, NULL, NULL, NULL, '2026-08-12 13:56:29', NULL, '600', NULL, '21.02067200', '105.81770240', NULL, 'HD260812-SQ8RB', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '25000', '3.78', '2026-08-12', '2026-08-12', '600', 'Silver', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('62', '4', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', 'Trụ sở chính: Võng Thị, Tây Hồ, Hà Nội', 'Trụ sở chính: Võng Thị, Tây Hồ, Hà Nội', 'vnpay', 'paid', '72864000', 'confirmed', '62_1786520313', '11726430', 'NCB', '20260812143833', '2026-08-12 14:38:28', NULL, '8096000', NULL, '21.01201960', '105.80265730', NULL, 'HD260812-VMZHC', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '0', '2.85', '2026-08-12', '2026-08-12', '8096000', 'Diamond', '7286', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('63', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', 'Trước trường Trung học cơ sở Yên Hòa 30m - Trung Kính, Phố Trung Kính, Hạ Yên Quyết, Phường Yên Hòa, Hà Nội, 11312, Việt Nam', 'Trước trường Trung học cơ sở Yên Hòa 30m - Trung Kính, Phố Trung Kính, Hạ Yên Quyết, Phường Yên Hòa, Hà Nội, 11312, Việt Nam', 'vnpay', 'paid', '36730400', 'confirmed', '63_1790330355', '69591426', 'NCB', '20260925165915', '2026-09-25 16:59:09', NULL, '749600', NULL, '21.02211572', '105.79092062', NULL, 'HD260925-VB70G', '0', NULL, '2', NULL, NULL, NULL, NULL, 'afternoon', '0', '1.19', '2026-09-25', '2026-09-25', '749600', 'Silver', '3673', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('64', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', '45 xuân thủy', '45 xuân thủy', 'vnpay', 'pending', '17955000', 'pending', NULL, NULL, NULL, NULL, '2026-09-25 17:11:20', NULL, '945000', NULL, NULL, NULL, NULL, 'HD260925-9C0VG', '0', NULL, NULL, NULL, NULL, NULL, NULL, 'any', '0', NULL, '2026-09-28', '2026-09-30', '945000', 'Gold', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('65', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', '45 XUÂN THỦY', '45 XUÂN THỦY', 'vnpay', 'paid', '17955000', 'confirmed', '65_1790331137', '59523104', 'NCB', '20260925171217', '2026-09-25 17:12:11', NULL, '945000', NULL, NULL, NULL, NULL, 'HD260925-6M62W', '0', NULL, NULL, NULL, NULL, NULL, NULL, 'any', '0', NULL, '2026-09-28', '2026-09-30', '945000', 'Gold', '1795', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('66', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', 'Tọa độ: 21.03013, 105.78972', 'Tọa độ: 21.03013, 105.78972', 'vnpay', 'paid', '24690500', 'confirmed', '66_1790331573', '14680087', 'NCB', '20260925171933', '2026-09-25 17:19:29', NULL, '1299500', NULL, '21.03012731', '105.78971903', NULL, 'HD260925-WTGOM', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '0', '0.75', '2026-09-25', '2026-09-25', '1299500', 'Gold', '2469', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('67', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', '45 xuan thuy', '45 xuan thuy', 'vnpay', 'paid', '49371500', 'completed', '67_1790332192', '46657935', 'NCB', '20260925172952', '2026-09-25 17:29:46', NULL, '2598500', '21', NULL, NULL, NULL, 'HD260925-9JEK6', '0', NULL, NULL, NULL, NULL, NULL, NULL, 'any', '0', NULL, '2026-09-28', '2026-09-30', '2598500', 'Gold', '4937', '1', NULL, '2026-09-25 17:33:25', NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('68', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', 'Trường Đại học Lao động - Xã hội, 43, Đường Trần Duy Hưng, Trung Kính Hạ, Kẻ Giàn, Phường Yên Hòa, Hà Nội, 11312, Việt Nam', 'Trường Đại học Lao động - Xã hội, 43, Đường Trần Duy Hưng, Trung Kính Hạ, Kẻ Giàn, Phường Yên Hòa, Hà Nội, 11312, Việt Nam', 'vnpay', 'paid', '23391000', 'confirmed', '68_1790332688', '16250791', 'NCB', '20260925173808', '2026-09-25 17:38:00', NULL, '2599000', NULL, '21.01210540', '105.80300330', NULL, 'HD260925-NCSJV', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '0', '2.87', '2026-09-25', '2026-09-25', '2599000', 'Diamond', '2339', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('69', '4', 'huy', '0128282728', 'huy28072k5@gmail.com', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'vnpay', 'paid', '23413500', 'confirmed', '69_1790332832', '28289659', 'NCB', '20260925174032', '2026-09-25 17:40:22', NULL, '2601500', NULL, '21.01411840', '105.82097920', NULL, 'HD260925-AMBTY', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '25000', '4.34', '2026-09-25', '2026-09-25', '2601500', 'Diamond', '2341', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('70', '4', 'huy', '0788415516', 'huy28072k5@gmail.com', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'vnpay', 'paid', '10363500', 'confirmed', '70_1790332875', '15081829', 'NCB', '20260925174115', '2026-09-25 17:41:09', NULL, '1151500', NULL, '21.01411840', '105.82097920', NULL, 'HD260925-A4W9A', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '25000', '4.34', '2026-09-25', '2026-09-25', '1151500', 'Diamond', '1036', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('71', '4', 'huy', '0788415517', 'huy28072k5@gmail.com', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'vnpay', 'paid', '19363500', 'confirmed', '71_1790333232', '50669816', 'NCB', '20260925174712', '2026-09-25 17:47:07', NULL, '2151500', NULL, '21.01411840', '105.82097920', NULL, 'HD260925-QFA4W', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '25000', '4.34', '2026-09-25', '2026-09-25', '2151500', 'Diamond', '1936', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('72', '4', 'huy', '0788415516', 'huy28072k5@gmail.com', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'cash', 'pending', '23413500', 'pending', NULL, NULL, NULL, NULL, '2026-09-25 17:49:58', NULL, '2601500', NULL, '21.01411840', '105.82097920', NULL, 'HD260925-1IJJQ', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '25000', '4.34', '2026-09-25', '2026-09-25', '2601500', 'Diamond', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('73', '4', 'ban', '0282827283', 'huy28072k5@gmail.com', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'vnpay', 'paid', '8563500', 'confirmed', '73_1790333526', '56182047', 'NCB', '20260925175206', '2026-09-25 17:52:00', NULL, '951500', NULL, '21.01411840', '105.82097920', NULL, 'HD260925-BGLQ3', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '25000', '4.34', '2026-09-25', '2026-09-25', '951500', 'Diamond', '856', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('74', '4', 'ban', '0282827284', 'huy28072k5@gmail.com', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'vnpay', 'paid', '33745500', 'confirmed', '74_1790334062', '13554921', 'NCB', '20260925180102', '2026-09-25 18:00:57', NULL, '3749500', NULL, '21.01411840', '105.82097920', NULL, 'HD260925-PMX7G', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '25000', '4.34', '2026-09-25', '2026-09-25', '3749500', 'Diamond', '3374', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('75', '4', 'huy', '0282827286', 'huy28072k5@gmail.com', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'vnpay', 'paid', '33745500', 'confirmed', '75_1790334163', '46279145', 'NCB', '20260925180243', '2026-09-25 18:02:38', NULL, '3749500', NULL, '21.01411840', '105.82097920', NULL, 'HD260925-LPWUR', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '25000', '4.34', '2026-09-25', '2026-09-25', '3749500', 'Diamond', '3374', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('76', '4', 'huy', '0282827285', 'huy28072k5@gmail.com', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'vnpay', 'paid', '34762500', 'confirmed', '76_1790336095', '37362342', 'NCB', '20260925183455', '2026-09-25 18:34:47', NULL, '3862500', NULL, '21.01411840', '105.82097920', NULL, 'HD260925-GR79S', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '25000', '4.34', '2026-09-25', '2026-09-25', '3862500', 'Diamond', '3476', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('77', '4', 'huy', '0282827284', 'huy28072k5@gmail.com', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'vnpay', 'paid', '15421500', 'confirmed', '77_1790336121', '26989159', 'NCB', '20260925183521', '2026-09-25 18:35:13', NULL, '1713500', NULL, '21.01411840', '105.82097920', NULL, 'HD260925-0EFTU', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '25000', '4.34', '2026-09-25', '2026-09-25', '1713500', 'Diamond', '1542', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('78', '4', 'huy', '0282827284', 'huy28072k5@gmail.com', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'vnpay', 'paid', '33745500', 'confirmed', '78_1790336161', '19329556', 'NCB', '20260925183601', '2026-09-25 18:35:57', NULL, '3749500', NULL, '21.01411840', '105.82097920', NULL, 'HD260925-4P6O3', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '25000', '4.34', '2026-09-25', '2026-09-25', '3749500', 'Diamond', '3374', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
+('103', '43', 'Nguyễn Đình Quân', '0988776655', 'quan.nguyen@gmail.com', NULL, NULL, 'bank_transfer', 'paid', '499000', 'delivered', NULL, NULL, NULL, NULL, '2026-11-21 11:49:51', NULL, '0', NULL, NULL, NULL, NULL, 'LMS-20261121-12A879', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('104', '44', 'Phạm Thuỳ Linh', '0988776655', 'linh.pham@gmail.com', NULL, NULL, 'bank_transfer', 'paid', '499000', 'delivered', NULL, NULL, NULL, NULL, '2026-11-21 11:50:40', NULL, '0', NULL, NULL, NULL, NULL, 'LMS-20261121-ED9881', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('105', '45', 'Hoàng Minh Tuấn', '0988776655', 'tuan.hoang@gmail.com', NULL, NULL, 'bank_transfer', 'paid', '320000', 'delivered', NULL, NULL, NULL, NULL, '2026-11-21 11:51:24', NULL, '0', NULL, NULL, NULL, NULL, 'LMS-20261121-E42157', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('106', '46', 'Đỗ Phương Anh', '0988776655', 'anh.do@gmail.com', NULL, NULL, 'bank_transfer', 'paid', '450000', 'delivered', NULL, NULL, NULL, NULL, '2026-11-21 11:51:24', NULL, '0', NULL, NULL, NULL, NULL, 'LMS-20261121-EE8652', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('107', '47', 'Trịnh Quốc Bảo', '0988776655', 'bao.trinh@gmail.com', NULL, NULL, 'bank_transfer', 'paid', '799000', 'delivered', NULL, NULL, NULL, NULL, '2026-11-21 11:51:24', NULL, '0', NULL, NULL, NULL, NULL, 'LMS-20261121-D4104D', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('108', '48', 'Ngô Thị Cẩm Tú', '0988776655', 'tu.ngo@gmail.com', NULL, NULL, 'bank_transfer', 'paid', '0', 'delivered', NULL, NULL, NULL, NULL, '2026-11-21 11:51:24', NULL, '0', NULL, NULL, NULL, NULL, 'LMS-20261121-595BCF', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('111', '1', 'Admin', '0901234567', 'admin@shop.test', NULL, NULL, 'vnpay', 'paid', '390000', 'completed', NULL, NULL, NULL, NULL, '2026-11-21 13:12:03', NULL, '0', NULL, NULL, NULL, NULL, 'LMS2611217AF0B2', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('114', '1', 'Admin', '0901234567', 'admin@shop.test', NULL, NULL, 'vnpay', 'paid', '799000', 'completed', NULL, NULL, NULL, NULL, '2026-11-21 13:12:34', NULL, '0', NULL, NULL, NULL, NULL, 'LMS2611219E4F30', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('115', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', NULL, NULL, 'vnpay', 'paid', '799000', 'completed', NULL, NULL, NULL, NULL, '2026-11-21 13:21:10', NULL, '0', NULL, NULL, NULL, NULL, 'LMS261121466960', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('116', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', NULL, NULL, 'bank_transfer', 'paid', '499000', 'completed', NULL, NULL, NULL, NULL, '2026-11-21 13:24:30', NULL, '0', NULL, NULL, NULL, NULL, 'LMS261121TEST02', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('117', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', NULL, NULL, 'vnpay', 'paid', '450000', 'completed', NULL, NULL, NULL, NULL, '2026-11-21 13:29:04', NULL, '0', NULL, NULL, NULL, NULL, 'LMS2611217F6499', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('121', '4', 'Tô Quang Huy', '0912345678', 'huy28072k5@gmail.com', NULL, NULL, 'bank_transfer', 'paid', '499000', 'confirmed', NULL, NULL, NULL, NULL, '2026-11-21 13:37:48', NULL, '0', NULL, NULL, NULL, NULL, 'HD261121-VSAYZ', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '49', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('122', '4', 'Tô Quang Huy', '0912345678', 'huy28072k5@gmail.com', NULL, NULL, 'vnpay', 'pending', '320000', 'pending', NULL, NULL, NULL, NULL, '2026-11-21 13:38:29', NULL, '0', NULL, NULL, NULL, NULL, 'HD261121-HSPGR', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('123', '4', 'huy', '0912345678', 'huy28072k5@gmail.com', NULL, NULL, 'vnpay', 'paid', '320000', 'confirmed', NULL, NULL, NULL, NULL, '2026-11-21 13:41:49', NULL, '0', NULL, NULL, NULL, NULL, 'HD261121-P3M35', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '32', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('126', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', NULL, NULL, 'cash', 'paid', '490000', 'completed', NULL, NULL, NULL, NULL, '2026-11-21 14:01:55', NULL, '0', NULL, NULL, NULL, NULL, 'HD261121-9WQ3U', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('129', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', NULL, NULL, 'vnpay', 'pending', '490000', 'pending', NULL, NULL, NULL, NULL, '2026-11-21 14:07:20', NULL, '0', NULL, NULL, NULL, NULL, 'HD261121-1ILH3', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('137', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', NULL, NULL, 'vnpay', 'paid', '499000', 'confirmed', '137_1795270291', '50370217', 'NCB', '20261121211131', '2026-11-21 14:11:27', NULL, '0', NULL, NULL, NULL, NULL, 'HD261121-BVMUO', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '49', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('150', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', NULL, NULL, 'bank_transfer', 'pending', '450000', 'pending', NULL, NULL, NULL, NULL, '2026-11-21 14:46:12', NULL, '0', NULL, NULL, NULL, NULL, 'TEST12345', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0');
 
--- -------------------------------------------------------------
--- Bảng: `lesson_progress`
--- -------------------------------------------------------------
-DROP TABLE IF EXISTS `lesson_progress`;
-CREATE TABLE `lesson_progress` (
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `password_reset_requests`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `password_reset_requests`;
+CREATE TABLE `password_reset_requests` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `user_id` int unsigned NOT NULL,
-  `lesson_id` int unsigned NOT NULL,
-  `is_completed` tinyint(1) NOT NULL DEFAULT '0',
-  `last_watch_second` int unsigned NOT NULL DEFAULT '0',
-  `completed_at` timestamp NULL DEFAULT NULL,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `request_type` enum('ADMIN_RESET','FORGOT_PASSWORD') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `otp_hash` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `token` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `status` enum('PENDING','USED','EXPIRED') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'PENDING',
+  `verify_attempts` int unsigned NOT NULL DEFAULT '0',
+  `expired_at` datetime NOT NULL,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created_by` enum('ADMIN','USER') COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_by_id` int unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_user_lesson` (`user_id`,`lesson_id`),
-  KEY `lesson_id` (`lesson_id`),
-  CONSTRAINT `lesson_progress_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `lesson_progress_ibfk_2` FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=121 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  UNIQUE KEY `prr_token_unique` (`token`),
+  KEY `prr_user_status` (`user_id`,`status`),
+  KEY `prr_token` (`token`),
+  CONSTRAINT `prr_user_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `lesson_progress`
-INSERT INTO `lesson_progress` (`id`, `user_id`, `lesson_id`, `is_completed`, `last_watch_second`, `completed_at`, `updated_at`) VALUES
-(1, 2, 18, 1, 120, '2026-11-21 18:39:21', '2026-11-21 11:39:21'),
-(2, 2, 5, 1, 0, '2026-11-21 18:39:21', '2026-11-21 11:39:21'),
-(23, 1, 41, 0, 450, NULL, '2026-11-21 11:54:48'),
-(29, 1, 1, 0, 76, NULL, '2026-11-21 12:32:45'),
-(51, 1, 2, 0, 9, NULL, '2026-11-21 12:32:54'),
-(58, 1, 25, 0, 8, NULL, '2026-11-21 13:12:25'),
-(63, 1, 15, 0, 5, NULL, '2026-11-21 13:14:38'),
-(69, 2, 15, 0, 6, NULL, '2026-11-21 13:28:45'),
-(72, 2, 6, 0, 4, NULL, '2026-11-21 14:11:49'),
-(73, 2, 21, 0, 29, NULL, '2026-11-21 13:29:39'),
-(93, 2, 33, 0, 3, NULL, '2026-11-21 14:01:58'),
-(110, 2, 37, 0, 0, NULL, '2026-11-21 14:10:53'),
-(112, 2, 46, 0, 0, NULL, '2026-11-21 14:11:42'),
-(120, 2, 41, 0, 180, NULL, '2026-11-21 14:15:27');
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `quiz_answers`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `quiz_answers`;
+CREATE TABLE `quiz_answers` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `question_id` int unsigned NOT NULL,
+  `answer_text` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `is_correct` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `question_id` (`question_id`),
+  CONSTRAINT `quiz_answers_ibfk_1` FOREIGN KEY (`question_id`) REFERENCES `quiz_questions` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=145 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- -------------------------------------------------------------
--- Bảng: `quizzes`
--- -------------------------------------------------------------
+-- Dữ liệu bảng `quiz_answers`
+INSERT INTO `quiz_answers` (`id`, `question_id`, `answer_text`, `is_correct`, `created_at`) VALUES
+('1', '1', 'Model', '1', '2026-11-21 11:33:12'),
+('2', '1', 'View', '0', '2026-11-21 11:33:12'),
+('3', '1', 'Controller', '0', '2026-11-21 11:33:12'),
+('4', '1', 'Router', '0', '2026-11-21 11:33:12'),
+('5', '2', 'Sử dụng Prepared Statements (PDO)', '1', '2026-11-21 11:33:12'),
+('6', '2', 'Chỉ dùng hàm md5()', '0', '2026-11-21 11:33:12'),
+('7', '2', 'Tắt firewall máy chủ', '0', '2026-11-21 11:33:12'),
+('8', '2', 'Nối chuỗi trực tiếp vào câu lệnh SQL', '0', '2026-11-21 11:33:12'),
+('9', '3', 'Yêu cầu xử lý thành công (OK)', '1', '2026-11-21 11:33:12'),
+('10', '3', 'Không tìm thấy trang (Not Found)', '0', '2026-11-21 11:33:12'),
+('11', '3', 'Lỗi máy chủ nội bộ (Internal Server Error)', '0', '2026-11-21 11:33:12'),
+('12', '3', 'Yêu cầu bị từ chối (Forbidden)', '0', '2026-11-21 11:33:12'),
+('13', '4', 'Pandas', '1', '2026-11-21 11:33:12'),
+('14', '4', 'Matplotlib', '0', '2026-11-21 11:33:12'),
+('15', '4', 'Flask', '0', '2026-11-21 11:33:12'),
+('16', '4', 'Requests', '0', '2026-11-21 11:33:12'),
+('17', '5', 'Linear Regression', '1', '2026-11-21 11:33:12'),
+('18', '5', 'K-Means Clustering', '0', '2026-11-21 11:33:12'),
+('19', '5', 'PCA (Giảm chiều dữ liệu)', '0', '2026-11-21 11:33:12'),
+('20', '5', 'Apriori', '0', '2026-11-21 11:33:12'),
+('21', '6', 'Overfitting (Quá khớp)', '1', '2026-11-21 11:33:12'),
+('22', '6', 'Underfitting (Chưa khớp)', '0', '2026-11-21 11:33:12'),
+('23', '6', 'Regularization', '0', '2026-11-21 11:33:12'),
+('24', '6', 'Cross-validation', '0', '2026-11-21 11:33:12'),
+('25', '7', 'useEffect', '1', '2026-11-21 11:33:12'),
+('26', '7', 'useState', '0', '2026-11-21 11:33:12'),
+('27', '7', 'useMemo', '0', '2026-11-21 11:33:12'),
+('28', '7', 'useReducer', '0', '2026-11-21 11:33:12'),
+('29', '8', 'Component được lên lịch để Re-render', '1', '2026-11-21 11:33:12'),
+('30', '8', 'Trình duyệt reload lại toàn bộ trang', '0', '2026-11-21 11:33:12'),
+('31', '8', 'Xóa toàn bộ bộ nhớ Cache', '0', '2026-11-21 11:33:12'),
+('32', '8', 'Không có thay đổi nào xảy ra', '0', '2026-11-21 11:33:12'),
+('33', '9', 'CSS Flexbox', '1', '2026-11-21 11:33:12'),
+('34', '9', 'CSS Float', '0', '2026-11-21 11:33:12'),
+('35', '9', 'CSS Position Absolute', '0', '2026-11-21 11:33:12'),
+('36', '9', 'CSS Z-Index', '0', '2026-11-21 11:33:12'),
+('37', '10', 'Tối thiểu 44x44 hoặc 48x48 px', '1', '2026-11-21 11:33:12'),
+('38', '10', 'Tối đa 10x10 px', '0', '2026-11-21 11:33:12'),
+('39', '10', 'Không cần quan tâm kích thước', '0', '2026-11-21 11:33:12'),
+('40', '10', 'Càng nhỏ càng tiết kiệm diện tích', '0', '2026-11-21 11:33:12'),
+('41', '11', 'FROM', '1', '2026-11-21 11:33:12'),
+('42', '11', 'RUN', '0', '2026-11-21 11:33:12'),
+('43', '11', 'COPY', '0', '2026-11-21 11:33:12'),
+('44', '11', 'EXPOSE', '0', '2026-11-21 11:33:12'),
+('45', '12', 'docker compose up', '1', '2026-11-21 11:33:12'),
+('46', '12', 'docker build', '0', '2026-11-21 11:33:12'),
+('47', '12', 'docker ps', '0', '2026-11-21 11:33:12'),
+('48', '12', 'docker commit', '0', '2026-11-21 11:33:12'),
+('49', '13', 'HAVING', '1', '2026-11-21 11:33:12'),
+('50', '13', 'WHERE', '0', '2026-11-21 11:33:12'),
+('51', '13', 'ORDER BY', '0', '2026-11-21 11:33:12'),
+('52', '13', 'LIMIT', '0', '2026-11-21 11:33:12'),
+('53', '14', 'LEFT JOIN', '1', '2026-11-21 11:33:12'),
+('54', '14', 'INNER JOIN', '0', '2026-11-21 11:33:12'),
+('55', '14', 'CROSS JOIN', '0', '2026-11-21 11:33:12'),
+('56', '14', 'RIGHT JOIN', '0', '2026-11-21 11:33:12'),
+('57', '15', 'Hiệu năng cao, khả năng mở rộng tốt và cộng đồng hỗ trợ mạnh mẽ', '1', '2026-11-21 11:47:30'),
+('58', '15', 'Chỉ chạy được trên môi trường Windows', '0', '2026-11-21 11:47:30'),
+('59', '15', 'Không cần viết kiểm thử phần mềm', '0', '2026-11-21 11:47:30'),
+('60', '16', 'Bật chứng chỉ mã hóa SSL/TLS (HTTPS) và bảo vệ dữ liệu bí mật qua Biến môi trường (.env)', '1', '2026-11-21 11:47:30'),
+('61', '16', 'Lưu trực tiếp mật khẩu và API Key vào mã nguồn Git công khai', '0', '2026-11-21 11:47:30'),
+('62', '16', 'Tắt tường lửa Firewall máy chủ', '0', '2026-11-21 11:47:30'),
+('63', '17', 'Hiệu năng cao, khả năng mở rộng tốt và cộng đồng hỗ trợ mạnh mẽ', '1', '2026-11-21 11:47:30'),
+('64', '17', 'Chỉ chạy được trên môi trường Windows', '0', '2026-11-21 11:47:30'),
+('65', '17', 'Không cần viết kiểm thử phần mềm', '0', '2026-11-21 11:47:30'),
+('66', '18', 'Bật chứng chỉ mã hóa SSL/TLS (HTTPS) và bảo vệ dữ liệu bí mật qua Biến môi trường (.env)', '1', '2026-11-21 11:47:30'),
+('67', '18', 'Lưu trực tiếp mật khẩu và API Key vào mã nguồn Git công khai', '0', '2026-11-21 11:47:30'),
+('68', '18', 'Tắt tường lửa Firewall máy chủ', '0', '2026-11-21 11:47:30'),
+('69', '19', 'Hiệu năng cao, khả năng mở rộng tốt và cộng đồng hỗ trợ mạnh mẽ', '1', '2026-11-21 11:47:30'),
+('70', '19', 'Chỉ chạy được trên môi trường Windows', '0', '2026-11-21 11:47:30'),
+('71', '19', 'Không cần viết kiểm thử phần mềm', '0', '2026-11-21 11:47:30'),
+('72', '20', 'Bật chứng chỉ mã hóa SSL/TLS (HTTPS) và bảo vệ dữ liệu bí mật qua Biến môi trường (.env)', '1', '2026-11-21 11:47:30'),
+('73', '20', 'Lưu trực tiếp mật khẩu và API Key vào mã nguồn Git công khai', '0', '2026-11-21 11:47:30'),
+('74', '20', 'Tắt tường lửa Firewall máy chủ', '0', '2026-11-21 11:47:30'),
+('75', '21', 'Hiệu năng cao, khả năng mở rộng tốt và cộng đồng hỗ trợ mạnh mẽ', '1', '2026-11-21 11:47:30'),
+('76', '21', 'Chỉ chạy được trên môi trường Windows', '0', '2026-11-21 11:47:30'),
+('77', '21', 'Không cần viết kiểm thử phần mềm', '0', '2026-11-21 11:47:30'),
+('78', '22', 'Bật chứng chỉ mã hóa SSL/TLS (HTTPS) và bảo vệ dữ liệu bí mật qua Biến môi trường (.env)', '1', '2026-11-21 11:47:30'),
+('79', '22', 'Lưu trực tiếp mật khẩu và API Key vào mã nguồn Git công khai', '0', '2026-11-21 11:47:30'),
+('80', '22', 'Tắt tường lửa Firewall máy chủ', '0', '2026-11-21 11:47:30'),
+('81', '23', 'Hiệu năng cao, khả năng mở rộng tốt và cộng đồng hỗ trợ mạnh mẽ', '1', '2026-11-21 11:47:30'),
+('82', '23', 'Chỉ chạy được trên môi trường Windows', '0', '2026-11-21 11:47:30'),
+('83', '23', 'Không cần viết kiểm thử phần mềm', '0', '2026-11-21 11:47:30'),
+('84', '24', 'Bật chứng chỉ mã hóa SSL/TLS (HTTPS) và bảo vệ dữ liệu bí mật qua Biến môi trường (.env)', '1', '2026-11-21 11:47:30'),
+('85', '24', 'Lưu trực tiếp mật khẩu và API Key vào mã nguồn Git công khai', '0', '2026-11-21 11:47:30'),
+('86', '24', 'Tắt tường lửa Firewall máy chủ', '0', '2026-11-21 11:47:30'),
+('87', '25', 'Hiệu năng cao, khả năng mở rộng tốt và cộng đồng hỗ trợ mạnh mẽ', '1', '2026-11-21 11:47:30'),
+('88', '25', 'Chỉ chạy được trên môi trường Windows', '0', '2026-11-21 11:47:30'),
+('89', '25', 'Không cần viết kiểm thử phần mềm', '0', '2026-11-21 11:47:30'),
+('90', '26', 'Bật chứng chỉ mã hóa SSL/TLS (HTTPS) và bảo vệ dữ liệu bí mật qua Biến môi trường (.env)', '1', '2026-11-21 11:47:30'),
+('91', '26', 'Lưu trực tiếp mật khẩu và API Key vào mã nguồn Git công khai', '0', '2026-11-21 11:47:30'),
+('92', '26', 'Tắt tường lửa Firewall máy chủ', '0', '2026-11-21 11:47:30'),
+('93', '27', 'View', '0', '2026-11-21 14:07:38'),
+('94', '27', 'Controller', '0', '2026-11-21 14:07:38'),
+('95', '27', 'Model', '1', '2026-11-21 14:07:38'),
+('96', '27', 'Router', '0', '2026-11-21 14:07:38'),
+('97', '28', 'Request - Response (Yêu cầu và Phản hồi)', '1', '2026-11-21 14:07:38'),
+('98', '28', 'Publish - Subscribe (Phát và Đăng ký)', '0', '2026-11-21 14:07:38'),
+('99', '28', 'Peer to Peer (Ngang hàng)', '0', '2026-11-21 14:07:38'),
+('100', '28', 'Broadcast không đồng bộ', '0', '2026-11-21 14:07:38'),
+('101', '29', 'Tăng dung lượng lưu trữ của máy chủ', '0', '2026-11-21 14:07:38'),
+('102', '29', 'Tách biệt hoàn toàn xử lý nghiệp vụ và hiển thị giao diện HTML', '1', '2026-11-21 14:07:38'),
+('103', '29', 'Giúp file mã nguồn chạy nhanh hơn gấp 10 lần', '0', '2026-11-21 14:07:38'),
+('104', '29', 'Bắt buộc người dùng phải đăng ký tài khoản', '0', '2026-11-21 14:07:38'),
+('105', '30', 'List', '0', '2026-11-21 14:08:32'),
+('106', '30', 'Tuple', '1', '2026-11-21 14:08:32'),
+('107', '30', 'Dictionary', '0', '2026-11-21 14:08:32'),
+('108', '30', 'Set', '0', '2026-11-21 14:08:32'),
+('109', '31', '[x for x in range(10) if x % 2 == 0]', '1', '2026-11-21 14:08:32'),
+('110', '31', '[x if x % 2 == 0 for x in range(10)]', '0', '2026-11-21 14:08:32'),
+('111', '31', '{x: x % 2 == 0 for x in range(10)}', '0', '2026-11-21 14:08:32'),
+('112', '31', '(x for x in range(10) if x % 2 == 0)', '0', '2026-11-21 14:08:32'),
+('113', '32', 'Props có thể thay đổi trực tiếp, State thì không', '0', '2026-11-21 14:08:32'),
+('114', '32', 'Props nhận từ bên ngoài (read-only), State được quản lý nội bộ component', '1', '2026-11-21 14:08:32'),
+('115', '32', 'State chỉ dùng được trong class component', '0', '2026-11-21 14:08:32'),
+('116', '32', 'Props bắt buộc phải là chuỗi ký tự String', '0', '2026-11-21 14:08:32'),
+('117', '33', 'Phải có một phần tử cha duy nhất bao bọc', '1', '2026-11-21 14:08:32'),
+('118', '33', 'Không được phép sử dụng thẻ div', '0', '2026-11-21 14:08:32'),
+('119', '33', 'Bắt buộc phải nhúng CSS inline', '0', '2026-11-21 14:08:32'),
+('120', '33', 'Phải khai báo kiểu dữ liệu TypeScript', '0', '2026-11-21 14:08:32'),
+('121', '34', 'Ctrl + G', '0', '2026-11-21 14:08:32'),
+('122', '34', 'Shift + A', '1', '2026-11-21 14:08:32'),
+('123', '34', 'Alt + L', '0', '2026-11-21 14:08:32'),
+('124', '34', 'Ctrl + Alt + K', '0', '2026-11-21 14:08:32'),
+('125', '35', 'Tự động co giãn theo kích thước của frame cha', '1', '2026-11-21 14:08:32'),
+('126', '35', 'Cố định kích thước không bao giờ thay đổi', '0', '2026-11-21 14:08:32'),
+('127', '35', 'Tự động tô màu nền ngẫu nhiên', '0', '2026-11-21 14:08:32'),
+('128', '35', 'Ẩn layer khi màn hình nhỏ lại', '0', '2026-11-21 14:08:32'),
+('129', '36', 'Image là thể hiện đang chạy của Container', '0', '2026-11-21 14:08:32'),
+('130', '36', 'Container là một instance đang chạy được tạo ra từ Image', '1', '2026-11-21 14:08:32'),
+('131', '36', 'Image và Container là hai thuật ngữ hoàn toàn giống nhau', '0', '2026-11-21 14:08:32'),
+('132', '36', 'Image chỉ dùng cho hệ điều hành Windows', '0', '2026-11-21 14:08:32'),
+('133', '37', 'docker run -d .', '0', '2026-11-21 14:08:32'),
+('134', '37', 'docker build -t my-app .', '1', '2026-11-21 14:08:32'),
+('135', '37', 'docker compose up', '0', '2026-11-21 14:08:32'),
+('136', '37', 'docker create image', '0', '2026-11-21 14:08:32'),
+('137', '38', 'WHERE', '0', '2026-11-21 14:08:32'),
+('138', '38', 'HAVING', '1', '2026-11-21 14:08:32'),
+('139', '38', 'ORDER BY', '0', '2026-11-21 14:08:32'),
+('140', '38', 'GROUP BY', '0', '2026-11-21 14:08:32'),
+('141', '39', 'Chỉ những dòng có giá trị khớp ở cả 2 bảng', '1', '2026-11-21 14:08:32'),
+('142', '39', 'Toàn bộ dữ liệu của bảng bên trái', '0', '2026-11-21 14:08:32'),
+('143', '39', 'Toàn bộ dữ liệu của bảng bên phải', '0', '2026-11-21 14:08:32'),
+('144', '39', 'Tất cả các dòng của cả hai bảng bất kể có khớp hay không', '0', '2026-11-21 14:08:32');
+
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `quiz_attempt_answers`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `quiz_attempt_answers`;
+CREATE TABLE `quiz_attempt_answers` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `attempt_id` int unsigned NOT NULL,
+  `question_id` int unsigned NOT NULL,
+  `answer_id` int unsigned NOT NULL,
+  `is_correct` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `attempt_id` (`attempt_id`),
+  KEY `question_id` (`question_id`),
+  KEY `answer_id` (`answer_id`),
+  CONSTRAINT `quiz_attempt_answers_ibfk_1` FOREIGN KEY (`attempt_id`) REFERENCES `quiz_attempts` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `quiz_attempt_answers_ibfk_2` FOREIGN KEY (`question_id`) REFERENCES `quiz_questions` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `quiz_attempt_answers_ibfk_3` FOREIGN KEY (`answer_id`) REFERENCES `quiz_answers` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=94 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dữ liệu bảng `quiz_attempt_answers`
+INSERT INTO `quiz_attempt_answers` (`id`, `attempt_id`, `question_id`, `answer_id`, `is_correct`) VALUES
+('1', '1', '1', '1', '1'),
+('2', '1', '2', '5', '1'),
+('3', '1', '3', '9', '1'),
+('4', '2', '1', '1', '1'),
+('5', '2', '2', '5', '1'),
+('6', '2', '3', '9', '1'),
+('7', '3', '1', '1', '1'),
+('8', '3', '2', '5', '1'),
+('9', '3', '3', '9', '1'),
+('10', '4', '1', '1', '1'),
+('11', '4', '2', '5', '1'),
+('12', '4', '3', '9', '1'),
+('13', '5', '1', '1', '1'),
+('14', '5', '2', '5', '1'),
+('15', '5', '3', '9', '1'),
+('16', '6', '1', '1', '1'),
+('17', '6', '2', '5', '1'),
+('18', '6', '3', '9', '1'),
+('19', '7', '1', '1', '1'),
+('20', '7', '2', '5', '1'),
+('21', '7', '3', '9', '1'),
+('22', '8', '1', '1', '1'),
+('23', '8', '2', '5', '1'),
+('24', '8', '3', '9', '1'),
+('25', '9', '1', '1', '1'),
+('26', '9', '2', '5', '1'),
+('27', '9', '3', '9', '1'),
+('28', '10', '1', '1', '1'),
+('29', '10', '2', '5', '1'),
+('30', '10', '3', '9', '1'),
+('31', '11', '1', '1', '1'),
+('32', '11', '2', '5', '1'),
+('33', '11', '3', '9', '1'),
+('34', '12', '1', '1', '1'),
+('35', '12', '2', '5', '1'),
+('36', '12', '3', '9', '1'),
+('37', '13', '1', '1', '1'),
+('38', '13', '2', '5', '1'),
+('39', '13', '3', '9', '1'),
+('40', '14', '1', '1', '1'),
+('41', '14', '2', '5', '1'),
+('42', '14', '3', '9', '1'),
+('43', '15', '1', '1', '1'),
+('44', '15', '2', '5', '1'),
+('45', '15', '3', '9', '1'),
+('46', '16', '1', '1', '1'),
+('47', '16', '2', '5', '1'),
+('48', '16', '3', '9', '1'),
+('49', '17', '1', '1', '1'),
+('50', '17', '2', '5', '1'),
+('51', '17', '3', '9', '1'),
+('52', '18', '1', '1', '1'),
+('53', '18', '2', '5', '1'),
+('54', '18', '3', '9', '1'),
+('55', '19', '1', '1', '1'),
+('56', '19', '2', '5', '1'),
+('57', '19', '3', '9', '1'),
+('58', '20', '1', '1', '1'),
+('59', '20', '2', '5', '1'),
+('60', '20', '3', '9', '1'),
+('61', '21', '1', '1', '1'),
+('62', '21', '2', '5', '1'),
+('63', '21', '3', '9', '1'),
+('64', '22', '1', '1', '1'),
+('65', '22', '2', '5', '1'),
+('66', '22', '3', '9', '1'),
+('67', '23', '1', '1', '1'),
+('68', '23', '2', '5', '1'),
+('69', '23', '3', '9', '1'),
+('70', '24', '1', '1', '1'),
+('71', '24', '2', '5', '1'),
+('72', '24', '3', '9', '1'),
+('73', '25', '38', '140', '0'),
+('74', '25', '39', '142', '0'),
+('75', '26', '38', '138', '1'),
+('76', '26', '39', '144', '0'),
+('77', '27', '38', '139', '0'),
+('78', '27', '39', '144', '0'),
+('79', '28', '38', '137', '0'),
+('80', '28', '39', '141', '1'),
+('81', '29', '38', '138', '1'),
+('82', '29', '39', '144', '0'),
+('83', '30', '38', '137', '0'),
+('84', '30', '39', '142', '0'),
+('85', '31', '1', '1', '1'),
+('86', '31', '2', '5', '1'),
+('87', '31', '3', '9', '1'),
+('88', '32', '1', '1', '1'),
+('89', '32', '2', '5', '1'),
+('90', '32', '3', '9', '1'),
+('91', '33', '1', '1', '1'),
+('92', '33', '2', '5', '1'),
+('93', '33', '3', '9', '1');
+
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `quiz_attempts`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `quiz_attempts`;
+CREATE TABLE `quiz_attempts` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `user_id` int unsigned NOT NULL,
+  `quiz_id` int unsigned NOT NULL,
+  `score_achieved` decimal(5,2) NOT NULL DEFAULT '0.00',
+  `total_score` decimal(5,2) NOT NULL DEFAULT '0.00',
+  `score_percentage` decimal(5,2) NOT NULL DEFAULT '0.00',
+  `is_passed` tinyint(1) NOT NULL DEFAULT '0',
+  `started_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `submitted_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `quiz_id` (`quiz_id`),
+  KEY `idx_attempt_user` (`user_id`,`quiz_id`),
+  CONSTRAINT `quiz_attempts_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `quiz_attempts_ibfk_2` FOREIGN KEY (`quiz_id`) REFERENCES `quizzes` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dữ liệu bảng `quiz_attempts`
+INSERT INTO `quiz_attempts` (`id`, `user_id`, `quiz_id`, `score_achieved`, `total_score`, `score_percentage`, `is_passed`, `started_at`, `submitted_at`) VALUES
+('1', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 11:39:21', '2026-11-21 18:39:21'),
+('2', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 11:39:21', '2026-11-21 18:39:21'),
+('3', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 11:42:49', '2026-11-21 18:42:49'),
+('4', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 11:45:38', '2026-11-21 18:45:38'),
+('5', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 11:47:06', '2026-11-21 18:47:06'),
+('6', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 11:47:30', '2026-11-21 18:47:30'),
+('7', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 11:47:35', '2026-11-21 18:47:35'),
+('8', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 11:48:19', '2026-11-21 18:48:19'),
+('9', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 11:53:59', '2026-11-21 18:53:59'),
+('10', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 11:54:34', '2026-11-21 18:54:34'),
+('11', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 11:54:48', '2026-11-21 18:54:48'),
+('12', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 12:06:40', '2026-11-21 19:06:40'),
+('13', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 12:14:27', '2026-11-21 19:14:27'),
+('14', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 13:10:30', '2026-11-21 20:10:30'),
+('15', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 13:36:14', '2026-11-21 20:36:14'),
+('16', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 13:36:38', '2026-11-21 20:36:38'),
+('17', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 13:42:34', '2026-11-21 20:42:34'),
+('18', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 14:07:17', '2026-11-21 21:07:17'),
+('19', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 14:08:37', '2026-11-21 21:08:37'),
+('20', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 14:09:50', '2026-11-21 21:09:50'),
+('21', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 14:09:56', '2026-11-21 21:09:56'),
+('22', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 14:15:27', '2026-11-21 21:15:27'),
+('23', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 14:17:07', '2026-11-21 21:17:07'),
+('24', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 14:18:15', '2026-11-21 21:18:15'),
+('25', '2', '18', '0.00', '2.00', '0.00', '0', '2026-11-22 04:40:41', '2026-11-22 11:40:41'),
+('26', '2', '18', '1.00', '2.00', '50.00', '0', '2026-11-22 04:40:53', '2026-11-22 11:40:53'),
+('27', '2', '18', '0.00', '2.00', '0.00', '0', '2026-11-22 04:41:13', '2026-11-22 11:41:13'),
+('28', '2', '18', '1.00', '2.00', '50.00', '0', '2026-11-22 04:41:36', '2026-11-22 11:41:36'),
+('29', '2', '18', '1.00', '2.00', '50.00', '0', '2026-11-22 04:41:55', '2026-11-22 11:41:55'),
+('30', '2', '18', '0.00', '2.00', '0.00', '0', '2026-11-22 04:42:11', '2026-11-22 11:42:11'),
+('31', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-22 04:47:14', '2026-11-22 11:47:14'),
+('32', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-22 04:49:51', '2026-11-22 11:49:51'),
+('33', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-22 04:51:04', '2026-11-22 11:51:04');
+
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `quiz_questions`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `quiz_questions`;
+CREATE TABLE `quiz_questions` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `quiz_id` int unsigned NOT NULL,
+  `question_text` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `question_type` enum('single_choice','multiple_choice','true_false') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'single_choice',
+  `points` decimal(5,2) NOT NULL DEFAULT '1.00',
+  `explanation` text COLLATE utf8mb4_unicode_ci,
+  `sort_order` int unsigned NOT NULL DEFAULT '0',
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `quiz_id` (`quiz_id`),
+  CONSTRAINT `quiz_questions_ibfk_1` FOREIGN KEY (`quiz_id`) REFERENCES `quizzes` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dữ liệu bảng `quiz_questions`
+INSERT INTO `quiz_questions` (`id`, `quiz_id`, `question_text`, `question_type`, `points`, `explanation`, `sort_order`, `created_at`) VALUES
+('1', '1', 'Trong mô hình MVC, thành phần nào trực tiếp tương tác với Cơ sở Dữ liệu?', 'single_choice', '1.00', 'Model đại diện cho dữ liệu và các quy tắc nghiệp vụ truy vấn DB.', '1', '2026-11-21 11:33:12'),
+('2', '1', 'Kỹ thuật nào dùng để chống tấn công SQL Injection hiệu quả nhất?', 'single_choice', '1.00', 'Prepared Statements với tham số buộc chặt (parameter binding) ngăn chặn chèn mã độc.', '2', '2026-11-21 11:33:12'),
+('3', '1', 'Trạng thái HTTP 200 biểu thị điều gì?', 'single_choice', '1.00', 'HTTP 200 OK báo hiệu yêu cầu đã được máy chủ xử lý thành công.', '3', '2026-11-21 11:33:12'),
+('4', '2', 'Thư viện Python nào chuyên dùng để thao tác và phân tích cấu trúc dữ liệu bảng (DataFrames)?', 'single_choice', '1.00', 'Pandas cung cấp cấu trúc DataFrame mạnh mẽ cho phân tích số liệu.', '1', '2026-11-21 11:33:12'),
+('5', '2', 'Thuật toán nào sau đây thuộc nhóm học có giám sát (Supervised Learning)?', 'single_choice', '1.00', 'Linear Regression và Random Forest là các thuật toán học có giám sát.', '2', '2026-11-21 11:33:12'),
+('6', '2', 'Hiện tượng mô hình hoạt động cực tốt trên tập Train nhưng kém trên tập Test gọi là gì?', 'single_choice', '1.00', 'Overfitting (Quá khớp) xảy ra khi mô hình học vẹt cả nhiễu của tập huấn luyện.', '3', '2026-11-21 11:33:12'),
+('7', '3', 'Hook nào trong React được dùng để thực hiện các side-effect (gọi API, lắng nghe event)?', 'single_choice', '1.00', 'useEffect xử lý các tác vụ ngoài luồng render như fetch data, timer, subscriptions.', '1', '2026-11-21 11:33:12'),
+('8', '3', 'Điều gì xảy ra khi bạn gọi hàm cập nhật State trong React?', 'single_choice', '1.00', 'React xếp lịch re-render component và so sánh Virtual DOM để cập nhật DOM thật.', '2', '2026-11-21 11:33:12'),
+('9', '4', 'Tính năng Auto Layout trong Figma tương tự với thuộc tính CSS nào?', 'single_choice', '1.00', 'Auto Layout mô phỏng hành vi của CSS Flexbox (hướng sắp xếp, khoảng cách, căn chỉnh).', '1', '2026-11-21 11:33:12'),
+('10', '4', 'Nguyên tắc nào sau đây đảm bảo khoảng cách ngón tay bấm (tap target) thuận tiện trên Mobile?', 'single_choice', '1.00', 'Theo chuẩn Apple & Google, kích thước nút bấm tối thiểu khuyến nghị là 44x44 hoặc 48x48 dp/px.', '2', '2026-11-21 11:33:12'),
+('11', '5', 'Chỉ thị nào trong Dockerfile được dùng để chỉ định Image nền khởi tạo?', 'single_choice', '1.00', 'FROM xác định base image (vd: FROM php:8.2-fpm hoặc FROM node:20).', '1', '2026-11-21 11:33:12'),
+('12', '5', 'Lệnh Docker nào dùng để chạy các container đa dịch vụ được định nghĩa trong file YAML?', 'single_choice', '1.00', 'docker compose up khởi chạy toàn bộ dịch vụ được cấu hình trong docker-compose.yml.', '2', '2026-11-21 11:33:12'),
+('13', '6', 'Mệnh đề nào dùng để lọc điều kiện trên kết quả đã được gom nhóm bởi GROUP BY?', 'single_choice', '1.00', 'HAVING dùng để lọc điều kiện sau khi nhóm (vd: HAVING COUNT(*) > 5), trong khi WHERE lọc trước khi nhóm.', '1', '2026-11-21 11:33:12'),
+('14', '6', 'Loại JOIN nào trả về tất cả bản ghi từ bảng bên trái bất kể có bản ghi khớp bên phải hay không?', 'single_choice', '1.00', 'LEFT JOIN (hoặc LEFT OUTER JOIN) giữ lại toàn bộ hàng từ bảng bên trái.', '2', '2026-11-21 11:33:12'),
+('15', '7', 'Ưu điểm lớn nhất của công nghệ được giảng dạy trong khóa học là gì?', 'single_choice', '5.00', 'Đáp án phản ánh chính xác nguyên lý thiết kế và tối ưu hiệu suất.', '1', '2026-11-21 11:47:30'),
+('16', '7', 'Để bảo mật ứng dụng khi triển khai lên môi trường Production, phương pháp nào là bắt buộc?', 'single_choice', '5.00', 'HTTPS và xác thực Token an toàn là yêu cầu tiên quyết.', '2', '2026-11-21 11:47:30'),
+('17', '8', 'Ưu điểm lớn nhất của công nghệ được giảng dạy trong khóa học là gì?', 'single_choice', '5.00', 'Đáp án phản ánh chính xác nguyên lý thiết kế và tối ưu hiệu suất.', '1', '2026-11-21 11:47:30'),
+('18', '8', 'Để bảo mật ứng dụng khi triển khai lên môi trường Production, phương pháp nào là bắt buộc?', 'single_choice', '5.00', 'HTTPS và xác thực Token an toàn là yêu cầu tiên quyết.', '2', '2026-11-21 11:47:30'),
+('19', '9', 'Ưu điểm lớn nhất của công nghệ được giảng dạy trong khóa học là gì?', 'single_choice', '5.00', 'Đáp án phản ánh chính xác nguyên lý thiết kế và tối ưu hiệu suất.', '1', '2026-11-21 11:47:30'),
+('20', '9', 'Để bảo mật ứng dụng khi triển khai lên môi trường Production, phương pháp nào là bắt buộc?', 'single_choice', '5.00', 'HTTPS và xác thực Token an toàn là yêu cầu tiên quyết.', '2', '2026-11-21 11:47:30'),
+('21', '10', 'Ưu điểm lớn nhất của công nghệ được giảng dạy trong khóa học là gì?', 'single_choice', '5.00', 'Đáp án phản ánh chính xác nguyên lý thiết kế và tối ưu hiệu suất.', '1', '2026-11-21 11:47:30'),
+('22', '10', 'Để bảo mật ứng dụng khi triển khai lên môi trường Production, phương pháp nào là bắt buộc?', 'single_choice', '5.00', 'HTTPS và xác thực Token an toàn là yêu cầu tiên quyết.', '2', '2026-11-21 11:47:30'),
+('23', '11', 'Ưu điểm lớn nhất của công nghệ được giảng dạy trong khóa học là gì?', 'single_choice', '5.00', 'Đáp án phản ánh chính xác nguyên lý thiết kế và tối ưu hiệu suất.', '1', '2026-11-21 11:47:30'),
+('24', '11', 'Để bảo mật ứng dụng khi triển khai lên môi trường Production, phương pháp nào là bắt buộc?', 'single_choice', '5.00', 'HTTPS và xác thực Token an toàn là yêu cầu tiên quyết.', '2', '2026-11-21 11:47:30'),
+('25', '12', 'Ưu điểm lớn nhất của công nghệ được giảng dạy trong khóa học là gì?', 'single_choice', '5.00', 'Đáp án phản ánh chính xác nguyên lý thiết kế và tối ưu hiệu suất.', '1', '2026-11-21 11:47:30'),
+('26', '12', 'Để bảo mật ứng dụng khi triển khai lên môi trường Production, phương pháp nào là bắt buộc?', 'single_choice', '5.00', 'HTTPS và xác thực Token an toàn là yêu cầu tiên quyết.', '2', '2026-11-21 11:47:30'),
+('27', '13', 'Trong mô hình MVC, thành phần nào chịu trách nhiệm trực tiếp tương tác và truy vấn Cơ sở dữ liệu?', 'single_choice', '1.00', 'Model là tầng đảm nhận toàn bộ logic dữ liệu, định nghĩa quan hệ và truy vấn CSDL.', '1', '2026-11-21 14:07:38'),
+('28', '13', 'Giao thức HTTP hoạt động theo cơ chế nào sau đây giữa Trình duyệt và Máy chủ?', 'single_choice', '1.00', 'HTTP hoạt động theo mô hình Request - Response (Yêu cầu và Phản hồi).', '2', '2026-11-21 14:07:38'),
+('29', '13', 'Mục đích quan trọng nhất của việc phân tách Controller và View trong kiến trúc MVC là gì?', 'single_choice', '1.00', 'Tách biệt luồng xử lý logic nghiệp vụ và giao diện hiển thị, giúp code dễ bảo trì và tái sử dụng.', '3', '2026-11-21 14:07:38'),
+('30', '14', 'Kiểu dữ liệu nào trong Python là kiểu bất biến (Immutable)?', 'single_choice', '1.00', 'Tuple trong Python là immutable, không thể thay đổi giá trị sau khi khởi tạo.', '1', '2026-11-21 14:08:32'),
+('31', '14', 'Cú pháp List Comprehension nào sau đây tạo ra danh sách số chẵn từ 0 đến 8?', 'single_choice', '1.00', '[x for x in range(10) if x % 2 == 0] sẽ sinh ra [0, 2, 4, 6, 8].', '2', '2026-11-21 14:08:32'),
+('32', '15', 'Điểm khác biệt căn bản giữa Props và State trong React là gì?', 'single_choice', '1.00', 'Props được truyền từ component cha xuống và mang tính read-only; State được quản lý nội bộ bên trong component và có thể thay đổi.', '1', '2026-11-21 14:08:32'),
+('33', '15', 'Quy tắc bắt buộc khi viết thẻ JSX trong React là gì?', 'single_choice', '1.00', 'JSX phải luôn được bao bọc bởi một thẻ cha duy nhất (hoặc React Fragment).', '2', '2026-11-21 14:08:32'),
+('34', '16', 'Phím tắt mặc định để tạo nhanh Auto Layout cho một cụm layer trong Figma là gì?', 'single_choice', '1.00', 'Shift + A là phím tắt tiêu chuẩn để bật Auto Layout trong Figma.', '1', '2026-11-21 14:08:32'),
+('35', '16', 'Chế độ \'Fill container\' trong Auto Layout có ý nghĩa gì?', 'single_choice', '1.00', 'Layer con sẽ tự động co giãn để lấp đầy toàn bộ chiều rộng hoặc chiều cao của frame cha.', '2', '2026-11-21 14:08:32'),
+('36', '17', 'Mối quan hệ giữa Docker Image và Docker Container là gì?', 'single_choice', '1.00', 'Image là bản thiết kế/khuôn mẫu chỉ đọc (Read-only Template), Container là một thể hiện (Instance) đang chạy của Image.', '1', '2026-11-21 14:08:32'),
+('37', '17', 'Lệnh nào sau đây dùng để build một Docker Image từ Dockerfile trong thư mục hiện tại?', 'single_choice', '1.00', 'docker build -t <tên-image> . là lệnh chuẩn để build image.', '2', '2026-11-21 14:08:32'),
+('38', '18', 'Mệnh đề nào trong SQL được dùng để lọc dữ liệu trên các hàm tổng hợp (AGGREGATE functions)?', 'single_choice', '1.00', 'Mệnh đề HAVING lọc kết quả sau khi đã GROUP BY và tính hàm tổng hợp; WHERE chỉ lọc dòng dữ liệu thô.', '1', '2026-11-21 14:08:32'),
+('39', '18', 'INNER JOIN trả về kết quả như thế nào giữa 2 bảng?', 'single_choice', '1.00', 'INNER JOIN chỉ trả về các bản ghi thỏa mãn điều kiện kết nối ở cả 2 bảng.', '2', '2026-11-21 14:08:32');
+
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `quizzes`
+-- ---------------------------------------------------------
 DROP TABLE IF EXISTS `quizzes`;
 CREATE TABLE `quizzes` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -390,601 +1494,145 @@ CREATE TABLE `quizzes` (
 
 -- Dữ liệu bảng `quizzes`
 INSERT INTO `quizzes` (`id`, `course_id`, `lesson_id`, `title`, `description`, `duration_minutes`, `passing_score`, `max_attempts`, `is_random_questions`, `created_at`) VALUES
-(1, 1, 5, 'Kiểm tra trắc nghiệm Kiến trúc MVC & Web Core', 'Bài kiểm tra trắc nghiệm đánh giá kiến thức bài học.', 15, '80.00', 3, 0, '2026-11-21 11:33:12'),
-(2, 2, 8, 'Đánh giá Năng lực Python & Machine Learning', 'Bài kiểm tra trắc nghiệm đánh giá kiến thức bài học.', 15, '80.00', 3, 0, '2026-11-21 11:33:12'),
-(3, 3, 11, 'Đánh giá Kiến thức ReactJS', 'Bài kiểm tra trắc nghiệm đánh giá kiến thức bài học.', 15, '80.00', 3, 0, '2026-11-21 11:33:12'),
-(4, 4, 14, 'Kiểm tra Kiến thức UI/UX Design', 'Bài kiểm tra trắc nghiệm đánh giá kiến thức bài học.', 15, '80.00', 3, 0, '2026-11-21 11:33:12'),
-(5, 5, 17, 'Đánh giá Kỹ năng Docker & DevOps', 'Bài kiểm tra trắc nghiệm đánh giá kiến thức bài học.', 15, '80.00', 3, 0, '2026-11-21 11:33:12'),
-(6, 6, 20, 'Đánh giá Kỹ năng SQL Thực chiến', 'Bài kiểm tra trắc nghiệm đánh giá kiến thức bài học.', 15, '80.00', 3, 0, '2026-11-21 11:33:12'),
-(7, 7, 24, 'Kiểm tra tổng hợp: Chuyên Sâu Golang & Kiến Trúc Microservices Hiệu Năng Cao', 'Bài kiểm tra gồm các câu hỏi trắc nghiệm kiến thức cốt lõi.', 15, '80.00', 3, 0, '2026-11-21 11:47:30'),
-(8, 8, 28, 'Kiểm tra tổng hợp: Lập Trình Di Động Đa Nền Tảng với Flutter & Dart 2026', 'Bài kiểm tra gồm các câu hỏi trắc nghiệm kiến thức cốt lõi.', 15, '80.00', 3, 0, '2026-11-21 11:47:30'),
-(9, 9, 32, 'Kiểm tra tổng hợp: Chinh Phục Điện Toán Đám Mây AWS Solutions Architect', 'Bài kiểm tra gồm các câu hỏi trắc nghiệm kiến thức cốt lõi.', 15, '80.00', 3, 0, '2026-11-21 11:47:30'),
-(10, 10, 36, 'Kiểm tra tổng hợp: An Toàn Thông Tin & Thực Hành Ethical Hacking (Pentest Web)', 'Bài kiểm tra gồm các câu hỏi trắc nghiệm kiến thức cốt lõi.', 15, '80.00', 3, 0, '2026-11-21 11:47:30'),
-(11, 11, 40, 'Kiểm tra tổng hợp: Digital Marketing Toàn Diện & Tăng Trưởng Doanh Thu với AI', 'Bài kiểm tra gồm các câu hỏi trắc nghiệm kiến thức cốt lõi.', 15, '80.00', 3, 0, '2026-11-21 11:47:30'),
-(12, 12, 44, 'Kiểm tra tổng hợp: Tiếng Anh Giao Tiếp & Phỏng Vấn Dành Cho Dân IT (Tech English)', 'Bài kiểm tra gồm các câu hỏi trắc nghiệm kiến thức cốt lõi.', 15, '80.00', 3, 0, '2026-11-21 11:47:30'),
-(13, 1, 45, 'Kiểm tra 15 phút: Kiến thức Nền tảng Web & Cấu trúc MVC', 'Bài kiểm tra nhanh củng cố kiến thức sau khi học xong Bài 1 & Bài 2 (35 phút video).', 15, '80.00', 0, 0, '2026-11-21 14:07:38'),
-(14, 2, 46, 'Kiểm tra 15 phút: Cú pháp Python & Cấu trúc dữ liệu', 'Củng cố kiến thức sau khi học xong phần cú pháp cơ bản của Python (13 phút).', 15, '80.00', 0, 0, '2026-11-21 14:08:32'),
-(15, 3, 47, 'Kiểm tra 15 phút: JSX, Props và Component React', 'Kiểm tra nhanh sau khi hoàn thành bài học về Component và Props trong React.', 15, '80.00', 0, 0, '2026-11-21 14:08:32'),
-(16, 4, 48, 'Kiểm tra 15 phút: Auto Layout & Hệ thống Variants Figma', 'Kiểm tra nhanh kỹ năng dựng khung layout linh hoạt trong Figma sau bài học 1.', 15, '80.00', 0, 0, '2026-11-21 14:08:32'),
-(17, 5, 49, 'Kiểm tra 15 phút: Khái niệm Docker, Image và Container', 'Kiểm tra thực hành các lệnh cơ bản Docker sau khi hoàn thành Bài 1.', 15, '80.00', 0, 0, '2026-11-21 14:08:32'),
-(18, 6, 50, 'Kiểm tra 15 phút: Kỹ thuật Truy vấn SQL & JOIN Bảng', 'Củng cố kiến thức cú pháp SQL sau bài giảng thực chiến đầu tiên.', 15, '80.00', 0, 0, '2026-11-21 14:08:32');
+('1', '1', '5', 'Kiểm tra trắc nghiệm Kiến trúc MVC & Web Core', 'Bài kiểm tra trắc nghiệm đánh giá kiến thức bài học.', '15', '80.00', '3', '0', '2026-11-21 11:33:12'),
+('2', '2', '8', 'Đánh giá Năng lực Python & Machine Learning', 'Bài kiểm tra trắc nghiệm đánh giá kiến thức bài học.', '15', '80.00', '3', '0', '2026-11-21 11:33:12'),
+('3', '3', '11', 'Đánh giá Kiến thức ReactJS', 'Bài kiểm tra trắc nghiệm đánh giá kiến thức bài học.', '15', '80.00', '3', '0', '2026-11-21 11:33:12'),
+('4', '4', '14', 'Kiểm tra Kiến thức UI/UX Design', 'Bài kiểm tra trắc nghiệm đánh giá kiến thức bài học.', '15', '80.00', '3', '0', '2026-11-21 11:33:12'),
+('5', '5', '17', 'Đánh giá Kỹ năng Docker & DevOps', 'Bài kiểm tra trắc nghiệm đánh giá kiến thức bài học.', '15', '80.00', '3', '0', '2026-11-21 11:33:12'),
+('6', '6', '20', 'Đánh giá Kỹ năng SQL Thực chiến', 'Bài kiểm tra trắc nghiệm đánh giá kiến thức bài học.', '15', '80.00', '3', '0', '2026-11-21 11:33:12'),
+('7', '7', '24', 'Kiểm tra tổng hợp: Chuyên Sâu Golang & Kiến Trúc Microservices Hiệu Năng Cao', 'Bài kiểm tra gồm các câu hỏi trắc nghiệm kiến thức cốt lõi.', '15', '80.00', '3', '0', '2026-11-21 11:47:30'),
+('8', '8', '28', 'Kiểm tra tổng hợp: Lập Trình Di Động Đa Nền Tảng với Flutter & Dart 2026', 'Bài kiểm tra gồm các câu hỏi trắc nghiệm kiến thức cốt lõi.', '15', '80.00', '3', '0', '2026-11-21 11:47:30'),
+('9', '9', '32', 'Kiểm tra tổng hợp: Chinh Phục Điện Toán Đám Mây AWS Solutions Architect', 'Bài kiểm tra gồm các câu hỏi trắc nghiệm kiến thức cốt lõi.', '15', '80.00', '3', '0', '2026-11-21 11:47:30'),
+('10', '10', '36', 'Kiểm tra tổng hợp: An Toàn Thông Tin & Thực Hành Ethical Hacking (Pentest Web)', 'Bài kiểm tra gồm các câu hỏi trắc nghiệm kiến thức cốt lõi.', '15', '80.00', '3', '0', '2026-11-21 11:47:30'),
+('11', '11', '40', 'Kiểm tra tổng hợp: Digital Marketing Toàn Diện & Tăng Trưởng Doanh Thu với AI', 'Bài kiểm tra gồm các câu hỏi trắc nghiệm kiến thức cốt lõi.', '15', '80.00', '3', '0', '2026-11-21 11:47:30'),
+('12', '12', '44', 'Kiểm tra tổng hợp: Tiếng Anh Giao Tiếp & Phỏng Vấn Dành Cho Dân IT (Tech English)', 'Bài kiểm tra gồm các câu hỏi trắc nghiệm kiến thức cốt lõi.', '15', '80.00', '3', '0', '2026-11-21 11:47:30'),
+('13', '1', '45', 'Kiểm tra 15 phút: Kiến thức Nền tảng Web & Cấu trúc MVC', 'Bài kiểm tra nhanh củng cố kiến thức sau khi học xong Bài 1 & Bài 2 (35 phút video).', '15', '80.00', '0', '0', '2026-11-21 14:07:38'),
+('14', '2', '46', 'Kiểm tra 15 phút: Cú pháp Python & Cấu trúc dữ liệu', 'Củng cố kiến thức sau khi học xong phần cú pháp cơ bản của Python (13 phút).', '15', '80.00', '0', '0', '2026-11-21 14:08:32'),
+('15', '3', '47', 'Kiểm tra 15 phút: JSX, Props và Component React', 'Kiểm tra nhanh sau khi hoàn thành bài học về Component và Props trong React.', '15', '80.00', '0', '0', '2026-11-21 14:08:32'),
+('16', '4', '48', 'Kiểm tra 15 phút: Auto Layout & Hệ thống Variants Figma', 'Kiểm tra nhanh kỹ năng dựng khung layout linh hoạt trong Figma sau bài học 1.', '15', '80.00', '0', '0', '2026-11-21 14:08:32'),
+('17', '5', '49', 'Kiểm tra 15 phút: Khái niệm Docker, Image và Container', 'Kiểm tra thực hành các lệnh cơ bản Docker sau khi hoàn thành Bài 1.', '15', '80.00', '0', '0', '2026-11-21 14:08:32'),
+('18', '6', '50', 'Kiểm tra 15 phút: Kỹ thuật Truy vấn SQL & JOIN Bảng', 'Củng cố kiến thức cú pháp SQL sau bài giảng thực chiến đầu tiên.', '15', '80.00', '0', '0', '2026-11-21 14:08:32');
 
--- -------------------------------------------------------------
--- Bảng: `quiz_questions`
--- -------------------------------------------------------------
-DROP TABLE IF EXISTS `quiz_questions`;
-CREATE TABLE `quiz_questions` (
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `rate_limits`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `rate_limits`;
+CREATE TABLE `rate_limits` (
+  `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `hits` int unsigned NOT NULL DEFAULT '1',
+  `expires_at` int unsigned NOT NULL,
+  PRIMARY KEY (`key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dữ liệu bảng `rate_limits`
+INSERT INTO `rate_limits` (`key`, `hits`, `expires_at`) VALUES
+('login:127.0.0.1', '1', '1795322612');
+
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `sections`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `sections`;
+CREATE TABLE `sections` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `quiz_id` int unsigned NOT NULL,
-  `question_text` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `question_type` enum('single_choice','multiple_choice','true_false') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'single_choice',
-  `points` decimal(5,2) NOT NULL DEFAULT '1.00',
-  `explanation` text COLLATE utf8mb4_unicode_ci,
+  `course_id` int unsigned NOT NULL,
+  `title` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
   `sort_order` int unsigned NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `quiz_id` (`quiz_id`),
-  CONSTRAINT `quiz_questions_ibfk_1` FOREIGN KEY (`quiz_id`) REFERENCES `quizzes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Dữ liệu bảng `quiz_questions`
-INSERT INTO `quiz_questions` (`id`, `quiz_id`, `question_text`, `question_type`, `points`, `explanation`, `sort_order`, `created_at`) VALUES
-(1, 1, 'Trong mô hình MVC, thành phần nào trực tiếp tương tác với Cơ sở Dữ liệu?', 'single_choice', '1.00', 'Model đại diện cho dữ liệu và các quy tắc nghiệp vụ truy vấn DB.', 1, '2026-11-21 11:33:12'),
-(2, 1, 'Kỹ thuật nào dùng để chống tấn công SQL Injection hiệu quả nhất?', 'single_choice', '1.00', 'Prepared Statements với tham số buộc chặt (parameter binding) ngăn chặn chèn mã độc.', 2, '2026-11-21 11:33:12'),
-(3, 1, 'Trạng thái HTTP 200 biểu thị điều gì?', 'single_choice', '1.00', 'HTTP 200 OK báo hiệu yêu cầu đã được máy chủ xử lý thành công.', 3, '2026-11-21 11:33:12'),
-(4, 2, 'Thư viện Python nào chuyên dùng để thao tác và phân tích cấu trúc dữ liệu bảng (DataFrames)?', 'single_choice', '1.00', 'Pandas cung cấp cấu trúc DataFrame mạnh mẽ cho phân tích số liệu.', 1, '2026-11-21 11:33:12'),
-(5, 2, 'Thuật toán nào sau đây thuộc nhóm học có giám sát (Supervised Learning)?', 'single_choice', '1.00', 'Linear Regression và Random Forest là các thuật toán học có giám sát.', 2, '2026-11-21 11:33:12'),
-(6, 2, 'Hiện tượng mô hình hoạt động cực tốt trên tập Train nhưng kém trên tập Test gọi là gì?', 'single_choice', '1.00', 'Overfitting (Quá khớp) xảy ra khi mô hình học vẹt cả nhiễu của tập huấn luyện.', 3, '2026-11-21 11:33:12'),
-(7, 3, 'Hook nào trong React được dùng để thực hiện các side-effect (gọi API, lắng nghe event)?', 'single_choice', '1.00', 'useEffect xử lý các tác vụ ngoài luồng render như fetch data, timer, subscriptions.', 1, '2026-11-21 11:33:12'),
-(8, 3, 'Điều gì xảy ra khi bạn gọi hàm cập nhật State trong React?', 'single_choice', '1.00', 'React xếp lịch re-render component và so sánh Virtual DOM để cập nhật DOM thật.', 2, '2026-11-21 11:33:12'),
-(9, 4, 'Tính năng Auto Layout trong Figma tương tự với thuộc tính CSS nào?', 'single_choice', '1.00', 'Auto Layout mô phỏng hành vi của CSS Flexbox (hướng sắp xếp, khoảng cách, căn chỉnh).', 1, '2026-11-21 11:33:12'),
-(10, 4, 'Nguyên tắc nào sau đây đảm bảo khoảng cách ngón tay bấm (tap target) thuận tiện trên Mobile?', 'single_choice', '1.00', 'Theo chuẩn Apple & Google, kích thước nút bấm tối thiểu khuyến nghị là 44x44 hoặc 48x48 dp/px.', 2, '2026-11-21 11:33:12'),
-(11, 5, 'Chỉ thị nào trong Dockerfile được dùng để chỉ định Image nền khởi tạo?', 'single_choice', '1.00', 'FROM xác định base image (vd: FROM php:8.2-fpm hoặc FROM node:20).', 1, '2026-11-21 11:33:12'),
-(12, 5, 'Lệnh Docker nào dùng để chạy các container đa dịch vụ được định nghĩa trong file YAML?', 'single_choice', '1.00', 'docker compose up khởi chạy toàn bộ dịch vụ được cấu hình trong docker-compose.yml.', 2, '2026-11-21 11:33:12'),
-(13, 6, 'Mệnh đề nào dùng để lọc điều kiện trên kết quả đã được gom nhóm bởi GROUP BY?', 'single_choice', '1.00', 'HAVING dùng để lọc điều kiện sau khi nhóm (vd: HAVING COUNT(*) > 5), trong khi WHERE lọc trước khi nhóm.', 1, '2026-11-21 11:33:12'),
-(14, 6, 'Loại JOIN nào trả về tất cả bản ghi từ bảng bên trái bất kể có bản ghi khớp bên phải hay không?', 'single_choice', '1.00', 'LEFT JOIN (hoặc LEFT OUTER JOIN) giữ lại toàn bộ hàng từ bảng bên trái.', 2, '2026-11-21 11:33:12'),
-(15, 7, 'Ưu điểm lớn nhất của công nghệ được giảng dạy trong khóa học là gì?', 'single_choice', '5.00', 'Đáp án phản ánh chính xác nguyên lý thiết kế và tối ưu hiệu suất.', 1, '2026-11-21 11:47:30'),
-(16, 7, 'Để bảo mật ứng dụng khi triển khai lên môi trường Production, phương pháp nào là bắt buộc?', 'single_choice', '5.00', 'HTTPS và xác thực Token an toàn là yêu cầu tiên quyết.', 2, '2026-11-21 11:47:30'),
-(17, 8, 'Ưu điểm lớn nhất của công nghệ được giảng dạy trong khóa học là gì?', 'single_choice', '5.00', 'Đáp án phản ánh chính xác nguyên lý thiết kế và tối ưu hiệu suất.', 1, '2026-11-21 11:47:30'),
-(18, 8, 'Để bảo mật ứng dụng khi triển khai lên môi trường Production, phương pháp nào là bắt buộc?', 'single_choice', '5.00', 'HTTPS và xác thực Token an toàn là yêu cầu tiên quyết.', 2, '2026-11-21 11:47:30'),
-(19, 9, 'Ưu điểm lớn nhất của công nghệ được giảng dạy trong khóa học là gì?', 'single_choice', '5.00', 'Đáp án phản ánh chính xác nguyên lý thiết kế và tối ưu hiệu suất.', 1, '2026-11-21 11:47:30'),
-(20, 9, 'Để bảo mật ứng dụng khi triển khai lên môi trường Production, phương pháp nào là bắt buộc?', 'single_choice', '5.00', 'HTTPS và xác thực Token an toàn là yêu cầu tiên quyết.', 2, '2026-11-21 11:47:30'),
-(21, 10, 'Ưu điểm lớn nhất của công nghệ được giảng dạy trong khóa học là gì?', 'single_choice', '5.00', 'Đáp án phản ánh chính xác nguyên lý thiết kế và tối ưu hiệu suất.', 1, '2026-11-21 11:47:30'),
-(22, 10, 'Để bảo mật ứng dụng khi triển khai lên môi trường Production, phương pháp nào là bắt buộc?', 'single_choice', '5.00', 'HTTPS và xác thực Token an toàn là yêu cầu tiên quyết.', 2, '2026-11-21 11:47:30'),
-(23, 11, 'Ưu điểm lớn nhất của công nghệ được giảng dạy trong khóa học là gì?', 'single_choice', '5.00', 'Đáp án phản ánh chính xác nguyên lý thiết kế và tối ưu hiệu suất.', 1, '2026-11-21 11:47:30'),
-(24, 11, 'Để bảo mật ứng dụng khi triển khai lên môi trường Production, phương pháp nào là bắt buộc?', 'single_choice', '5.00', 'HTTPS và xác thực Token an toàn là yêu cầu tiên quyết.', 2, '2026-11-21 11:47:30'),
-(25, 12, 'Ưu điểm lớn nhất của công nghệ được giảng dạy trong khóa học là gì?', 'single_choice', '5.00', 'Đáp án phản ánh chính xác nguyên lý thiết kế và tối ưu hiệu suất.', 1, '2026-11-21 11:47:30'),
-(26, 12, 'Để bảo mật ứng dụng khi triển khai lên môi trường Production, phương pháp nào là bắt buộc?', 'single_choice', '5.00', 'HTTPS và xác thực Token an toàn là yêu cầu tiên quyết.', 2, '2026-11-21 11:47:30'),
-(27, 13, 'Trong mô hình MVC, thành phần nào chịu trách nhiệm trực tiếp tương tác và truy vấn Cơ sở dữ liệu?', 'single_choice', '1.00', 'Model là tầng đảm nhận toàn bộ logic dữ liệu, định nghĩa quan hệ và truy vấn CSDL.', 1, '2026-11-21 14:07:38'),
-(28, 13, 'Giao thức HTTP hoạt động theo cơ chế nào sau đây giữa Trình duyệt và Máy chủ?', 'single_choice', '1.00', 'HTTP hoạt động theo mô hình Request - Response (Yêu cầu và Phản hồi).', 2, '2026-11-21 14:07:38'),
-(29, 13, 'Mục đích quan trọng nhất của việc phân tách Controller và View trong kiến trúc MVC là gì?', 'single_choice', '1.00', 'Tách biệt luồng xử lý logic nghiệp vụ và giao diện hiển thị, giúp code dễ bảo trì và tái sử dụng.', 3, '2026-11-21 14:07:38'),
-(30, 14, 'Kiểu dữ liệu nào trong Python là kiểu bất biến (Immutable)?', 'single_choice', '1.00', 'Tuple trong Python là immutable, không thể thay đổi giá trị sau khi khởi tạo.', 1, '2026-11-21 14:08:32'),
-(31, 14, 'Cú pháp List Comprehension nào sau đây tạo ra danh sách số chẵn từ 0 đến 8?', 'single_choice', '1.00', '[x for x in range(10) if x % 2 == 0] sẽ sinh ra [0, 2, 4, 6, 8].', 2, '2026-11-21 14:08:32'),
-(32, 15, 'Điểm khác biệt căn bản giữa Props và State trong React là gì?', 'single_choice', '1.00', 'Props được truyền từ component cha xuống và mang tính read-only; State được quản lý nội bộ bên trong component và có thể thay đổi.', 1, '2026-11-21 14:08:32'),
-(33, 15, 'Quy tắc bắt buộc khi viết thẻ JSX trong React là gì?', 'single_choice', '1.00', 'JSX phải luôn được bao bọc bởi một thẻ cha duy nhất (hoặc React Fragment).', 2, '2026-11-21 14:08:32'),
-(34, 16, 'Phím tắt mặc định để tạo nhanh Auto Layout cho một cụm layer trong Figma là gì?', 'single_choice', '1.00', 'Shift + A là phím tắt tiêu chuẩn để bật Auto Layout trong Figma.', 1, '2026-11-21 14:08:32'),
-(35, 16, 'Chế độ \'Fill container\' trong Auto Layout có ý nghĩa gì?', 'single_choice', '1.00', 'Layer con sẽ tự động co giãn để lấp đầy toàn bộ chiều rộng hoặc chiều cao của frame cha.', 2, '2026-11-21 14:08:32'),
-(36, 17, 'Mối quan hệ giữa Docker Image và Docker Container là gì?', 'single_choice', '1.00', 'Image là bản thiết kế/khuôn mẫu chỉ đọc (Read-only Template), Container là một thể hiện (Instance) đang chạy của Image.', 1, '2026-11-21 14:08:32'),
-(37, 17, 'Lệnh nào sau đây dùng để build một Docker Image từ Dockerfile trong thư mục hiện tại?', 'single_choice', '1.00', 'docker build -t <tên-image> . là lệnh chuẩn để build image.', 2, '2026-11-21 14:08:32'),
-(38, 18, 'Mệnh đề nào trong SQL được dùng để lọc dữ liệu trên các hàm tổng hợp (AGGREGATE functions)?', 'single_choice', '1.00', 'Mệnh đề HAVING lọc kết quả sau khi đã GROUP BY và tính hàm tổng hợp; WHERE chỉ lọc dòng dữ liệu thô.', 1, '2026-11-21 14:08:32'),
-(39, 18, 'INNER JOIN trả về kết quả như thế nào giữa 2 bảng?', 'single_choice', '1.00', 'INNER JOIN chỉ trả về các bản ghi thỏa mãn điều kiện kết nối ở cả 2 bảng.', 2, '2026-11-21 14:08:32');
-
--- -------------------------------------------------------------
--- Bảng: `quiz_answers`
--- -------------------------------------------------------------
-DROP TABLE IF EXISTS `quiz_answers`;
-CREATE TABLE `quiz_answers` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `question_id` int unsigned NOT NULL,
-  `answer_text` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `is_correct` tinyint(1) NOT NULL DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `question_id` (`question_id`),
-  CONSTRAINT `quiz_answers_ibfk_1` FOREIGN KEY (`question_id`) REFERENCES `quiz_questions` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=145 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Dữ liệu bảng `quiz_answers`
-INSERT INTO `quiz_answers` (`id`, `question_id`, `answer_text`, `is_correct`, `created_at`) VALUES
-(1, 1, 'Model', 1, '2026-11-21 11:33:12'),
-(2, 1, 'View', 0, '2026-11-21 11:33:12'),
-(3, 1, 'Controller', 0, '2026-11-21 11:33:12'),
-(4, 1, 'Router', 0, '2026-11-21 11:33:12'),
-(5, 2, 'Sử dụng Prepared Statements (PDO)', 1, '2026-11-21 11:33:12'),
-(6, 2, 'Chỉ dùng hàm md5()', 0, '2026-11-21 11:33:12'),
-(7, 2, 'Tắt firewall máy chủ', 0, '2026-11-21 11:33:12'),
-(8, 2, 'Nối chuỗi trực tiếp vào câu lệnh SQL', 0, '2026-11-21 11:33:12'),
-(9, 3, 'Yêu cầu xử lý thành công (OK)', 1, '2026-11-21 11:33:12'),
-(10, 3, 'Không tìm thấy trang (Not Found)', 0, '2026-11-21 11:33:12'),
-(11, 3, 'Lỗi máy chủ nội bộ (Internal Server Error)', 0, '2026-11-21 11:33:12'),
-(12, 3, 'Yêu cầu bị từ chối (Forbidden)', 0, '2026-11-21 11:33:12'),
-(13, 4, 'Pandas', 1, '2026-11-21 11:33:12'),
-(14, 4, 'Matplotlib', 0, '2026-11-21 11:33:12'),
-(15, 4, 'Flask', 0, '2026-11-21 11:33:12'),
-(16, 4, 'Requests', 0, '2026-11-21 11:33:12'),
-(17, 5, 'Linear Regression', 1, '2026-11-21 11:33:12'),
-(18, 5, 'K-Means Clustering', 0, '2026-11-21 11:33:12'),
-(19, 5, 'PCA (Giảm chiều dữ liệu)', 0, '2026-11-21 11:33:12'),
-(20, 5, 'Apriori', 0, '2026-11-21 11:33:12'),
-(21, 6, 'Overfitting (Quá khớp)', 1, '2026-11-21 11:33:12'),
-(22, 6, 'Underfitting (Chưa khớp)', 0, '2026-11-21 11:33:12'),
-(23, 6, 'Regularization', 0, '2026-11-21 11:33:12'),
-(24, 6, 'Cross-validation', 0, '2026-11-21 11:33:12'),
-(25, 7, 'useEffect', 1, '2026-11-21 11:33:12'),
-(26, 7, 'useState', 0, '2026-11-21 11:33:12'),
-(27, 7, 'useMemo', 0, '2026-11-21 11:33:12'),
-(28, 7, 'useReducer', 0, '2026-11-21 11:33:12'),
-(29, 8, 'Component được lên lịch để Re-render', 1, '2026-11-21 11:33:12'),
-(30, 8, 'Trình duyệt reload lại toàn bộ trang', 0, '2026-11-21 11:33:12'),
-(31, 8, 'Xóa toàn bộ bộ nhớ Cache', 0, '2026-11-21 11:33:12'),
-(32, 8, 'Không có thay đổi nào xảy ra', 0, '2026-11-21 11:33:12'),
-(33, 9, 'CSS Flexbox', 1, '2026-11-21 11:33:12'),
-(34, 9, 'CSS Float', 0, '2026-11-21 11:33:12'),
-(35, 9, 'CSS Position Absolute', 0, '2026-11-21 11:33:12'),
-(36, 9, 'CSS Z-Index', 0, '2026-11-21 11:33:12'),
-(37, 10, 'Tối thiểu 44x44 hoặc 48x48 px', 1, '2026-11-21 11:33:12'),
-(38, 10, 'Tối đa 10x10 px', 0, '2026-11-21 11:33:12'),
-(39, 10, 'Không cần quan tâm kích thước', 0, '2026-11-21 11:33:12'),
-(40, 10, 'Càng nhỏ càng tiết kiệm diện tích', 0, '2026-11-21 11:33:12'),
-(41, 11, 'FROM', 1, '2026-11-21 11:33:12'),
-(42, 11, 'RUN', 0, '2026-11-21 11:33:12'),
-(43, 11, 'COPY', 0, '2026-11-21 11:33:12'),
-(44, 11, 'EXPOSE', 0, '2026-11-21 11:33:12'),
-(45, 12, 'docker compose up', 1, '2026-11-21 11:33:12'),
-(46, 12, 'docker build', 0, '2026-11-21 11:33:12'),
-(47, 12, 'docker ps', 0, '2026-11-21 11:33:12'),
-(48, 12, 'docker commit', 0, '2026-11-21 11:33:12'),
-(49, 13, 'HAVING', 1, '2026-11-21 11:33:12'),
-(50, 13, 'WHERE', 0, '2026-11-21 11:33:12');
-INSERT INTO `quiz_answers` (`id`, `question_id`, `answer_text`, `is_correct`, `created_at`) VALUES
-(51, 13, 'ORDER BY', 0, '2026-11-21 11:33:12'),
-(52, 13, 'LIMIT', 0, '2026-11-21 11:33:12'),
-(53, 14, 'LEFT JOIN', 1, '2026-11-21 11:33:12'),
-(54, 14, 'INNER JOIN', 0, '2026-11-21 11:33:12'),
-(55, 14, 'CROSS JOIN', 0, '2026-11-21 11:33:12'),
-(56, 14, 'RIGHT JOIN', 0, '2026-11-21 11:33:12'),
-(57, 15, 'Hiệu năng cao, khả năng mở rộng tốt và cộng đồng hỗ trợ mạnh mẽ', 1, '2026-11-21 11:47:30'),
-(58, 15, 'Chỉ chạy được trên môi trường Windows', 0, '2026-11-21 11:47:30'),
-(59, 15, 'Không cần viết kiểm thử phần mềm', 0, '2026-11-21 11:47:30'),
-(60, 16, 'Bật chứng chỉ mã hóa SSL/TLS (HTTPS) và bảo vệ dữ liệu bí mật qua Biến môi trường (.env)', 1, '2026-11-21 11:47:30'),
-(61, 16, 'Lưu trực tiếp mật khẩu và API Key vào mã nguồn Git công khai', 0, '2026-11-21 11:47:30'),
-(62, 16, 'Tắt tường lửa Firewall máy chủ', 0, '2026-11-21 11:47:30'),
-(63, 17, 'Hiệu năng cao, khả năng mở rộng tốt và cộng đồng hỗ trợ mạnh mẽ', 1, '2026-11-21 11:47:30'),
-(64, 17, 'Chỉ chạy được trên môi trường Windows', 0, '2026-11-21 11:47:30'),
-(65, 17, 'Không cần viết kiểm thử phần mềm', 0, '2026-11-21 11:47:30'),
-(66, 18, 'Bật chứng chỉ mã hóa SSL/TLS (HTTPS) và bảo vệ dữ liệu bí mật qua Biến môi trường (.env)', 1, '2026-11-21 11:47:30'),
-(67, 18, 'Lưu trực tiếp mật khẩu và API Key vào mã nguồn Git công khai', 0, '2026-11-21 11:47:30'),
-(68, 18, 'Tắt tường lửa Firewall máy chủ', 0, '2026-11-21 11:47:30'),
-(69, 19, 'Hiệu năng cao, khả năng mở rộng tốt và cộng đồng hỗ trợ mạnh mẽ', 1, '2026-11-21 11:47:30'),
-(70, 19, 'Chỉ chạy được trên môi trường Windows', 0, '2026-11-21 11:47:30'),
-(71, 19, 'Không cần viết kiểm thử phần mềm', 0, '2026-11-21 11:47:30'),
-(72, 20, 'Bật chứng chỉ mã hóa SSL/TLS (HTTPS) và bảo vệ dữ liệu bí mật qua Biến môi trường (.env)', 1, '2026-11-21 11:47:30'),
-(73, 20, 'Lưu trực tiếp mật khẩu và API Key vào mã nguồn Git công khai', 0, '2026-11-21 11:47:30'),
-(74, 20, 'Tắt tường lửa Firewall máy chủ', 0, '2026-11-21 11:47:30'),
-(75, 21, 'Hiệu năng cao, khả năng mở rộng tốt và cộng đồng hỗ trợ mạnh mẽ', 1, '2026-11-21 11:47:30'),
-(76, 21, 'Chỉ chạy được trên môi trường Windows', 0, '2026-11-21 11:47:30'),
-(77, 21, 'Không cần viết kiểm thử phần mềm', 0, '2026-11-21 11:47:30'),
-(78, 22, 'Bật chứng chỉ mã hóa SSL/TLS (HTTPS) và bảo vệ dữ liệu bí mật qua Biến môi trường (.env)', 1, '2026-11-21 11:47:30'),
-(79, 22, 'Lưu trực tiếp mật khẩu và API Key vào mã nguồn Git công khai', 0, '2026-11-21 11:47:30'),
-(80, 22, 'Tắt tường lửa Firewall máy chủ', 0, '2026-11-21 11:47:30'),
-(81, 23, 'Hiệu năng cao, khả năng mở rộng tốt và cộng đồng hỗ trợ mạnh mẽ', 1, '2026-11-21 11:47:30'),
-(82, 23, 'Chỉ chạy được trên môi trường Windows', 0, '2026-11-21 11:47:30'),
-(83, 23, 'Không cần viết kiểm thử phần mềm', 0, '2026-11-21 11:47:30'),
-(84, 24, 'Bật chứng chỉ mã hóa SSL/TLS (HTTPS) và bảo vệ dữ liệu bí mật qua Biến môi trường (.env)', 1, '2026-11-21 11:47:30'),
-(85, 24, 'Lưu trực tiếp mật khẩu và API Key vào mã nguồn Git công khai', 0, '2026-11-21 11:47:30'),
-(86, 24, 'Tắt tường lửa Firewall máy chủ', 0, '2026-11-21 11:47:30'),
-(87, 25, 'Hiệu năng cao, khả năng mở rộng tốt và cộng đồng hỗ trợ mạnh mẽ', 1, '2026-11-21 11:47:30'),
-(88, 25, 'Chỉ chạy được trên môi trường Windows', 0, '2026-11-21 11:47:30'),
-(89, 25, 'Không cần viết kiểm thử phần mềm', 0, '2026-11-21 11:47:30'),
-(90, 26, 'Bật chứng chỉ mã hóa SSL/TLS (HTTPS) và bảo vệ dữ liệu bí mật qua Biến môi trường (.env)', 1, '2026-11-21 11:47:30'),
-(91, 26, 'Lưu trực tiếp mật khẩu và API Key vào mã nguồn Git công khai', 0, '2026-11-21 11:47:30'),
-(92, 26, 'Tắt tường lửa Firewall máy chủ', 0, '2026-11-21 11:47:30'),
-(93, 27, 'View', 0, '2026-11-21 14:07:38'),
-(94, 27, 'Controller', 0, '2026-11-21 14:07:38'),
-(95, 27, 'Model', 1, '2026-11-21 14:07:38'),
-(96, 27, 'Router', 0, '2026-11-21 14:07:38'),
-(97, 28, 'Request - Response (Yêu cầu và Phản hồi)', 1, '2026-11-21 14:07:38'),
-(98, 28, 'Publish - Subscribe (Phát và Đăng ký)', 0, '2026-11-21 14:07:38'),
-(99, 28, 'Peer to Peer (Ngang hàng)', 0, '2026-11-21 14:07:38'),
-(100, 28, 'Broadcast không đồng bộ', 0, '2026-11-21 14:07:38');
-INSERT INTO `quiz_answers` (`id`, `question_id`, `answer_text`, `is_correct`, `created_at`) VALUES
-(101, 29, 'Tăng dung lượng lưu trữ của máy chủ', 0, '2026-11-21 14:07:38'),
-(102, 29, 'Tách biệt hoàn toàn xử lý nghiệp vụ và hiển thị giao diện HTML', 1, '2026-11-21 14:07:38'),
-(103, 29, 'Giúp file mã nguồn chạy nhanh hơn gấp 10 lần', 0, '2026-11-21 14:07:38'),
-(104, 29, 'Bắt buộc người dùng phải đăng ký tài khoản', 0, '2026-11-21 14:07:38'),
-(105, 30, 'List', 0, '2026-11-21 14:08:32'),
-(106, 30, 'Tuple', 1, '2026-11-21 14:08:32'),
-(107, 30, 'Dictionary', 0, '2026-11-21 14:08:32'),
-(108, 30, 'Set', 0, '2026-11-21 14:08:32'),
-(109, 31, '[x for x in range(10) if x % 2 == 0]', 1, '2026-11-21 14:08:32'),
-(110, 31, '[x if x % 2 == 0 for x in range(10)]', 0, '2026-11-21 14:08:32'),
-(111, 31, '{x: x % 2 == 0 for x in range(10)}', 0, '2026-11-21 14:08:32'),
-(112, 31, '(x for x in range(10) if x % 2 == 0)', 0, '2026-11-21 14:08:32'),
-(113, 32, 'Props có thể thay đổi trực tiếp, State thì không', 0, '2026-11-21 14:08:32'),
-(114, 32, 'Props nhận từ bên ngoài (read-only), State được quản lý nội bộ component', 1, '2026-11-21 14:08:32'),
-(115, 32, 'State chỉ dùng được trong class component', 0, '2026-11-21 14:08:32'),
-(116, 32, 'Props bắt buộc phải là chuỗi ký tự String', 0, '2026-11-21 14:08:32'),
-(117, 33, 'Phải có một phần tử cha duy nhất bao bọc', 1, '2026-11-21 14:08:32'),
-(118, 33, 'Không được phép sử dụng thẻ div', 0, '2026-11-21 14:08:32'),
-(119, 33, 'Bắt buộc phải nhúng CSS inline', 0, '2026-11-21 14:08:32'),
-(120, 33, 'Phải khai báo kiểu dữ liệu TypeScript', 0, '2026-11-21 14:08:32'),
-(121, 34, 'Ctrl + G', 0, '2026-11-21 14:08:32'),
-(122, 34, 'Shift + A', 1, '2026-11-21 14:08:32'),
-(123, 34, 'Alt + L', 0, '2026-11-21 14:08:32'),
-(124, 34, 'Ctrl + Alt + K', 0, '2026-11-21 14:08:32'),
-(125, 35, 'Tự động co giãn theo kích thước của frame cha', 1, '2026-11-21 14:08:32'),
-(126, 35, 'Cố định kích thước không bao giờ thay đổi', 0, '2026-11-21 14:08:32'),
-(127, 35, 'Tự động tô màu nền ngẫu nhiên', 0, '2026-11-21 14:08:32'),
-(128, 35, 'Ẩn layer khi màn hình nhỏ lại', 0, '2026-11-21 14:08:32'),
-(129, 36, 'Image là thể hiện đang chạy của Container', 0, '2026-11-21 14:08:32'),
-(130, 36, 'Container là một instance đang chạy được tạo ra từ Image', 1, '2026-11-21 14:08:32'),
-(131, 36, 'Image và Container là hai thuật ngữ hoàn toàn giống nhau', 0, '2026-11-21 14:08:32'),
-(132, 36, 'Image chỉ dùng cho hệ điều hành Windows', 0, '2026-11-21 14:08:32'),
-(133, 37, 'docker run -d .', 0, '2026-11-21 14:08:32'),
-(134, 37, 'docker build -t my-app .', 1, '2026-11-21 14:08:32'),
-(135, 37, 'docker compose up', 0, '2026-11-21 14:08:32'),
-(136, 37, 'docker create image', 0, '2026-11-21 14:08:32'),
-(137, 38, 'WHERE', 0, '2026-11-21 14:08:32'),
-(138, 38, 'HAVING', 1, '2026-11-21 14:08:32'),
-(139, 38, 'ORDER BY', 0, '2026-11-21 14:08:32'),
-(140, 38, 'GROUP BY', 0, '2026-11-21 14:08:32'),
-(141, 39, 'Chỉ những dòng có giá trị khớp ở cả 2 bảng', 1, '2026-11-21 14:08:32'),
-(142, 39, 'Toàn bộ dữ liệu của bảng bên trái', 0, '2026-11-21 14:08:32'),
-(143, 39, 'Toàn bộ dữ liệu của bảng bên phải', 0, '2026-11-21 14:08:32'),
-(144, 39, 'Tất cả các dòng của cả hai bảng bất kể có khớp hay không', 0, '2026-11-21 14:08:32');
-
--- -------------------------------------------------------------
--- Bảng: `quiz_attempts`
--- -------------------------------------------------------------
-DROP TABLE IF EXISTS `quiz_attempts`;
-CREATE TABLE `quiz_attempts` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `user_id` int unsigned NOT NULL,
-  `quiz_id` int unsigned NOT NULL,
-  `score_achieved` decimal(5,2) NOT NULL DEFAULT '0.00',
-  `total_score` decimal(5,2) NOT NULL DEFAULT '0.00',
-  `score_percentage` decimal(5,2) NOT NULL DEFAULT '0.00',
-  `is_passed` tinyint(1) NOT NULL DEFAULT '0',
-  `started_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `submitted_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `quiz_id` (`quiz_id`),
-  KEY `idx_attempt_user` (`user_id`,`quiz_id`),
-  CONSTRAINT `quiz_attempts_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `quiz_attempts_ibfk_2` FOREIGN KEY (`quiz_id`) REFERENCES `quizzes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Dữ liệu bảng `quiz_attempts`
-INSERT INTO `quiz_attempts` (`id`, `user_id`, `quiz_id`, `score_achieved`, `total_score`, `score_percentage`, `is_passed`, `started_at`, `submitted_at`) VALUES
-(1, 2, 1, '3.00', '3.00', '100.00', 1, '2026-11-21 11:39:21', '2026-11-21 18:39:21'),
-(2, 2, 1, '3.00', '3.00', '100.00', 1, '2026-11-21 11:39:21', '2026-11-21 18:39:21'),
-(3, 2, 1, '3.00', '3.00', '100.00', 1, '2026-11-21 11:42:49', '2026-11-21 18:42:49'),
-(4, 2, 1, '3.00', '3.00', '100.00', 1, '2026-11-21 11:45:38', '2026-11-21 18:45:38'),
-(5, 2, 1, '3.00', '3.00', '100.00', 1, '2026-11-21 11:47:06', '2026-11-21 18:47:06'),
-(6, 2, 1, '3.00', '3.00', '100.00', 1, '2026-11-21 11:47:30', '2026-11-21 18:47:30'),
-(7, 2, 1, '3.00', '3.00', '100.00', 1, '2026-11-21 11:47:35', '2026-11-21 18:47:35'),
-(8, 2, 1, '3.00', '3.00', '100.00', 1, '2026-11-21 11:48:19', '2026-11-21 18:48:19'),
-(9, 2, 1, '3.00', '3.00', '100.00', 1, '2026-11-21 11:53:59', '2026-11-21 18:53:59'),
-(10, 2, 1, '3.00', '3.00', '100.00', 1, '2026-11-21 11:54:34', '2026-11-21 18:54:34'),
-(11, 2, 1, '3.00', '3.00', '100.00', 1, '2026-11-21 11:54:48', '2026-11-21 18:54:48'),
-(12, 2, 1, '3.00', '3.00', '100.00', 1, '2026-11-21 12:06:40', '2026-11-21 19:06:40'),
-(13, 2, 1, '3.00', '3.00', '100.00', 1, '2026-11-21 12:14:27', '2026-11-21 19:14:27'),
-(14, 2, 1, '3.00', '3.00', '100.00', 1, '2026-11-21 13:10:30', '2026-11-21 20:10:30'),
-(15, 2, 1, '3.00', '3.00', '100.00', 1, '2026-11-21 13:36:14', '2026-11-21 20:36:14'),
-(16, 2, 1, '3.00', '3.00', '100.00', 1, '2026-11-21 13:36:38', '2026-11-21 20:36:38'),
-(17, 2, 1, '3.00', '3.00', '100.00', 1, '2026-11-21 13:42:34', '2026-11-21 20:42:34'),
-(18, 2, 1, '3.00', '3.00', '100.00', 1, '2026-11-21 14:07:17', '2026-11-21 21:07:17'),
-(19, 2, 1, '3.00', '3.00', '100.00', 1, '2026-11-21 14:08:37', '2026-11-21 21:08:37'),
-(20, 2, 1, '3.00', '3.00', '100.00', 1, '2026-11-21 14:09:50', '2026-11-21 21:09:50'),
-(21, 2, 1, '3.00', '3.00', '100.00', 1, '2026-11-21 14:09:56', '2026-11-21 21:09:56'),
-(22, 2, 1, '3.00', '3.00', '100.00', 1, '2026-11-21 14:15:27', '2026-11-21 21:15:27');
-
--- -------------------------------------------------------------
--- Bảng: `quiz_attempt_answers`
--- -------------------------------------------------------------
-DROP TABLE IF EXISTS `quiz_attempt_answers`;
-CREATE TABLE `quiz_attempt_answers` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `attempt_id` int unsigned NOT NULL,
-  `question_id` int unsigned NOT NULL,
-  `answer_id` int unsigned NOT NULL,
-  `is_correct` tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`),
-  KEY `attempt_id` (`attempt_id`),
-  KEY `question_id` (`question_id`),
-  KEY `answer_id` (`answer_id`),
-  CONSTRAINT `quiz_attempt_answers_ibfk_1` FOREIGN KEY (`attempt_id`) REFERENCES `quiz_attempts` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `quiz_attempt_answers_ibfk_2` FOREIGN KEY (`question_id`) REFERENCES `quiz_questions` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `quiz_attempt_answers_ibfk_3` FOREIGN KEY (`answer_id`) REFERENCES `quiz_answers` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=67 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Dữ liệu bảng `quiz_attempt_answers`
-INSERT INTO `quiz_attempt_answers` (`id`, `attempt_id`, `question_id`, `answer_id`, `is_correct`) VALUES
-(1, 1, 1, 1, 1),
-(2, 1, 2, 5, 1),
-(3, 1, 3, 9, 1),
-(4, 2, 1, 1, 1),
-(5, 2, 2, 5, 1),
-(6, 2, 3, 9, 1),
-(7, 3, 1, 1, 1),
-(8, 3, 2, 5, 1),
-(9, 3, 3, 9, 1),
-(10, 4, 1, 1, 1),
-(11, 4, 2, 5, 1),
-(12, 4, 3, 9, 1),
-(13, 5, 1, 1, 1),
-(14, 5, 2, 5, 1),
-(15, 5, 3, 9, 1),
-(16, 6, 1, 1, 1),
-(17, 6, 2, 5, 1),
-(18, 6, 3, 9, 1),
-(19, 7, 1, 1, 1),
-(20, 7, 2, 5, 1),
-(21, 7, 3, 9, 1),
-(22, 8, 1, 1, 1),
-(23, 8, 2, 5, 1),
-(24, 8, 3, 9, 1),
-(25, 9, 1, 1, 1),
-(26, 9, 2, 5, 1),
-(27, 9, 3, 9, 1),
-(28, 10, 1, 1, 1),
-(29, 10, 2, 5, 1),
-(30, 10, 3, 9, 1),
-(31, 11, 1, 1, 1),
-(32, 11, 2, 5, 1),
-(33, 11, 3, 9, 1),
-(34, 12, 1, 1, 1),
-(35, 12, 2, 5, 1),
-(36, 12, 3, 9, 1),
-(37, 13, 1, 1, 1),
-(38, 13, 2, 5, 1),
-(39, 13, 3, 9, 1),
-(40, 14, 1, 1, 1),
-(41, 14, 2, 5, 1),
-(42, 14, 3, 9, 1),
-(43, 15, 1, 1, 1),
-(44, 15, 2, 5, 1),
-(45, 15, 3, 9, 1),
-(46, 16, 1, 1, 1),
-(47, 16, 2, 5, 1),
-(48, 16, 3, 9, 1),
-(49, 17, 1, 1, 1),
-(50, 17, 2, 5, 1);
-INSERT INTO `quiz_attempt_answers` (`id`, `attempt_id`, `question_id`, `answer_id`, `is_correct`) VALUES
-(51, 17, 3, 9, 1),
-(52, 18, 1, 1, 1),
-(53, 18, 2, 5, 1),
-(54, 18, 3, 9, 1),
-(55, 19, 1, 1, 1),
-(56, 19, 2, 5, 1),
-(57, 19, 3, 9, 1),
-(58, 20, 1, 1, 1),
-(59, 20, 2, 5, 1),
-(60, 20, 3, 9, 1),
-(61, 21, 1, 1, 1),
-(62, 21, 2, 5, 1),
-(63, 21, 3, 9, 1),
-(64, 22, 1, 1, 1),
-(65, 22, 2, 5, 1),
-(66, 22, 3, 9, 1);
-
--- -------------------------------------------------------------
--- Bảng: `certificates`
--- -------------------------------------------------------------
-DROP TABLE IF EXISTS `certificates`;
-CREATE TABLE `certificates` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `certificate_code` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `user_id` int unsigned NOT NULL,
-  `course_id` int unsigned NOT NULL,
-  `issued_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `pdf_path` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `status` enum('valid','revoked') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'valid',
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `certificate_code` (`certificate_code`),
-  UNIQUE KEY `uq_user_course_cert` (`user_id`,`course_id`),
-  KEY `course_id` (`course_id`),
-  KEY `idx_cert_code` (`certificate_code`),
-  CONSTRAINT `certificates_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `certificates_ibfk_2` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Dữ liệu bảng `certificates`
-INSERT INTO `certificates` (`id`, `certificate_code`, `user_id`, `course_id`, `issued_at`, `pdf_path`, `status`) VALUES
-(1, 'CERT-2026-X8B9K2', 2, 1, '2026-11-21 11:29:15', NULL, 'valid'),
-(2, 'CERT-2026-706CF3BC', 1, 1, '2026-11-21 11:38:44', NULL, 'valid'),
-(3, 'CERT-2026-882D3383', 43, 1, '2026-11-21 11:47:30', NULL, 'valid'),
-(4, 'CERT-2026-7B1F4939', 45, 3, '2026-11-21 11:51:24', NULL, 'valid'),
-(5, 'CERT-2026-2034C86F', 45, 4, '2026-11-21 11:51:24', NULL, 'valid'),
-(6, 'CERT-2026-CCA8C0B0', 45, 5, '2026-11-21 11:51:24', NULL, 'valid'),
-(7, 'CERT-2026-4AF648B6', 46, 4, '2026-11-21 11:51:24', NULL, 'valid'),
-(8, 'CERT-2026-07EE4BBD', 46, 5, '2026-11-21 11:51:24', NULL, 'valid'),
-(9, 'CERT-2026-8063B4BB', 46, 6, '2026-11-21 11:51:24', NULL, 'valid'),
-(10, 'CERT-2026-2AAA51BC', 47, 5, '2026-11-21 11:51:24', NULL, 'valid'),
-(11, 'CERT-2026-14FA3F86', 47, 6, '2026-11-21 11:51:24', NULL, 'valid'),
-(12, 'CERT-2026-C6D8B1D1', 47, 7, '2026-11-21 11:51:24', NULL, 'valid'),
-(13, 'CERT-2026-F0EB7673', 48, 6, '2026-11-21 11:51:24', NULL, 'valid'),
-(14, 'CERT-2026-C12FC5D8', 48, 7, '2026-11-21 11:51:24', NULL, 'valid'),
-(15, 'CERT-2026-82F61ACD', 48, 8, '2026-11-21 11:51:24', NULL, 'valid');
-
--- -------------------------------------------------------------
--- Bảng: `enrollments`
--- -------------------------------------------------------------
-DROP TABLE IF EXISTS `enrollments`;
-CREATE TABLE `enrollments` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `user_id` int unsigned NOT NULL,
-  `course_id` int unsigned NOT NULL,
-  `status` enum('active','expired','revoked') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
-  `progress_percent` decimal(5,2) NOT NULL DEFAULT '0.00',
-  `enrolled_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `completed_at` timestamp NULL DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `uq_user_course` (`user_id`,`course_id`),
-  KEY `course_id` (`course_id`),
-  KEY `idx_enroll_user` (`user_id`),
-  CONSTRAINT `enrollments_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `enrollments_ibfk_2` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=73 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Dữ liệu bảng `enrollments`
-INSERT INTO `enrollments` (`id`, `user_id`, `course_id`, `status`, `progress_percent`, `enrolled_at`, `completed_at`) VALUES
-(2, 1, 1, 'active', '0.00', '2026-11-21 11:38:44', NULL),
-(3, 2, 6, 'active', '33.33', '2026-11-21 11:39:21', NULL),
-(8, 43, 1, 'active', '100.00', '2026-11-21 11:47:30', '2026-11-21 18:47:30'),
-(9, 43, 2, 'active', '25.00', '2026-11-21 11:47:30', NULL),
-(10, 43, 3, 'active', '25.00', '2026-11-21 11:47:30', NULL),
-(14, 44, 2, 'active', '70.00', '2026-11-21 11:50:40', NULL),
-(15, 44, 3, 'active', '70.00', '2026-11-21 11:50:40', NULL),
-(16, 44, 4, 'active', '70.00', '2026-11-21 11:50:40', NULL),
-(17, 45, 3, 'active', '100.00', '2026-11-21 11:51:24', '2026-11-21 18:51:24'),
-(18, 45, 4, 'active', '100.00', '2026-11-21 11:51:24', '2026-11-21 18:51:24'),
-(19, 45, 5, 'active', '100.00', '2026-11-21 11:51:24', '2026-11-21 18:51:24'),
-(20, 46, 4, 'active', '100.00', '2026-11-21 11:51:24', '2026-11-21 18:51:24'),
-(21, 46, 5, 'active', '100.00', '2026-11-21 11:51:24', '2026-11-21 18:51:24'),
-(22, 46, 6, 'active', '100.00', '2026-11-21 11:51:24', '2026-11-21 18:51:24'),
-(23, 47, 5, 'active', '100.00', '2026-11-21 11:51:24', '2026-11-21 18:51:24'),
-(24, 47, 6, 'active', '100.00', '2026-11-21 11:51:24', '2026-11-21 18:51:24'),
-(25, 47, 7, 'active', '100.00', '2026-11-21 11:51:24', '2026-11-21 18:51:24'),
-(26, 48, 6, 'active', '100.00', '2026-11-21 11:51:24', '2026-11-21 18:51:24'),
-(27, 48, 7, 'active', '100.00', '2026-11-21 11:51:24', '2026-11-21 18:51:24'),
-(28, 48, 8, 'active', '100.00', '2026-11-21 11:51:24', '2026-11-21 18:51:24'),
-(36, 1, 8, 'active', '0.00', '2026-11-21 13:12:03', NULL),
-(39, 1, 5, 'active', '0.00', '2026-11-21 13:12:34', NULL),
-(67, 2, 11, 'active', '0.00', '2026-11-21 14:10:52', NULL);
-
--- -------------------------------------------------------------
--- Bảng: `instructor_profiles`
--- -------------------------------------------------------------
-DROP TABLE IF EXISTS `instructor_profiles`;
-CREATE TABLE `instructor_profiles` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `user_id` int unsigned NOT NULL,
-  `headline` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `bio` text COLLATE utf8mb4_unicode_ci,
-  `qualification` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `experience_years` tinyint unsigned DEFAULT '0',
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `user_id` (`user_id`),
-  CONSTRAINT `instructor_profiles_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Dữ liệu bảng `instructor_profiles`
-INSERT INTO `instructor_profiles` (`id`, `user_id`, `headline`, `bio`, `qualification`, `experience_years`, `created_at`) VALUES
-(1, 25, 'Senior Fullstack Engineer & Giảng viên Công nghệ', 'Hơn 8 năm kinh nghiệm phát triển hệ thống và giảng dạy cho hàng ngàn học viên.', 'Thạc sĩ Khoa học Máy tính', 8, '2026-11-21 11:19:27'),
-(2, 26, 'AI Research Scientist & Data Lead', 'Tiến sĩ Trí tuệ Nhân tạo tại ĐH Quốc gia, chuyên gia Machine Learning và phân tích dữ liệu lớn.', 'Tiến sĩ Trí tuệ Nhân tạo', 10, '2026-11-21 11:33:11'),
-(3, 27, 'Lead Product Designer & UX Specialist', 'Hơn 6 năm thiết kế sản phẩm số cho các tập đoàn công nghệ, chuyên sâu về Design System trên Figma.', 'Cử nhân Thiết kế Đồ họa & Tương tác', 6, '2026-11-21 11:33:11'),
-(4, 28, 'DevOps & Cloud Solutions Architect', 'Chuyên gia tư vấn hạ tầng đám mây, Kubernetes, Docker và tự động hóa quy trình CI/CD cho doanh nghiệp.', 'Kỹ sư Hệ thống & AWS Certified Solutions Architect', 7, '2026-11-21 11:33:11'),
-(5, 40, 'Senior Backend Engineer & Go Specialist tại VNG', 'Hơn 9 năm kinh nghiệm thiết kế hệ thống Microservices xử lý hàng chục triệu requests mỗi ngày với Golang, Docker, Kafka.', 'Thạc sĩ Khoa học Máy tính (ĐH Bách Khoa)', 9, '2026-11-21 11:47:30'),
-(6, 41, 'AWS Certified Solutions Architect - Professional', 'Từng tư vấn di chuyển hạ tầng đám mây cho hơn 40 tập đoàn lớn, chuyên sâu về Kubernetes, Terraform và kiến trúc Serverless.', 'Kỹ sư Hệ thống Viễn thông & Đám mây', 11, '2026-11-21 11:47:30'),
-(7, 42, 'Lead Growth Marketer & Digital Strategist', 'Chuyên gia tối ưu tỷ lệ chuyển đổi, quản lý ngân sách quảng cáo hơn 2 triệu USD/năm trên nền tảng Meta và Google Ads.', 'Cử nhân Kinh tế Đối ngoại (ĐH Ngoại Thương)', 7, '2026-11-21 11:47:30');
-
--- -------------------------------------------------------------
--- Bảng: `course_reviews`
--- -------------------------------------------------------------
-DROP TABLE IF EXISTS `course_reviews`;
-CREATE TABLE `course_reviews` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `course_id` int unsigned NOT NULL,
-  `user_id` int unsigned NOT NULL,
-  `rating` tinyint unsigned NOT NULL DEFAULT '5',
-  `comment` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  KEY `idx_course_rating` (`course_id`,`rating`),
-  CONSTRAINT `course_reviews_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `course_reviews_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
-
--- Dữ liệu bảng `course_reviews`
-INSERT INTO `course_reviews` (`id`, `course_id`, `user_id`, `rating`, `comment`, `created_at`) VALUES
-(1, 1, 2, 5, 'Khóa học cực kỳ chi tiết! Giảng viên dạy rất có tâm, giải thích mô hình MVC và bảo mật dễ hiểu.', '2026-11-21 11:45:35'),
-(2, 1, 2, 5, 'Nhờ khóa học mà mình đã tự xây dựng được đồ án website hoàn chỉnh nộp tốt nghiệp.', '2026-11-21 11:45:35'),
-(3, 2, 2, 5, 'Lộ trình Machine Learning rất logic, bài tập thực hành sát với yêu cầu tuyển dụng.', '2026-11-21 11:45:35'),
-(4, 3, 2, 5, 'Phần React Hooks và Context API giảng rất sâu sắc, giải quyết triệt để vấn đề re-render.', '2026-11-21 11:45:35'),
-(5, 4, 2, 5, 'Tuyệt vời! Khóa học hoàn toàn miễn phí nhưng chất lượng còn hơn cả nhiều khóa có phí.', '2026-11-21 11:45:35'),
-(6, 5, 2, 5, 'Hướng dẫn Docker và CI/CD thực chiến, triển khai mượt mà lên server.', '2026-11-21 11:45:35'),
-(7, 6, 2, 5, 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 11:47:06'),
-(8, 12, 2, 5, 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 11:47:30'),
-(9, 12, 2, 5, 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 11:47:35'),
-(10, 12, 2, 5, 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 11:48:19'),
-(11, 12, 2, 5, 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 11:53:59'),
-(12, 12, 2, 5, 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 11:54:34'),
-(13, 12, 2, 5, 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 11:54:48'),
-(14, 12, 2, 5, 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 12:06:40'),
-(15, 12, 2, 5, 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 12:14:27'),
-(16, 12, 2, 5, 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 13:10:30'),
-(17, 12, 2, 5, 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 13:36:15'),
-(18, 12, 2, 5, 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 13:36:38'),
-(19, 12, 2, 5, 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 13:42:34'),
-(20, 12, 2, 5, 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 14:07:17'),
-(21, 12, 2, 5, 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 14:08:37'),
-(22, 12, 2, 5, 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 14:09:50'),
-(23, 12, 2, 5, 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 14:09:56'),
-(24, 12, 2, 5, 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 14:15:27');
-
--- -------------------------------------------------------------
--- Bảng: `course_discussions`
--- -------------------------------------------------------------
-DROP TABLE IF EXISTS `course_discussions`;
-CREATE TABLE `course_discussions` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `lesson_id` int unsigned NOT NULL,
-  `user_id` int unsigned NOT NULL,
-  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `user_id` (`user_id`),
-  KEY `idx_lesson_discuss` (`lesson_id`),
-  CONSTRAINT `course_discussions_ibfk_1` FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `course_discussions_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+  KEY `idx_section_sort` (`course_id`,`sort_order`),
+  CONSTRAINT `sections_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `course_discussions`
-INSERT INTO `course_discussions` (`id`, `lesson_id`, `user_id`, `content`, `created_at`) VALUES
-(1, 1, 2, 'Chào thầy, em đã hoàn thành xong bài 1 và cấu hình môi trường thành công! Em sẵn sàng sang bài tiếp theo.', '2026-11-21 11:45:35'),
-(2, 1, 2, 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 11:47:06'),
-(3, 1, 2, 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 11:47:30'),
-(4, 1, 2, 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 11:47:35'),
-(5, 1, 2, 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 11:48:19'),
-(6, 1, 2, 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 11:53:59'),
-(7, 1, 2, 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 11:54:34'),
-(8, 1, 2, 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 11:54:48'),
-(9, 1, 2, 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 12:06:40'),
-(10, 1, 2, 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 12:14:27'),
-(11, 1, 2, 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 13:10:30'),
-(12, 1, 2, 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 13:36:15'),
-(13, 1, 2, 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 13:36:38'),
-(14, 1, 2, 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 13:42:34'),
-(15, 1, 2, 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 14:07:17'),
-(16, 1, 2, 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 14:08:37'),
-(17, 1, 2, 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 14:09:50'),
-(18, 1, 2, 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 14:09:56'),
-(19, 1, 2, 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 14:15:27');
+-- Dữ liệu bảng `sections`
+INSERT INTO `sections` (`id`, `course_id`, `title`, `sort_order`, `created_at`) VALUES
+('1', '1', 'Chương 1: Tổng quan và Thiết lập môi trường', '1', '2026-11-21 11:19:46'),
+('2', '1', 'Chương 2: Kiến trúc Nâng cao & Lập trình Hướng đối tượng', '2', '2026-11-21 11:33:11'),
+('3', '2', 'Chương 1: Python Căn Bản & Cấu Trúc Dữ Liệu', '1', '2026-11-21 11:33:12'),
+('4', '3', 'Chương 1: Kiến trúc React Core & Tư duy Component', '1', '2026-11-21 11:33:12'),
+('5', '4', 'Chương 1: Công cụ Figma & Nguyên lý Visual Design', '1', '2026-11-21 11:33:12'),
+('6', '5', 'Chương 1: Đóng gói Ứng dụng với Docker', '1', '2026-11-21 11:33:12'),
+('7', '6', 'Chương 1: SQL Truy Vấn & Tối Ưu Hóa Dữ Liệu', '1', '2026-11-21 11:33:12'),
+('8', '7', 'Chương 1: Nền tảng kiến thức & Thiết lập môi trường', '1', '2026-11-21 11:47:30'),
+('9', '7', 'Chương 2: Thực chiến chuyên sâu & Kiểm tra đánh giá', '2', '2026-11-21 11:47:30'),
+('10', '8', 'Chương 1: Nền tảng kiến thức & Thiết lập môi trường', '1', '2026-11-21 11:47:30'),
+('11', '8', 'Chương 2: Thực chiến chuyên sâu & Kiểm tra đánh giá', '2', '2026-11-21 11:47:30'),
+('12', '9', 'Chương 1: Nền tảng kiến thức & Thiết lập môi trường', '1', '2026-11-21 11:47:30'),
+('13', '9', 'Chương 2: Thực chiến chuyên sâu & Kiểm tra đánh giá', '2', '2026-11-21 11:47:30'),
+('14', '10', 'Chương 1: Nền tảng kiến thức & Thiết lập môi trường', '1', '2026-11-21 11:47:30'),
+('15', '10', 'Chương 2: Thực chiến chuyên sâu & Kiểm tra đánh giá', '2', '2026-11-21 11:47:30'),
+('16', '11', 'Chương 1: Nền tảng kiến thức & Thiết lập môi trường', '1', '2026-11-21 11:47:30'),
+('17', '11', 'Chương 2: Thực chiến chuyên sâu & Kiểm tra đánh giá', '2', '2026-11-21 11:47:30'),
+('18', '12', 'Chương 1: Nền tảng kiến thức & Thiết lập môi trường', '1', '2026-11-21 11:47:30'),
+('19', '12', 'Chương 2: Thực chiến chuyên sâu & Kiểm tra đánh giá', '2', '2026-11-21 11:47:30');
 
--- -------------------------------------------------------------
--- Bảng: `lesson_notes`
--- -------------------------------------------------------------
-DROP TABLE IF EXISTS `lesson_notes`;
-CREATE TABLE `lesson_notes` (
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `user_addresses`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `user_addresses`;
+CREATE TABLE `user_addresses` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `lesson_id` int unsigned NOT NULL,
   `user_id` int unsigned NOT NULL,
-  `timestamp_seconds` int unsigned NOT NULL DEFAULT '0',
-  `content` text COLLATE utf8mb4_unicode_ci NOT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `label` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `recipient` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `phone` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `address_line` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `ward` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `district` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `city` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `latitude` decimal(10,8) DEFAULT NULL,
+  `longitude` decimal(11,8) DEFAULT NULL,
+  `is_default` tinyint(1) NOT NULL DEFAULT '0',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
-  KEY `lesson_id` (`lesson_id`),
-  KEY `idx_user_lesson` (`user_id`,`lesson_id`),
-  CONSTRAINT `lesson_notes_ibfk_1` FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `lesson_notes_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  KEY `idx_user` (`user_id`),
+  CONSTRAINT `user_addresses_user_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `lesson_notes`
-INSERT INTO `lesson_notes` (`id`, `lesson_id`, `user_id`, `timestamp_seconds`, `content`, `created_at`, `updated_at`) VALUES
-(1, 1, 2, 45, 'Lưu ý về cấu trúc thư mục MVC và cách gọi Database connection.', '2026-11-21 11:52:22', '2026-11-21 11:52:22');
+-- ---------------------------------------------------------
+-- Cấu trúc bảng `users`
+-- ---------------------------------------------------------
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE `users` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(150) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `phone` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `avatar` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `password` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `role` enum('admin','customer','shipper','student','instructor') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'student',
+  `status` enum('active','inactive','banned') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'active',
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `failed_login_attempts` int unsigned NOT NULL DEFAULT '0',
+  `lockout_until` datetime DEFAULT NULL,
+  `loyalty_points` int unsigned NOT NULL DEFAULT '0',
+  `loyalty_tier` varchar(30) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Standard',
+  `two_factor_secret` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `two_factor_enabled` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `users_email_unique` (`email`)
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Dữ liệu bảng `users`
+INSERT INTO `users` (`id`, `name`, `email`, `phone`, `avatar`, `password`, `role`, `status`, `created_at`, `failed_login_attempts`, `lockout_until`, `loyalty_points`, `loyalty_tier`, `two_factor_secret`, `two_factor_enabled`) VALUES
+('1', 'Admin', 'admin@shop.test', '0901234567', NULL, '$2y$10$kdcd7bTl11qWkeuQlDjHd.wgsCUWuTjJnwtXad0WNKtB/9154yWwu', 'admin', 'active', '2026-06-16 01:46:26', '0', NULL, '0', 'Standard', NULL, '0'),
+('2', 'Nguyễn Văn A', 'khach@shop.test', '0912345678', NULL, '$2y$10$Qrp7GX7/3abDVbnAZdVLX.1edRvM80TkGu4fyTWJPaFa27LA2WbAC', 'customer', 'active', '2026-06-16 01:46:26', '0', NULL, '18134', 'Diamond', NULL, '0'),
+('4', 'huy', 'huy28072k5@gmail.com', '028282728', NULL, '$2y$10$TR6H/lL76w.sf6an91P4CONNyFezc3xRAf9dUyQqKPj5FEcw.BIGG', 'customer', 'active', '2026-06-21 08:42:25', '0', NULL, '166646', 'Diamond', NULL, '0'),
+('21', 'Nguyễn Văn Shipper', 'shipper@shop.test', '0987654321', NULL, '$2y$10$Ad7KPM/fgPDwS9pfcemkVO.Rj33Co7FWQUtjX3faWjor3mIavORK6', 'shipper', 'active', '2026-07-10 20:00:06', '0', NULL, '0', 'Standard', NULL, '0'),
+('22', 'Tài khoản Google', 'user.google@gmail.com', '', NULL, '$2y$10$yp30kH9E0kFiPmcL3z2/gu.QGbEMuIIdCjjrHo//Xi5MeMH7m/bna', 'customer', 'active', '2026-08-10 00:13:29', '0', NULL, '0', 'Standard', NULL, '0'),
+('23', 'Google User', 'fanhinbenho@gmail.com', '', NULL, '$2y$10$KiESqwlXqDz72OJL1xu0PO/QHfnbMMVP9ylvgkTcUT0wo0Uruq2m6', 'customer', 'active', '2026-08-12 13:19:52', '0', NULL, '0', 'Standard', NULL, '0'),
+('24', 'Google User', 'huy28072k5@gmail.comgmaigmai', '', NULL, '$2y$10$.xlA7djohqSRJxDSAxwaOe2bbiP9Jr2PyjCIrceWECc9KBd/agHxi', 'customer', 'active', '2026-08-12 14:35:25', '0', NULL, '0', 'Standard', NULL, '0'),
+('25', 'ThS. Nguyễn Văn A', 'giangvien@lms.local', '', NULL, '$2y$10$DJs1JtsYS7c8XSc.//lW7OIj/ppI5T8vxyBzpERwKo/MDFB.t4z.6', 'instructor', 'active', '2026-11-21 11:19:27', '0', NULL, '0', 'Standard', NULL, '0'),
+('26', 'TS. Trần Hoàng Minh', 'minh.tran@lms.local', '', NULL, '$2y$10$.algbcOerNda/HuOgNCyeOjEDlPqhF.g8FT7ryw3FsX3CUNTOzOTm', 'instructor', 'active', '2026-11-21 11:33:11', '0', NULL, '0', 'Standard', NULL, '0'),
+('27', 'Lê Thị Mai Hương', 'huong.le@lms.local', '', NULL, '$2y$10$.algbcOerNda/HuOgNCyeOjEDlPqhF.g8FT7ryw3FsX3CUNTOzOTm', 'instructor', 'active', '2026-11-21 11:33:11', '0', NULL, '0', 'Standard', NULL, '0'),
+('28', 'Hoàng Văn Đức', 'duc.hoang@lms.local', '', NULL, '$2y$10$.algbcOerNda/HuOgNCyeOjEDlPqhF.g8FT7ryw3FsX3CUNTOzOTm', 'instructor', 'active', '2026-11-21 11:33:11', '0', NULL, '0', 'Standard', NULL, '0'),
+('40', 'ThS. Đặng Tuấn Anh', 'tuananh.dang@lms.local', '0912345678', NULL, '$2y$10$5G870H/L0syCspwd8XNQvez5jXU1X7iuDHPS3BHGMPHV4G/iv.2/m', 'instructor', 'active', '2026-11-21 11:47:30', '0', NULL, '0', 'Standard', NULL, '0'),
+('41', 'KTS. Vũ Hải Nam', 'hainam.vu@lms.local', '0912345678', NULL, '$2y$10$5G870H/L0syCspwd8XNQvez5jXU1X7iuDHPS3BHGMPHV4G/iv.2/m', 'instructor', 'active', '2026-11-21 11:47:30', '0', NULL, '0', 'Standard', NULL, '0'),
+('42', 'Bùi Quỳnh Chi', 'quynhchi.bui@lms.local', '0912345678', NULL, '$2y$10$5G870H/L0syCspwd8XNQvez5jXU1X7iuDHPS3BHGMPHV4G/iv.2/m', 'instructor', 'active', '2026-11-21 11:47:30', '0', NULL, '0', 'Standard', NULL, '0'),
+('43', 'Nguyễn Đình Quân', 'quan.nguyen@gmail.com', '0988776655', NULL, '$2y$10$5G870H/L0syCspwd8XNQvez5jXU1X7iuDHPS3BHGMPHV4G/iv.2/m', 'student', 'active', '2026-11-21 11:47:30', '0', NULL, '0', 'Standard', NULL, '0'),
+('44', 'Phạm Thuỳ Linh', 'linh.pham@gmail.com', '0988776655', NULL, '$2y$10$5G870H/L0syCspwd8XNQvez5jXU1X7iuDHPS3BHGMPHV4G/iv.2/m', 'student', 'active', '2026-11-21 11:47:30', '0', NULL, '0', 'Standard', NULL, '0'),
+('45', 'Hoàng Minh Tuấn', 'tuan.hoang@gmail.com', '0988776655', NULL, '$2y$10$5G870H/L0syCspwd8XNQvez5jXU1X7iuDHPS3BHGMPHV4G/iv.2/m', 'student', 'active', '2026-11-21 11:47:30', '0', NULL, '0', 'Standard', NULL, '0'),
+('46', 'Đỗ Phương Anh', 'anh.do@gmail.com', '0988776655', NULL, '$2y$10$5G870H/L0syCspwd8XNQvez5jXU1X7iuDHPS3BHGMPHV4G/iv.2/m', 'student', 'active', '2026-11-21 11:47:30', '0', NULL, '0', 'Standard', NULL, '0'),
+('47', 'Trịnh Quốc Bảo', 'bao.trinh@gmail.com', '0988776655', NULL, '$2y$10$5G870H/L0syCspwd8XNQvez5jXU1X7iuDHPS3BHGMPHV4G/iv.2/m', 'student', 'active', '2026-11-21 11:47:30', '0', NULL, '0', 'Standard', NULL, '0'),
+('48', 'Ngô Thị Cẩm Tú', 'tu.ngo@gmail.com', '0988776655', NULL, '$2y$10$5G870H/L0syCspwd8XNQvez5jXU1X7iuDHPS3BHGMPHV4G/iv.2/m', 'student', 'active', '2026-11-21 11:47:30', '0', NULL, '0', 'Standard', NULL, '0');
 
 SET FOREIGN_KEY_CHECKS = 1;

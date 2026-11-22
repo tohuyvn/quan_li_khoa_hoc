@@ -207,21 +207,23 @@ body {
   background-color: transparent !important;
   color: inherit !important;
   border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+  box-shadow: none !important;
 }
 
 .table thead th,
 .table thead.table-light th,
 .table-light {
-  --bs-table-bg: rgba(15, 17, 24, 0.75) !important;
+  --bs-table-bg: rgba(15, 17, 24, 0.85) !important;
   --bs-table-color: var(--refract-accent-orange) !important;
-  background: rgba(15, 17, 24, 0.75) !important;
-  background-color: rgba(15, 17, 24, 0.75) !important;
+  background: rgba(15, 17, 24, 0.85) !important;
+  background-color: rgba(15, 17, 24, 0.85) !important;
   border-bottom: 2px solid rgba(255, 255, 255, 0.15) !important;
   color: var(--refract-accent-orange) !important;
   font-weight: 600 !important;
   text-transform: uppercase !important;
   font-size: 0.78rem !important;
   letter-spacing: 0.04em !important;
+  box-shadow: none !important;
 }
 
 .table tbody tr {
@@ -230,11 +232,18 @@ body {
   transition: all 0.2s ease !important;
 }
 
+.table tbody tr td {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
 .table tbody tr:hover,
+.table tbody tr:hover td,
 .table-hover > tbody > tr:hover > * {
   --bs-table-accent-bg: rgba(255, 255, 255, 0.08) !important;
   background-color: rgba(255, 255, 255, 0.08) !important;
   color: #ffffff !important;
+  box-shadow: none !important;
 }
 
 /* Badges styling on Glass Background */
