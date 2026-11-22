@@ -336,19 +336,10 @@ function vnpayBankName(string $code): string
 
 function enrichProductsForDisplay(array $products, array $categoryMap): array
 {
-    $reviewModel = new \App\Models\Review();
-    $ratingsMap = $reviewModel->getAllAverageRatings();
-
     foreach ($products as &$product) {
         $product['category_name'] = $categoryMap[$product['category_id']] ?? ($product['category_name'] ?? 'Khác');
-        $pId = $product['id'];
-        if (isset($ratingsMap[$pId])) {
-            $product['rating_avg'] = $ratingsMap[$pId]['average'];
-            $product['rating_count'] = $ratingsMap[$pId]['count'];
-        } else {
-            $product['rating_avg'] = 5.0;
-            $product['rating_count'] = 0;
-        }
+        $product['rating_avg'] = $product['rating_avg'] ?? 5.0;
+        $product['rating_count'] = $product['rating_count'] ?? 0;
     }
     unset($product);
 

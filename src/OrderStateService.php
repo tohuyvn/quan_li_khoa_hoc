@@ -174,24 +174,7 @@ class OrderStateService
         }
 
         if ($newStatus === 'completed') {
-            try {
-                // Legacy physical shop handler removed
-
-                // Decrement store stock
-                if (!empty($order['store_id'])) {
-                    $stock = new \App\Models\StoreStock();
-                    foreach ($items as $item) {
-                        $stock->decrement(
-                            (int) $order['store_id'],
-                            (int) $item['product_id'],
-                            (int) ($item['quantity'] ?? 1),
-                            (int) ($item['variant_id'] ?? 0)
-                        );
-                    }
-                }
-            } catch (\Throwable $e) {
-                return ['ok' => false, 'error' => 'Không thể kích hoạt bảo hành: ' . $e->getMessage()];
-            }
+            // Course order completed
         }
 
         self::logStatus($orderId, $current, $newStatus, $actorType, $actorId, $note);
@@ -267,14 +250,8 @@ class OrderStateService
         }
 
         $code = $order['order_code'] ?? ('#' . $orderId);
-                // Legacy physical shop handler removed
-            $userId,
-            $amount,
-            'order_cancel',
-            $orderId,
-            'Hoàn tiền khi hủy đơn ' . $code,
-            true
-        );
+        // Legacy physical shop refund handler removed
+        return;
 
         // Đóng yêu cầu hoàn tiền đang chờ (đã cộng ví ở trên)
         $db->prepare(

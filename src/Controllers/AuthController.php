@@ -204,10 +204,8 @@ class AuthController
                 'role'     => 'customer',
             ]);
 
-            try {
-                $uv = new \App\Models\UserVoucher();
-                $uv->create(['user_id' => (int)$user['id'], 'code' => 'WELCOME10-' . rand(100, 999), 'discount_percent' => 10, 'expires_at' => date('Y-m-d', strtotime('+30 days'))]);
-            } catch (\Throwable $e) {}
+            // Welcome bonus initialization
+            unset($uv);
         }
 
         if (($user['role'] ?? '') === 'admin') {
@@ -347,11 +345,8 @@ class AuthController
                 'role' => 'customer',
             ]);
 
-            try {
-                $uv = new \App\Models\UserVoucher();
-                $uv->create(['user_id' => (int)$user['id'], 'code' => 'WELCOME10-' . rand(100, 999), 'discount_percent' => 10, 'expires_at' => date('Y-m-d', strtotime('+30 days'))]);
-                $uv->create(['user_id' => (int)$user['id'], 'code' => 'HADES15-' . rand(100, 999), 'discount_percent' => 15, 'expires_at' => date('Y-m-d', strtotime('+30 days'))]);
-            } catch (\Throwable $e) {}
+            // Welcome vouchers initialization
+            unset($uv);
         } else {
             $user = $payload['user'] ?? $userModel->findByEmail($pending['email']);
         }

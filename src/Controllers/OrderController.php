@@ -3,7 +3,6 @@
 namespace App\Controllers;
 
 use App\Models\Order;
-use App\Models\Store;
 
 class OrderController
 {
@@ -95,16 +94,13 @@ class OrderController
         }
 
         $items = $orderModel->itemsWithProduct($id);
-        $refundRequests = (new \App\Models\RefundRequest())->forOrder($id);
+        $refundRequests = [];
 
         $db = \App\DB::connection();
         $stmtLogs = $db->prepare('SELECT * FROM order_status_logs WHERE order_id = ? ORDER BY created_at ASC');
         $stmtLogs->execute([$id]);
         $statusLogs = $stmtLogs->fetchAll();
         $store = null;
-        if (!empty($order['store_id'])) {
-            $store = (new Store())->find((int) $order['store_id']);
-        }
 
         $deviceUnits = [];
         $warrantiesByImei = [];

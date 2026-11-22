@@ -166,8 +166,8 @@ class OrderController
         view('admin.orders.show', [
             'order' => $order,
             'items' => $this->orders->itemsWithProduct($id),
-            'refundRequests' => (new \App\Models\RefundRequest())->forOrder($id),
-            'stores' => (new \App\Models\Store())->all(),
+            'refundRequests' => [],
+            'stores' => [],
             'deviceUnits' => $this->unitsForOrder($id),
         ]);
     }
@@ -177,13 +177,7 @@ class OrderController
         if (!isAdmin()) {
             redirect('/admin/login');
         }
-        $storeId = (int) ($_POST['store_id'] ?? 0);
-        if ($storeId <= 0 || !(new \App\Models\Store())->find($storeId)) {
-            flash('error', 'Cửa hàng không hợp lệ.');
-            redirect('/admin/orders/' . $id);
-        }
-        $this->orders->update($id, ['store_id' => $storeId]);
-        flash('success', 'Đã chuyển kho xử lý đơn.');
+        flash('error', 'Hệ thống quản lý khóa học không sử dụng chi nhánh cửa hàng.');
         redirect('/admin/orders/' . $id);
     }
 
