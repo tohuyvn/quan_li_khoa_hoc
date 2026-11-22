@@ -1,7 +1,10 @@
 -- ========================================================
 -- Hades Academy LMS - Clean Complete Database Export
--- Generated: 2026-11-22 12:37:03
+-- Generated: 2026-11-22 15:46:57
 -- ========================================================
+
+CREATE DATABASE IF NOT EXISTS `shop_hades` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `shop_hades`;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
