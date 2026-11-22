@@ -76,11 +76,13 @@ DB_PASSWORD=
 ```
 
 ### Bước 3: Khởi tạo Cơ sở Dữ liệu
-Import schema hoàn chỉnh của hệ thống LMS:
+Import database hoàn chỉnh của hệ thống LMS (đã kèm dữ liệu mẫu khóa học, bài học, tài khoản test và bài kiểm tra):
 ```bash
-mysql -u root -p shop_hades < ../lms_complete_backup.sql
+mysql -u root -p shop_hades < data/full_lms_phpmyadmin.sql
 ```
-*(Hoặc import file `lms_complete_backup.sql` trực tiếp từ giao diện phpMyAdmin).*
+> [!TIP]
+> **Dành cho phpMyAdmin**: Bạn chỉ cần mở phpMyAdmin, chọn database `shop_hades` (hoặc tạo mới), chuyển sang tab **Import** (hoặc **SQL**) và import trực tiếp file duy nhất:
+> **`data/full_lms_phpmyadmin.sql`** (chứa đầy đủ toàn bộ bảng & dữ liệu mẫu).
 
 ---
 
