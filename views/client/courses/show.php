@@ -11,34 +11,34 @@
     <div class="row g-4">
         <!-- Main Content (Left) -->
         <div class="col-lg-8">
-            <h1 class="h2 fw-bold text-dark mb-3"><?= e($course['title']) ?></h1>
-            <p class="lead text-muted mb-4"><?= e($course['summary']) ?></p>
+            <h1 class="h2 fw-bold text-white mb-3"><?= e($course['title']) ?></h1>
+            <p class="lead text-white-50 mb-4"><?= e($course['summary']) ?></p>
 
-            <div class="d-flex align-items-center flex-wrap gap-3 mb-4 p-3 bg-light rounded-4">
+            <div class="d-flex align-items-center flex-wrap gap-3 mb-4 p-3 rounded-4 bg-dark bg-opacity-50 border border-white border-opacity-10 backdrop-blur">
                 <div class="d-flex align-items-center gap-2">
                     <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
                         <i class="bi bi-person-fill"></i>
                     </div>
                     <div>
-                        <div class="small text-muted">Giảng viên</div>
-                        <div class="fw-semibold text-dark"><?= e($course['instructor_name'] ?? 'Chuyên gia') ?></div>
+                        <div class="small text-white-50">Giảng viên</div>
+                        <div class="fw-semibold text-white"><?= e($course['instructor_name'] ?? 'Chuyên gia') ?></div>
                     </div>
                 </div>
                 <div class="vr d-none d-sm-block"></div>
                 <div>
-                    <div class="small text-muted">Danh mục</div>
-                    <div class="fw-semibold text-dark"><?= e($course['category_name'] ?? 'Lập trình') ?></div>
+                    <div class="small text-white-50">Danh mục</div>
+                    <div class="fw-semibold text-white"><?= e($course['category_name'] ?? 'Lập trình') ?></div>
                 </div>
                 <div class="vr d-none d-sm-block"></div>
                 <div>
-                    <div class="small text-muted">Trình độ</div>
+                    <div class="small text-white-50">Trình độ</div>
                     <span class="badge bg-primary-subtle text-primary text-uppercase px-2 py-1">
                         <?= e($course['level']) ?>
                     </span>
                 </div>
                 <div class="vr d-none d-sm-block"></div>
                 <div>
-                    <div class="small text-muted">Đánh giá</div>
+                    <div class="small text-white-50">Đánh giá</div>
                     <div class="fw-semibold text-warning">
                         <i class="bi bi-star-fill"></i> <?= (float)($ratingStats['avg_rating'] ?? 5.0) ?> / 5.0
                         <span class="text-muted small fw-normal">(<?= (int)($ratingStats['total_reviews'] ?? 0) ?> nhận xét)</span>
@@ -59,7 +59,7 @@
                 }
             ?>
             <?php if ($previewLesson): ?>
-                <div class="card border-0 shadow-sm rounded-4 overflow-hidden mb-4">
+                <div class="refract-card p-0 overflow-hidden mb-4">
                     <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-2 px-3">
                         <span class="small"><i class="bi bi-play-circle-fill text-danger me-1"></i> Video học thử: <strong><?= e($previewLesson['title']) ?></strong></span>
                         <span class="badge bg-success">Học thử miễn phí</span>
@@ -71,18 +71,18 @@
             <?php endif; ?>
 
             <!-- Description -->
-            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
-                <h4 class="fw-bold mb-3"><i class="bi bi-info-circle text-primary me-2"></i>Giới thiệu khóa học</h4>
-                <div class="course-description text-secondary">
+            <div class="refract-card p-4 mb-4">
+                <h4 class="fw-bold mb-3 text-white"><i class="bi bi-info-circle text-info me-2"></i>Giới thiệu khóa học</h4>
+                <div class="course-description text-white-50">
                     <?= $course['description'] ?: '<p>Khóa học cung cấp đầy đủ kiến thức lý thuyết lẫn bài tập thực hành sát với dự án thực tế.</p>' ?>
                 </div>
             </div>
 
             <!-- Curriculum Syllabus -->
-            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+            <div class="refract-card p-4 mb-4">
                 <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
                     <div>
-                        <h4 class="fw-bold mb-1"><i class="bi bi-collection-play text-primary me-2"></i>Nội dung khóa học</h4>
+                        <h4 class="fw-bold mb-1 text-white"><i class="bi bi-collection-play text-warning me-2"></i>Nội dung khóa học</h4>
                         <span class="text-muted small">
                             <?= count($curriculum) ?> chương • <?= (int)$course['total_lessons'] ?> bài học • <?= (int)$course['total_duration_minutes'] ?> phút bài giảng
                         </span>
@@ -101,11 +101,11 @@
 
                 <!-- Account Watch Progress Overview Card -->
                 <?php if ($currentUser): ?>
-                    <div class="bg-light p-3 rounded-4 mb-4 border">
+                    <div class="p-3 rounded-4 mb-4 bg-dark bg-opacity-60 border border-white border-opacity-10">
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2">
                             <div class="d-flex align-items-center gap-2">
-                                <span class="fw-bold text-dark"><i class="bi bi-stopwatch-fill text-primary"></i> Tiến độ theo dõi video của bạn:</span>
-                                <span class="badge bg-white text-secondary border rounded-pill px-2 py-1 small">
+                                <span class="fw-bold text-white"><i class="bi bi-stopwatch-fill text-warning"></i> Tiến độ theo dõi video của bạn:</span>
+                                <span class="badge bg-white bg-opacity-10 text-white-50 border border-white border-opacity-10 rounded-pill px-2.5 py-1 small">
                                     <?= (int)($watchStats['completed_lessons'] ?? 0) ?>/<?= (int)($watchStats['total_lessons'] ?? 0) ?> bài đã hoàn thành
                                 </span>
                             </div>
@@ -113,7 +113,7 @@
                                 Đã xem: <span id="courseWatchedTimeText"><?= e($watchStats['formatted_watched'] ?? '00:00') ?></span> / <?= e($watchStats['formatted_total'] ?? '00:00') ?> (<span id="courseWatchPercentText"><?= (int)($watchStats['watch_percent'] ?? 0) ?>%</span>)
                             </div>
                         </div>
-                        <div class="progress" style="height: 8px; border-radius: 6px; background-color: #dee2e6;">
+                        <div class="progress" style="height: 8px; border-radius: 6px; background-color: rgba(255,255,255,0.1);">
                             <div id="courseOverviewProgressBar" class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: <?= (int)($watchStats['watch_percent'] ?? 0) ?>%;"></div>
                         </div>
                     </div>
@@ -131,17 +131,17 @@
 
                 <div class="accordion" id="curriculumAccordion">
                     <?php foreach ($curriculum as $idx => $section): ?>
-                        <div class="accordion-item border rounded-3 mb-2 overflow-hidden shadow-none">
+                        <div class="accordion-item rounded-3 mb-2 overflow-hidden border border-white border-opacity-10 bg-dark bg-opacity-40 shadow-none">
                             <h2 class="accordion-header">
-                                <button class="accordion-button <?= $idx > 0 ? 'collapsed' : '' ?> bg-light fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#sec-<?= $section['id'] ?>">
+                                <button class="accordion-button <?= $idx > 0 ? 'collapsed' : '' ?> bg-dark bg-opacity-75 text-white fw-semibold border-0" type="button" data-bs-toggle="collapse" data-bs-target="#sec-<?= $section['id'] ?>">
                                     <div class="d-flex justify-content-between align-items-center w-100 pe-3 flex-wrap gap-2">
                                         <span><?= e($section['title']) ?></span>
                                         <div class="d-flex align-items-center gap-2">
-                                            <span class="badge bg-secondary-subtle text-secondary small fw-normal">
+                                            <span class="badge bg-white bg-opacity-10 text-white-50 small fw-normal">
                                                 <?= count($section['lessons']) ?> bài
                                             </span>
                                             <?php if (!empty($section['total_duration_seconds'])): ?>
-                                                <span class="badge bg-light text-muted border small fw-normal">
+                                                <span class="badge bg-white bg-opacity-10 text-white-50 border border-white border-opacity-10 small fw-normal">
                                                     <i class="bi bi-clock me-1"></i><?= $fmtTime($section['total_duration_seconds']) ?>
                                                 </span>
                                             <?php endif; ?>
@@ -159,7 +159,7 @@
                                                 $isComp = !empty($lesson['is_completed']);
                                                 $pct = ($dur > 0) ? min(100, (int) round(($wat / $dur) * 100)) : ($isComp ? 100 : 0);
                                             ?>
-                                            <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 lesson-row"
+                                            <li class="list-group-item d-flex justify-content-between align-items-center px-4 py-3 lesson-row bg-transparent border-white border-opacity-10"
                                                 data-lesson-id="<?= (int)$lesson['id'] ?>"
                                                 data-duration="<?= $dur ?>"
                                                 data-watch="<?= $wat ?>"
@@ -180,9 +180,9 @@
                                                         <?php endif; ?>
                                                     </div>
                                                     <div class="flex-grow-1">
-                                                        <div class="fw-medium text-dark mb-1">
+                                                        <div class="fw-medium text-white mb-1">
                                                             <?php if ($isEnrolled): ?>
-                                                                <a href="/learn/<?= $course['id'] ?>/lesson/<?= $lesson['id'] ?>" class="text-dark text-decoration-none hover-primary">
+                                                                <a href="/learn/<?= $course['id'] ?>/lesson/<?= $lesson['id'] ?>" class="text-white text-decoration-none hover-primary">
                                                                     <?= e($lesson['title']) ?>
                                                                 </a>
                                                             <?php else: ?>
@@ -196,14 +196,14 @@
                                                                 <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0 lesson-watch-badge" style="font-size: 0.75rem;">
                                                                     <i class="bi bi-check-circle-fill me-1"></i> Đã hoàn thành (<?= $fmtTime($dur ?: $wat) ?>)
                                                                 </span>
-                                                                <div class="progress" style="height: 5px; width: 130px; background-color: #e9ecef; border-radius: 4px;">
+                                                                <div class="progress" style="height: 5px; width: 130px; background-color: rgba(255,255,255,0.08); border-radius: 4px;">
                                                                     <div class="progress-bar bg-success lesson-progress-bar" role="progressbar" style="width: 100%;"></div>
                                                                 </div>
                                                             <?php elseif ($wat > 0): ?>
                                                                 <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-0 lesson-watch-badge" style="font-size: 0.75rem;">
                                                                     <i class="bi bi-play-circle-fill me-1"></i> Đã xem: <strong><?= $fmtTime($wat) ?></strong> / <?= $fmtTime($dur) ?> (<?= $pct ?>%)
                                                                 </span>
-                                                                <div class="progress" style="height: 5px; width: 130px; background-color: #e9ecef; border-radius: 4px;">
+                                                                <div class="progress" style="height: 5px; width: 130px; background-color: rgba(255,255,255,0.08); border-radius: 4px;">
                                                                     <div class="progress-bar bg-primary lesson-progress-bar" role="progressbar" style="width: <?= $pct ?>%;"></div>
                                                                 </div>
                                                             <?php else: ?>
@@ -211,8 +211,8 @@
                                                                     <span class="small text-muted"><i class="bi bi-clock me-1"></i> <?= $fmtTime($dur) ?></span>
                                                                 <?php endif; ?>
                                                                 <?php if ($currentUser): ?>
-                                                                    <span class="badge bg-light text-secondary border rounded-pill px-2 py-0 lesson-watch-badge" style="font-size: 0.75rem;">Chưa xem</span>
-                                                                    <div class="progress" style="height: 5px; width: 130px; background-color: #e9ecef; border-radius: 4px;">
+                                                                    <span class="badge bg-white bg-opacity-10 text-white-50 border border-white border-opacity-10 rounded-pill px-2 py-0 lesson-watch-badge" style="font-size: 0.75rem;">Chưa xem</span>
+                                                                    <div class="progress" style="height: 5px; width: 130px; background-color: rgba(255,255,255,0.08); border-radius: 4px;">
                                                                         <div class="progress-bar bg-secondary lesson-progress-bar" role="progressbar" style="width: 0%;"></div>
                                                                     </div>
                                                                 <?php endif; ?>
@@ -240,7 +240,7 @@
                                                             <i class="bi bi-box-arrow-in-right"></i> Vào học
                                                         </a>
                                                     <?php else: ?>
-                                                        <span class="badge bg-light text-muted border rounded-pill px-2 py-1">
+                                                        <span class="badge bg-white bg-opacity-10 text-white-50 border border-white border-opacity-10 rounded-pill px-2 py-1">
                                                             <i class="bi bi-lock-fill"></i> Khóa
                                                         </span>
                                                     <?php endif; ?>
@@ -256,14 +256,14 @@
             </div>
 
             <!-- Instructor Profile -->
-            <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
-                <h4 class="fw-bold mb-3"><i class="bi bi-person-badge text-primary me-2"></i>Thông tin Giảng viên</h4>
+            <div class="refract-card p-4 mb-4">
+                <h4 class="fw-bold mb-3 text-white"><i class="bi bi-person-badge text-info me-2"></i>Thông tin Giảng viên</h4>
                 <div class="d-flex gap-3 align-items-start">
                     <div class="bg-primary-subtle text-primary rounded-4 d-flex align-items-center justify-content-center p-3" style="width: 70px; height: 70px;">
                         <i class="bi bi-person-fill display-6"></i>
                     </div>
                     <div>
-                        <h5 class="fw-bold mb-1"><?= e($course['instructor_name']) ?></h5>
+                        <h5 class="fw-bold mb-1 text-white"><?= e($course['instructor_name']) ?></h5>
                         <p class="text-primary small mb-2"><?= e($course['instructor_headline'] ?? 'Giảng viên chuyên môn') ?></p>
                         <p class="text-muted small mb-0"><?= e($course['instructor_bio'] ?? 'Nhiều năm kinh nghiệm giảng dạy và phát triển các hệ thống thực tế.') ?></p>
                     </div>
@@ -271,9 +271,9 @@
             </div>
 
             <!-- Student Reviews Section -->
-            <div id="reviewsSection" class="card border-0 shadow-sm rounded-4 p-4">
+            <div id="reviewsSection" class="refract-card p-4">
                 <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-                    <h4 class="fw-bold mb-0"><i class="bi bi-chat-heart text-danger me-2"></i>Đánh giá từ Học viên</h4>
+                    <h4 class="fw-bold mb-0 text-white"><i class="bi bi-chat-heart text-danger me-2"></i>Đánh giá từ Học viên</h4>
                     <div class="text-warning fw-bold fs-5">
                         <i class="bi bi-star-fill"></i> <?= (float)($ratingStats['avg_rating'] ?? 5.0) ?> / 5.0
                         <span class="text-muted small fw-normal">(<?= (int)($ratingStats['total_reviews'] ?? 0) ?> đánh giá)</span>
@@ -282,8 +282,8 @@
 
                 <!-- Review Form if Enrolled -->
                 <?php if ($isEnrolled): ?>
-                    <div class="p-3 bg-light rounded-4 mb-4">
-                        <h6 class="fw-bold mb-2">Để lại cảm nhận của bạn về khóa học:</h6>
+                    <div class="p-3 rounded-4 mb-4 bg-dark bg-opacity-50 border border-white border-opacity-10">
+                        <h6 class="fw-bold mb-2 text-white">Để lại cảm nhận của bạn về khóa học:</h6>
                         <form method="post" action="/courses/<?= $course['id'] ?>/review">
                             <?= csrf_field() ?>
                             <div class="mb-2 d-flex align-items-center gap-2">
@@ -318,7 +318,7 @@
                                         <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 0.8rem;">
                                             <?= mb_substr($rev['user_name'], 0, 1) ?>
                                         </div>
-                                        <span class="fw-semibold text-dark"><?= e($rev['user_name']) ?></span>
+                                        <span class="fw-semibold text-white"><?= e($rev['user_name']) ?></span>
                                     </div>
                                     <div class="text-warning small">
                                         <?php for ($i = 1; $i <= 5; $i++): ?>
@@ -326,7 +326,7 @@
                                         <?php endfor; ?>
                                     </div>
                                 </div>
-                                <p class="text-secondary small mb-1 ms-4 ps-2"><?= nl2br(e($rev['comment'])) ?></p>
+                                <p class="text-white-50 small mb-1 ms-4 ps-2"><?= nl2br(e($rev['comment'])) ?></p>
                                 <div class="text-muted ms-4 ps-2" style="font-size: 0.75rem;"><?= date('d/m/Y', strtotime($rev['created_at'])) ?></div>
                             </div>
                         <?php endforeach; ?>
@@ -337,7 +337,7 @@
 
         <!-- Sticky Sidebar Card (Right) -->
         <div class="col-lg-4">
-            <div class="card border-0 shadow-sm rounded-4 overflow-hidden sticky-top" style="top: 24px;">
+            <div class="refract-card p-0 overflow-hidden sticky-top" style="top: 24px;">
                 <img src="<?= e($course['thumbnail'] ?: '/image/banner1.png') ?>" class="card-img-top object-fit-cover" style="height: 220px;" alt="<?= e($course['title']) ?>">
                 <div class="card-body p-4">
                     <?php
@@ -367,8 +367,8 @@
                         <?php endif; ?>
                     </div>
 
-                    <h6 class="fw-bold mb-3">Khóa học này bao gồm:</h6>
-                    <ul class="list-unstyled text-secondary small d-flex flex-column gap-2 mb-0">
+                    <h6 class="fw-bold mb-3 text-white">Khóa học này bao gồm:</h6>
+                    <ul class="list-unstyled text-white-50 small d-flex flex-column gap-2 mb-0">
                         <li><i class="bi bi-clock-history text-primary me-2"></i> <?= (int)$course['total_duration_minutes'] ?> phút video bài giảng</li>
                         <li><i class="bi bi-journal-text text-primary me-2"></i> <?= (int)$course['total_lessons'] ?> bài học giáo trình chuẩn</li>
                         <li><i class="bi bi-download text-primary me-2"></i> Tải tài liệu và mã nguồn đính kèm</li>
@@ -521,7 +521,7 @@ const LmsWatchCache = {
                     <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2 py-0 lesson-watch-badge" style="font-size: 0.75rem;">
                         <i class="bi bi-check-circle-fill me-1"></i> Đã hoàn thành (${this.formatTime(duration || seconds)})
                     </span>
-                    <div class="progress" style="height: 5px; width: 130px; background-color: #e9ecef; border-radius: 4px;">
+                    <div class="progress" style="height: 5px; width: 130px; background-color: rgba(255,255,255,0.08); border-radius: 4px;">
                         <div class="progress-bar bg-success lesson-progress-bar" role="progressbar" style="width: 100%;"></div>
                     </div>`;
                 if (icon) icon.className = 'bi bi-check-circle-fill text-success fs-5 lesson-status-icon';
@@ -530,7 +530,7 @@ const LmsWatchCache = {
                     <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-2 py-0 lesson-watch-badge" style="font-size: 0.75rem;">
                         <i class="bi bi-play-circle-fill me-1"></i> Đã xem: <strong>${this.formatTime(seconds)}</strong> / ${this.formatTime(duration)} (${pct}%)
                     </span>
-                    <div class="progress" style="height: 5px; width: 130px; background-color: #e9ecef; border-radius: 4px;">
+                    <div class="progress" style="height: 5px; width: 130px; background-color: rgba(255,255,255,0.08); border-radius: 4px;">
                         <div class="progress-bar bg-primary lesson-progress-bar" role="progressbar" style="width: ${pct}%;"></div>
                     </div>`;
                 if (icon) icon.className = 'bi bi-play-circle-fill text-primary fs-5 lesson-status-icon';
