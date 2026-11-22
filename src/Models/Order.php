@@ -402,11 +402,8 @@ class Order
     public function itemsWithProduct(int $orderId): array
     {
         $stmt = $this->db->prepare(
-            'SELECT oi.*, p.image AS product_image, p.stock AS product_stock, c.name AS category_name,
-                    co.thumbnail AS course_thumbnail, co.title AS course_title
+            'SELECT oi.*, co.thumbnail AS product_image, co.thumbnail AS course_thumbnail, co.title AS course_title
              FROM order_items oi
-             LEFT JOIN products p ON p.id = oi.product_id
-             LEFT JOIN categories c ON c.id = p.category_id
              LEFT JOIN courses co ON co.id = oi.course_id
              WHERE oi.order_id = ?
              ORDER BY oi.id ASC'
@@ -420,9 +417,9 @@ class Order
             $row['course_id'] = isset($row['course_id']) ? (int) $row['course_id'] : null;
             $row['quantity'] = (int) $row['quantity'];
             $row['price'] = (int) $row['price'];
-            $row['product_stock'] = isset($row['product_stock']) ? (int) $row['product_stock'] : null;
-            $row['image'] = $row['product_image'] ?? $row['course_thumbnail'] ?? null;
-            $row['name'] = $row['product_name'] ?? $row['course_title'] ?? ($row['name'] ?? 'Khóa học');
+            $row['product_stock'] = null;
+            $row['image'] = $row['course_thumbnail'] ?? $row['product_image'] ?? null;
+            $row['name'] = $row['course_title'] ?? $row['product_name'] ?? ($row['name'] ?? 'Khóa học');
 
             return $row;
         }, $stmt->fetchAll());
@@ -445,9 +442,9 @@ class Order
 
         $placeholders = implode(',', array_fill(0, count($ids), '?'));
         $stmt = $this->db->prepare("
-            SELECT oi.order_id, oi.product_name, oi.quantity, p.image AS product_image
+            SELECT oi.order_id, oi.product_name, oi.quantity, co.thumbnail AS product_image
             FROM order_items oi
-            LEFT JOIN products p ON p.id = oi.product_id
+            LEFT JOIN courses co ON co.id = oi.course_id
             WHERE oi.order_id IN ({$placeholders})
             ORDER BY oi.id ASC
         ");

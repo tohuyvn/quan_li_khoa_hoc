@@ -63,6 +63,16 @@ class ProfileController
         $stmtCerts->execute([$currentUser['id']]);
         $certsCount = (int) $stmtCerts->fetchColumn();
 
+        $stmtCertList = $db->prepare('
+            SELECT c.*, cr.title AS course_title, cr.slug, cr.thumbnail 
+            FROM certificates c
+            JOIN courses cr ON cr.id = c.course_id
+            WHERE c.user_id = ? AND c.status = "valid"
+            ORDER BY c.issued_at DESC
+        ');
+        $stmtCertList->execute([$currentUser['id']]);
+        $certificates = $stmtCertList->fetchAll();
+
         $stmtQuizAttempts = $db->prepare('SELECT COUNT(*) FROM quiz_attempts WHERE user_id = ?');
         $stmtQuizAttempts->execute([$currentUser['id']]);
         $quizAttemptsCount = (int) $stmtQuizAttempts->fetchColumn();
@@ -79,6 +89,7 @@ class ProfileController
             'totalSpent' => $totalSpent,
             'enrolledCount' => $enrolledCount,
             'certsCount' => $certsCount,
+            'certificates' => $certificates,
             'quizAttemptsCount' => $quizAttemptsCount,
             'recentOrders' => $recentOrders,
         ]);

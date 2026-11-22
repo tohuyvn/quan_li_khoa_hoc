@@ -111,6 +111,13 @@ $initial = mb_strtoupper(mb_substr($user['name'] ?? 'H', 0, 1, 'UTF-8'), 'UTF-8'
                         <i class="bi bi-person-gear"></i>
                         <span>Thông tin cá nhân</span>
                     </button>
+                    <button class="sidebar-nav-item border-0 text-start w-100 bg-transparent" id="tab-certs-btn" data-bs-toggle="pill" data-bs-target="#tab-certs" type="button" role="tab">
+                        <i class="bi bi-award-fill text-warning"></i>
+                        <span>Chứng chỉ của tôi</span>
+                        <?php if (!empty($certsCount)): ?>
+                            <span class="badge bg-warning text-dark rounded-pill ms-auto small"><?= $certsCount ?></span>
+                        <?php endif; ?>
+                    </button>
                     <button class="sidebar-nav-item border-0 text-start w-100 bg-transparent" id="tab-password-btn" data-bs-toggle="pill" data-bs-target="#tab-password" type="button" role="tab">
                         <i class="bi bi-shield-lock"></i>
                         <span>Đổi mật khẩu</span>
@@ -206,6 +213,63 @@ $initial = mb_strtoupper(mb_substr($user['name'] ?? 'H', 0, 1, 'UTF-8'), 'UTF-8'
                     </div>
                 </div>
 
+                <!-- TAB: Chứng chỉ của tôi -->
+                <div class="tab-pane fade" id="tab-certs" role="tabpanel">
+                    <div class="refract-card p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-white border-opacity-10 flex-wrap gap-2">
+                            <div>
+                                <h5 class="fw-bold mb-1 text-white">Chứng Chỉ Khóa Học Của Tôi</h5>
+                                <p class="text-muted small mb-0">Danh sách các văn bằng & chứng chỉ số bạn đã hoàn thành và đạt tiêu chuẩn tốt nghiệp</p>
+                            </div>
+                            <a href="/verify-certificate" class="btn btn-outline-info btn-sm rounded-pill px-3">
+                                <i class="bi bi-patch-check me-1"></i> Tra cứu QR chứng chỉ
+                            </a>
+                        </div>
+
+                        <?php if (empty($certificates)): ?>
+                            <div class="text-center py-5">
+                                <i class="bi bi-award text-muted mb-3" style="font-size: 56px;"></i>
+                                <h6 class="text-white fw-bold">Chưa có chứng chỉ nào</h6>
+                                <p class="text-muted small mb-4">Hãy hoàn thành 100% bài học và vượt qua bài kiểm tra cuối khóa để nhận chứng chỉ chính thức.</p>
+                                <a href="/my-courses" class="btn-refract-action d-inline-flex align-items-center gap-2">
+                                    <i class="bi bi-play-circle-fill"></i> Tiếp tục học ngay
+                                </a>
+                            </div>
+                        <?php else: ?>
+                            <div class="row g-3">
+                                <?php foreach ($certificates as $cert): ?>
+                                    <div class="col-md-6">
+                                        <div class="p-3 rounded-4 bg-dark bg-opacity-50 border border-warning border-opacity-25 h-100 d-flex flex-column justify-content-between">
+                                            <div>
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <span class="badge bg-warning bg-opacity-25 text-warning border border-warning border-opacity-25 rounded-pill px-2.5 py-1 small fw-bold font-monospace">
+                                                        <i class="bi bi-qr-code me-1"></i> <?= e($cert['certificate_code']) ?>
+                                                    </span>
+                                                    <span class="badge bg-success bg-opacity-25 text-success rounded-pill px-2 py-0.5 small">
+                                                        <i class="bi bi-check-circle-fill me-1"></i> Hợp lệ
+                                                    </span>
+                                                </div>
+                                                <h6 class="text-white fw-bold mb-1"><?= e($cert['course_title']) ?></h6>
+                                                <div class="small text-white-50 mb-3">
+                                                    <i class="bi bi-calendar-check me-1 text-warning"></i> Cấp ngày: <?= date('d/m/Y', strtotime($cert['issued_at'])) ?>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex gap-2 pt-2 border-top border-white border-opacity-10">
+                                                <a href="/certificates/<?= e($cert['certificate_code']) ?>" class="btn btn-warning btn-sm fw-bold rounded-pill flex-grow-1 d-inline-flex justify-content-center align-items-center gap-1.5 text-dark">
+                                                    <i class="bi bi-award-fill"></i> Xem & Tải Chứng Chỉ
+                                                </a>
+                                                <a href="https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=<?= urlencode($cert['course_title']) ?>&organizationName=Hades+Academy&certId=<?= urlencode($cert['certificate_code']) ?>" target="_blank" class="btn btn-outline-light btn-sm rounded-pill px-2.5" title="Thêm vào LinkedIn">
+                                                    <i class="bi bi-linkedin text-info"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
                 <!-- TAB 2: Đổi mật khẩu -->
                 <div class="tab-pane fade" id="tab-password" role="tabpanel">
                     <div class="refract-card p-4">
@@ -243,6 +307,63 @@ $initial = mb_strtoupper(mb_substr($user['name'] ?? 'H', 0, 1, 'UTF-8'), 'UTF-8'
                                 </div>
                             </div>
                         </form>
+                    </div>
+                </div>
+
+                <!-- TAB: Chứng chỉ của tôi -->
+                <div class="tab-pane fade" id="tab-certs" role="tabpanel">
+                    <div class="refract-card p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-white border-opacity-10 flex-wrap gap-2">
+                            <div>
+                                <h5 class="fw-bold mb-1 text-white">Chứng Chỉ Khóa Học Của Tôi</h5>
+                                <p class="text-muted small mb-0">Danh sách các văn bằng & chứng chỉ số bạn đã hoàn thành và đạt tiêu chuẩn tốt nghiệp</p>
+                            </div>
+                            <a href="/verify-certificate" class="btn btn-outline-info btn-sm rounded-pill px-3">
+                                <i class="bi bi-patch-check me-1"></i> Tra cứu QR chứng chỉ
+                            </a>
+                        </div>
+
+                        <?php if (empty($certificates)): ?>
+                            <div class="text-center py-5">
+                                <i class="bi bi-award text-muted mb-3" style="font-size: 56px;"></i>
+                                <h6 class="text-white fw-bold">Chưa có chứng chỉ nào</h6>
+                                <p class="text-muted small mb-4">Hãy hoàn thành 100% bài học và vượt qua bài kiểm tra cuối khóa để nhận chứng chỉ chính thức.</p>
+                                <a href="/my-courses" class="btn-refract-action d-inline-flex align-items-center gap-2">
+                                    <i class="bi bi-play-circle-fill"></i> Tiếp tục học ngay
+                                </a>
+                            </div>
+                        <?php else: ?>
+                            <div class="row g-3">
+                                <?php foreach ($certificates as $cert): ?>
+                                    <div class="col-md-6">
+                                        <div class="p-3 rounded-4 bg-dark bg-opacity-50 border border-warning border-opacity-25 h-100 d-flex flex-column justify-content-between">
+                                            <div>
+                                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                                    <span class="badge bg-warning bg-opacity-25 text-warning border border-warning border-opacity-25 rounded-pill px-2.5 py-1 small fw-bold font-monospace">
+                                                        <i class="bi bi-qr-code me-1"></i> <?= e($cert['certificate_code']) ?>
+                                                    </span>
+                                                    <span class="badge bg-success bg-opacity-25 text-success rounded-pill px-2 py-0.5 small">
+                                                        <i class="bi bi-check-circle-fill me-1"></i> Hợp lệ
+                                                    </span>
+                                                </div>
+                                                <h6 class="text-white fw-bold mb-1"><?= e($cert['course_title']) ?></h6>
+                                                <div class="small text-white-50 mb-3">
+                                                    <i class="bi bi-calendar-check me-1 text-warning"></i> Cấp ngày: <?= date('d/m/Y', strtotime($cert['issued_at'])) ?>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex gap-2 pt-2 border-top border-white border-opacity-10">
+                                                <a href="/certificates/<?= e($cert['certificate_code']) ?>" class="btn btn-warning btn-sm fw-bold rounded-pill flex-grow-1 d-inline-flex justify-content-center align-items-center gap-1.5 text-dark">
+                                                    <i class="bi bi-award-fill"></i> Xem & Tải Chứng Chỉ
+                                                </a>
+                                                <a href="https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=<?= urlencode($cert['course_title']) ?>&organizationName=Hades+Academy&certId=<?= urlencode($cert['certificate_code']) ?>" target="_blank" class="btn btn-outline-light btn-sm rounded-pill px-2.5" title="Thêm vào LinkedIn">
+                                                    <i class="bi bi-linkedin text-info"></i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
                     </div>
                 </div>
 

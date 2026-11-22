@@ -136,11 +136,16 @@ class OrderController
             $unitsByProduct[$pid][] = $unit;
         }
 
+        $canRefund = false;
+        if (class_exists(\App\RefundService::class)) {
+            $canRefund = \App\RefundService::canRequestRefund($order);
+        }
+
         view('client.orders.show', [
             'order' => $order,
             'items' => $items,
             'refundRequests' => $refundRequests,
-            'canRefund' => \App\RefundService::canRequestRefund($order),
+            'canRefund' => $canRefund,
             'statusLogs' => $statusLogs,
             'store' => $store,
             'deviceUnits' => $deviceUnits,
