@@ -51,9 +51,13 @@
         </p>
 
         <?php if (config('app_env') === 'local'): ?>
-            <div class="alert alert-info mt-3 p-2 small text-center" style="font-size:12px; border-radius: 8px; border: none; background: #e0f2fe; color: #0369a1;">
-                <strong>Môi trường Local:</strong> Bạn có thể tìm thấy mã OTP tại file log:<br>
-                <code>storage/logs/otp.log</code>
+            <?php 
+                $localOtp = $_SESSION['pending_otp']['code'] ?? '';
+            ?>
+            <div class="alert alert-info mt-3 p-3 small text-center" style="font-size:13px; border-radius: 8px; border: 1px dashed #38bdf8; background: rgba(56, 189, 248, 0.1); color: #38bdf8;">
+                <strong>🛠️ Chế độ Local:</strong> Mã OTP của bạn là: <br>
+                <span style="font-size: 22px; font-weight: 800; letter-spacing: 4px; color: #38bdf8; display: inline-block; margin-top: 4px; font-family: monospace;"><?= e($localOtp) ?></span>
+                <div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">(Hiển thị trực tiếp khi chạy localhost để test tiện lợi)</div>
             </div>
         <?php endif; ?>
     </div>
