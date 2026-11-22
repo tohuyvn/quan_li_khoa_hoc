@@ -1,15 +1,10 @@
--- =========================================================
--- HADES ACADEMY - E-LEARNING MANAGEMENT SYSTEM (LMS)
--- Database Clean Export (Chỉ chứa bảng Quản lý khóa học & Auth)
--- Ngày xuất: 2026-11-22 11:51:07
--- =========================================================
+-- ========================================================
+-- Hades Academy LMS - Clean Complete Database Export
+-- Generated: 2026-11-22 12:37:03
+-- ========================================================
 
 SET FOREIGN_KEY_CHECKS = 0;
-SET NAMES utf8mb4;
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `admin_audit_logs`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `admin_audit_logs`;
 CREATE TABLE `admin_audit_logs` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -22,14 +17,10 @@ CREATE TABLE `admin_audit_logs` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `admin_audit_logs`
 INSERT INTO `admin_audit_logs` (`id`, `admin_id`, `admin_name`, `action`, `details`, `ip_address`, `created_at`) VALUES
 ('1', '1', 'Admin', 'update_trade_in_status', 'Cập nhật yêu cầu Trade-in #1 sang trạng thái: completed', NULL, '2026-07-10 20:38:10'),
 ('2', '1', 'Admin', 'price_change', 'Price updated for product \'Cáp sạc nhanh USB-C bọc dù 60W\' (ID: 11): 190.000 đ -> 5.000 đ', '172.18.0.1', '2026-08-12 06:40:06');
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `api_otps`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `api_otps`;
 CREATE TABLE `api_otps` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -43,9 +34,6 @@ CREATE TABLE `api_otps` (
   KEY `api_otps_email_code` (`email`,`code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `app_notifications`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `app_notifications`;
 CREATE TABLE `app_notifications` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -61,13 +49,9 @@ CREATE TABLE `app_notifications` (
   KEY `idx_notif_created` (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `categories`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `categories`;
 CREATE ALGORITHM=UNDEFINED DEFINER=`hades_user`@`%` SQL SECURITY DEFINER VIEW `categories` AS select `course_categories`.`id` AS `id`,`course_categories`.`name` AS `name`,`course_categories`.`slug` AS `slug`,`course_categories`.`description` AS `description`,`course_categories`.`icon` AS `icon`,`course_categories`.`sort_order` AS `sort_order`,`course_categories`.`is_active` AS `is_active`,`course_categories`.`created_at` AS `created_at`,`course_categories`.`updated_at` AS `updated_at` from `course_categories`;
 
--- Dữ liệu bảng `categories`
 INSERT INTO `categories` (`id`, `name`, `slug`, `description`, `icon`, `sort_order`, `is_active`, `created_at`, `updated_at`) VALUES
 ('1', 'Lập trình Web & Mobile', 'lap-trinh-web-mobile', NULL, 'fas fa-code', '0', '1', '2026-11-22 04:51:01', '2026-11-22 04:51:01'),
 ('2', 'Trí tuệ Nhân tạo & Data', 'ai-machine-learning-data', NULL, 'fas fa-brain', '0', '1', '2026-11-22 04:51:01', '2026-11-22 04:51:01'),
@@ -75,9 +59,6 @@ INSERT INTO `categories` (`id`, `name`, `slug`, `description`, `icon`, `sort_ord
 ('4', 'Thiết kế UI/UX', 'thiet-ke-ui-ux', NULL, 'fas fa-palette', '0', '1', '2026-11-22 04:51:01', '2026-11-22 04:51:01'),
 ('5', 'Khoa học Máy tính', 'khoa-hoc-may-tinh', NULL, 'fas fa-laptop-code', '0', '1', '2026-11-22 04:51:01', '2026-11-22 04:51:01');
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `certificates`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `certificates`;
 CREATE TABLE `certificates` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -96,7 +77,6 @@ CREATE TABLE `certificates` (
   CONSTRAINT `certificates_ibfk_2` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `certificates`
 INSERT INTO `certificates` (`id`, `certificate_code`, `user_id`, `course_id`, `issued_at`, `pdf_path`, `status`) VALUES
 ('1', 'CERT-2026-X8B9K2', '2', '1', '2026-11-21 11:29:15', NULL, 'valid'),
 ('2', 'CERT-2026-706CF3BC', '1', '1', '2026-11-21 11:38:44', NULL, 'valid'),
@@ -114,9 +94,6 @@ INSERT INTO `certificates` (`id`, `certificate_code`, `user_id`, `course_id`, `i
 ('14', 'CERT-2026-C12FC5D8', '48', '7', '2026-11-21 11:51:24', NULL, 'valid'),
 ('15', 'CERT-2026-82F61ACD', '48', '8', '2026-11-21 11:51:24', NULL, 'valid');
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `course_categories`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `course_categories`;
 CREATE TABLE `course_categories` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -132,7 +109,6 @@ CREATE TABLE `course_categories` (
   UNIQUE KEY `slug` (`slug`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `course_categories`
 INSERT INTO `course_categories` (`id`, `name`, `slug`, `description`, `icon`, `sort_order`, `is_active`, `created_at`, `updated_at`) VALUES
 ('1', 'Lập trình Web & Mobile', 'lap-trinh-web-mobile', NULL, 'fas fa-code', '0', '1', '2026-11-22 04:51:01', '2026-11-22 04:51:01'),
 ('2', 'Trí tuệ Nhân tạo & Data', 'ai-machine-learning-data', NULL, 'fas fa-brain', '0', '1', '2026-11-22 04:51:01', '2026-11-22 04:51:01'),
@@ -140,9 +116,6 @@ INSERT INTO `course_categories` (`id`, `name`, `slug`, `description`, `icon`, `s
 ('4', 'Thiết kế UI/UX', 'thiet-ke-ui-ux', NULL, 'fas fa-palette', '0', '1', '2026-11-22 04:51:01', '2026-11-22 04:51:01'),
 ('5', 'Khoa học Máy tính', 'khoa-hoc-may-tinh', NULL, 'fas fa-laptop-code', '0', '1', '2026-11-22 04:51:01', '2026-11-22 04:51:01');
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `course_discussions`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `course_discussions`;
 CREATE TABLE `course_discussions` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -155,9 +128,8 @@ CREATE TABLE `course_discussions` (
   KEY `idx_lesson_discuss` (`lesson_id`),
   CONSTRAINT `course_discussions_ibfk_1` FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`id`) ON DELETE CASCADE,
   CONSTRAINT `course_discussions_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `course_discussions`
 INSERT INTO `course_discussions` (`id`, `lesson_id`, `user_id`, `content`, `created_at`) VALUES
 ('1', '1', '2', 'Chào thầy, em đã hoàn thành xong bài 1 và cấu hình môi trường thành công! Em sẵn sàng sang bài tiếp theo.', '2026-11-21 11:45:35'),
 ('2', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 11:47:06'),
@@ -182,11 +154,12 @@ INSERT INTO `course_discussions` (`id`, `lesson_id`, `user_id`, `content`, `crea
 ('21', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-21 14:18:15'),
 ('22', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-22 04:47:15'),
 ('23', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-22 04:49:51'),
-('24', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-22 04:51:04');
+('24', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-22 04:51:04'),
+('25', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-22 04:54:52'),
+('26', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-22 05:00:59'),
+('27', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-22 05:05:38'),
+('28', '1', '2', 'Em có câu hỏi về phần cài đặt môi trường trong bài học này.', '2026-11-22 05:34:09');
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `course_reviews`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `course_reviews`;
 CREATE TABLE `course_reviews` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -200,9 +173,8 @@ CREATE TABLE `course_reviews` (
   KEY `idx_course_rating` (`course_id`,`rating`),
   CONSTRAINT `course_reviews_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE,
   CONSTRAINT `course_reviews_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `course_reviews`
 INSERT INTO `course_reviews` (`id`, `course_id`, `user_id`, `rating`, `comment`, `created_at`) VALUES
 ('1', '1', '2', '5', 'Khóa học cực kỳ chi tiết! Giảng viên dạy rất có tâm, giải thích mô hình MVC và bảo mật dễ hiểu.', '2026-11-21 11:45:35'),
 ('2', '1', '2', '5', 'Nhờ khóa học mà mình đã tự xây dựng được đồ án website hoàn chỉnh nộp tốt nghiệp.', '2026-11-21 11:45:35'),
@@ -231,11 +203,12 @@ INSERT INTO `course_reviews` (`id`, `course_id`, `user_id`, `rating`, `comment`,
 ('25', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 14:17:07'),
 ('26', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-21 14:18:15'),
 ('27', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-22 04:47:14'),
-('28', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-22 04:51:04');
+('28', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-22 04:51:04'),
+('29', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-22 04:54:52'),
+('30', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-22 05:00:59'),
+('31', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-22 05:05:38'),
+('32', '12', '2', '5', 'Khóa học rất hay và trực quan! Đã học được rất nhiều kiến thức bổ ích.', '2026-11-22 05:34:09');
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `courses`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `courses`;
 CREATE TABLE `courses` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -264,7 +237,6 @@ CREATE TABLE `courses` (
   CONSTRAINT `courses_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `categories` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `courses`
 INSERT INTO `courses` (`id`, `instructor_id`, `category_id`, `title`, `slug`, `summary`, `description`, `thumbnail`, `price`, `sale_price`, `level`, `status`, `total_duration_minutes`, `total_lessons`, `created_at`, `updated_at`) VALUES
 ('1', '25', '87', 'Khóa học Lập trình Web Fullstack từ Zero đến Hero', 'khoa-hoc-lap-trinh-web-fullstack-tu-zero-den-hero', 'Lộ trình toàn diện làm chủ PHP, MySQL, Frontend hiện đại và tư duy kiến trúc dự án thực tế.', '<h3>Chào mừng bạn đến với khóa học Lập trình Web Fullstack!</h3><p>Khóa học này sẽ đưa bạn từ người chưa biết gì tới khi có thể tự tay xây dựng một website hoàn chỉnh với đầy đủ tính năng xác thực, thanh toán, thi trắc nghiệm và cấp chứng chỉ.</p><h4>Bạn sẽ học được gì:</h4><ul><li>Cú pháp và tư duy lập trình web hiện đại</li><li>Mô hình MVC (Model-View-Controller) trong thực tế</li><li>Thiết kế Cơ sở dữ liệu chuẩn hóa 3NF với MySQL</li><li>Tích hợp các cổng thanh toán phổ biến: VNPay, MoMo, VietQR</li></ul>', '/image/courses/web_fullstack.jpg', '599000.00', '299000.00', 'beginner', 'published', '57', '6', '2026-11-21 11:19:46', '2026-11-21 14:07:38'),
 ('2', '26', '88', 'Chinh Phục Python & Trí Tuệ Nhân Tạo (AI / Machine Learning)', 'chinh-phuc-python-va-tri-tue-nhan-tao', 'Học cú pháp Python từ căn bản, làm việc với thư viện Numpy/Pandas và huấn luyện mô hình Machine Learning thực tế.', '<h3>Trở thành kỹ sư AI với lộ trình bài bản</h3><p>Khóa học trang bị cho bạn tư duy toán học ứng dụng, kỹ năng xử lý dữ liệu lớn và thuật toán Machine Learning / Deep Learning từ căn bản đến nâng cao.</p><h4>Nội dung trọng tâm:</h4><ul><li>Lập trình Python chuyên sâu: Generators, Decorators, OOP</li><li>Xử lý và làm sạch dữ liệu lớn với Pandas & NumPy</li><li>Huấn luyện mô hình Hồi quy (Regression) và Phân loại (Classification)</li><li>Đánh giá độ chính xác Precision, Recall, F1-Score</li></ul>', '/image/courses/python_ai.jpg', '899000.00', '499000.00', 'intermediate', 'published', '28', '4', '2026-11-21 11:33:12', '2026-11-21 14:08:32'),
@@ -279,9 +251,6 @@ INSERT INTO `courses` (`id`, `instructor_id`, `category_id`, `title`, `slug`, `s
 ('11', '42', '83', 'Digital Marketing Toàn Diện & Tăng Trưởng Doanh Thu với AI', 'digital-marketing-toan-dien-tang-truong-doanh-thu-voi-ai', 'Chiến lược chạy Ads Facebook, Google Ads, SEO Onpage/Offpage và tự động hóa sáng tạo nội dung tiếp thị bằng AI.', '<p>Khóa học thực chiến giúp bạn tự xây dựng phễu bán hàng, thiết lập chiến dịch quảng cáo ra đơn và đo lường ROI chuyển đổi chuẩn xác.</p>', '/image/courses/digital_marketing_growth.jpg', '550000.00', '0.00', 'all', 'published', '420', '5', '2026-11-21 11:47:30', '2026-11-21 11:47:30'),
 ('12', '42', '84', 'Tiếng Anh Giao Tiếp & Phỏng Vấn Dành Cho Dân IT (Tech English)', 'tieng-anh-giao-tiep-phong-van-danh-cho-dan-it-tech-english', 'Nâng cao khả năng đọc tài liệu chuyên ngành, viết email chuyên nghiệp và tự tin đàm phán lương trong phỏng vấn công ty Global.', '<p>Trang bị trọn gói bộ kỹ năng giao tiếp tiếng Anh chuẩn môi trường làm việc công nghệ quốc tế (Agile/Scrum, Standup meeting, Code Review).</p>', '/image/courses/ielts_tech.jpg', '0.00', '0.00', 'beginner', 'published', '360', '4', '2026-11-21 11:47:30', '2026-11-21 11:47:30');
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `enrollments`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `enrollments`;
 CREATE TABLE `enrollments` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -297,9 +266,8 @@ CREATE TABLE `enrollments` (
   KEY `idx_enroll_user` (`user_id`),
   CONSTRAINT `enrollments_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `enrollments_ibfk_2` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=92 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=110 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `enrollments`
 INSERT INTO `enrollments` (`id`, `user_id`, `course_id`, `status`, `progress_percent`, `enrolled_at`, `completed_at`) VALUES
 ('2', '1', '1', 'active', '0.00', '2026-11-21 11:38:44', NULL),
 ('3', '2', '6', 'active', '25.00', '2026-11-21 11:39:21', NULL),
@@ -323,11 +291,10 @@ INSERT INTO `enrollments` (`id`, `user_id`, `course_id`, `status`, `progress_per
 ('28', '48', '8', 'active', '100.00', '2026-11-21 11:51:24', '2026-11-21 18:51:24'),
 ('36', '1', '8', 'active', '0.00', '2026-11-21 13:12:03', NULL),
 ('39', '1', '5', 'active', '0.00', '2026-11-21 13:12:34', NULL),
-('67', '2', '11', 'active', '0.00', '2026-11-21 14:10:52', NULL);
+('67', '2', '11', 'active', '0.00', '2026-11-21 14:10:52', NULL),
+('100', '2', '1', 'active', '16.67', '2026-11-22 05:04:10', '2026-11-22 05:04:10'),
+('105', '2', '10', 'active', '0.00', '2026-11-22 05:29:19', NULL);
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `instructor_profiles`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `instructor_profiles`;
 CREATE TABLE `instructor_profiles` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -342,7 +309,6 @@ CREATE TABLE `instructor_profiles` (
   CONSTRAINT `instructor_profiles_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `instructor_profiles`
 INSERT INTO `instructor_profiles` (`id`, `user_id`, `headline`, `bio`, `qualification`, `experience_years`, `created_at`) VALUES
 ('1', '25', 'Senior Fullstack Engineer & Giảng viên Công nghệ', 'Hơn 8 năm kinh nghiệm phát triển hệ thống và giảng dạy cho hàng ngàn học viên.', 'Thạc sĩ Khoa học Máy tính', '8', '2026-11-21 11:19:27'),
 ('2', '26', 'AI Research Scientist & Data Lead', 'Tiến sĩ Trí tuệ Nhân tạo tại ĐH Quốc gia, chuyên gia Machine Learning và phân tích dữ liệu lớn.', 'Tiến sĩ Trí tuệ Nhân tạo', '10', '2026-11-21 11:33:11'),
@@ -352,9 +318,6 @@ INSERT INTO `instructor_profiles` (`id`, `user_id`, `headline`, `bio`, `qualific
 ('6', '41', 'AWS Certified Solutions Architect - Professional', 'Từng tư vấn di chuyển hạ tầng đám mây cho hơn 40 tập đoàn lớn, chuyên sâu về Kubernetes, Terraform và kiến trúc Serverless.', 'Kỹ sư Hệ thống Viễn thông & Đám mây', '11', '2026-11-21 11:47:30'),
 ('7', '42', 'Lead Growth Marketer & Digital Strategist', 'Chuyên gia tối ưu tỷ lệ chuyển đổi, quản lý ngân sách quảng cáo hơn 2 triệu USD/năm trên nền tảng Meta và Google Ads.', 'Cử nhân Kinh tế Đối ngoại (ĐH Ngoại Thương)', '7', '2026-11-21 11:47:30');
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `job_queue`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `job_queue`;
 CREATE TABLE `job_queue` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -372,9 +335,6 @@ CREATE TABLE `job_queue` (
   KEY `idx_jobs_type` (`job_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `lesson_discussions`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `lesson_discussions`;
 CREATE TABLE `lesson_discussions` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -392,13 +352,9 @@ CREATE TABLE `lesson_discussions` (
   CONSTRAINT `lesson_discussions_ibfk_3` FOREIGN KEY (`parent_id`) REFERENCES `lesson_discussions` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `lesson_discussions`
 INSERT INTO `lesson_discussions` (`id`, `lesson_id`, `user_id`, `parent_id`, `content`, `created_at`) VALUES
 ('1', '1', '2', NULL, 'Em chào thầy, cho em hỏi thêm về cách cấu hình biến môi trường .env trên server ạ?', '2026-11-21 11:52:22');
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `lesson_materials`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `lesson_materials`;
 CREATE TABLE `lesson_materials` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -414,7 +370,6 @@ CREATE TABLE `lesson_materials` (
   CONSTRAINT `lesson_materials_ibfk_1` FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `lesson_materials`
 INSERT INTO `lesson_materials` (`id`, `lesson_id`, `title`, `file_path`, `file_type`, `file_size_bytes`, `download_count`, `created_at`) VALUES
 ('1', '1', 'Giao_trinh_tong_quan_khoa_hoc.pdf', '/storage/materials/sample_doc.pdf', 'pdf', '1048576', '0', '2026-11-21 11:19:46'),
 ('2', '3', 'Giao_trinh_tong_quan_fullstack.pdf', '/storage/materials/Giao_trinh_tong_quan_fullstack.pdf', 'pdf', '1048576', '0', '2026-11-21 11:33:11'),
@@ -436,9 +391,6 @@ INSERT INTO `lesson_materials` (`id`, `lesson_id`, `title`, `file_path`, `file_t
 ('18', '38', 'Giao-trinh-thuc-hanh.pdf', '/storage/docs/sample.pdf', 'pdf', '2450000', '1', '2026-11-21 11:47:30'),
 ('19', '42', 'Giao-trinh-thuc-hanh.pdf', '/storage/docs/sample.pdf', 'pdf', '2450000', '0', '2026-11-21 11:47:30');
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `lesson_notes`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `lesson_notes`;
 CREATE TABLE `lesson_notes` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -455,13 +407,9 @@ CREATE TABLE `lesson_notes` (
   CONSTRAINT `lesson_notes_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `lesson_notes`
 INSERT INTO `lesson_notes` (`id`, `lesson_id`, `user_id`, `timestamp_seconds`, `content`, `created_at`, `updated_at`) VALUES
 ('1', '1', '2', '45', 'Lưu ý về cấu trúc thư mục MVC và cách gọi Database connection.', '2026-11-21 11:52:22', '2026-11-21 11:52:22');
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `lesson_progress`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `lesson_progress`;
 CREATE TABLE `lesson_progress` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -476,9 +424,8 @@ CREATE TABLE `lesson_progress` (
   KEY `lesson_id` (`lesson_id`),
   CONSTRAINT `lesson_progress_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `lesson_progress_ibfk_2` FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=207 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=226 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `lesson_progress`
 INSERT INTO `lesson_progress` (`id`, `user_id`, `lesson_id`, `is_completed`, `last_watch_second`, `completed_at`, `updated_at`) VALUES
 ('1', '2', '18', '1', '120', '2026-11-21 18:39:21', '2026-11-21 11:39:21'),
 ('2', '2', '5', '1', '0', '2026-11-21 18:39:21', '2026-11-21 11:39:21'),
@@ -495,11 +442,9 @@ INSERT INTO `lesson_progress` (`id`, `user_id`, `lesson_id`, `is_completed`, `la
 ('112', '2', '46', '0', '0', NULL, '2026-11-21 14:11:42'),
 ('129', '2', '50', '0', '0', NULL, '2026-11-22 04:40:37'),
 ('174', '2', '38', '0', '108', NULL, '2026-11-22 04:47:30'),
-('206', '2', '41', '0', '180', NULL, '2026-11-22 04:51:04');
+('222', '2', '41', '0', '180', NULL, '2026-11-22 05:34:09'),
+('224', '2', '19', '0', '4', NULL, '2026-11-22 05:36:42');
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `lesson_videos`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `lesson_videos`;
 CREATE TABLE `lesson_videos` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -513,7 +458,6 @@ CREATE TABLE `lesson_videos` (
   CONSTRAINT `lesson_videos_ibfk_1` FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=33 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `lesson_videos`
 INSERT INTO `lesson_videos` (`id`, `lesson_id`, `provider`, `video_url`, `duration_seconds`, `created_at`) VALUES
 ('1', '1', 'youtube', 'https://www.youtube.com/embed/zJSY8tbf_ys', '900', '2026-11-21 11:19:46'),
 ('2', '3', 'youtube', 'https://www.youtube.com/embed/zJSY8tbf_ys', '600', '2026-11-21 11:33:11'),
@@ -548,9 +492,6 @@ INSERT INTO `lesson_videos` (`id`, `lesson_id`, `provider`, `video_url`, `durati
 ('31', '34', 'youtube', 'https://www.youtube.com/embed/3Kq1MIfTWCE', '1200', '2026-11-21 12:05:36'),
 ('32', '38', 'youtube', 'https://www.youtube.com/embed/nU-IIXBWlS4', '1200', '2026-11-21 12:05:36');
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `lessons`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `lessons`;
 CREATE TABLE `lessons` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -567,7 +508,6 @@ CREATE TABLE `lessons` (
   CONSTRAINT `lessons_ibfk_1` FOREIGN KEY (`section_id`) REFERENCES `sections` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `lessons`
 INSERT INTO `lessons` (`id`, `section_id`, `title`, `slug`, `lesson_type`, `content`, `is_preview`, `sort_order`, `created_at`) VALUES
 ('1', '1', 'Bài 1: Giới thiệu khóa học & Phương pháp học hiệu quả', 'bai-1-gioi-thieu-khoa-hoc', 'video', NULL, '1', '1', '2026-11-21 11:19:46'),
 ('2', '1', 'Bài 2: Hiểu rõ mô hình MVC trong thực tế', 'bai-2-hieu-ro-mo-hinh-mvc', 'video', NULL, '1', '2', '2026-11-21 11:19:46'),
@@ -620,9 +560,6 @@ INSERT INTO `lessons` (`id`, `section_id`, `title`, `slug`, `lesson_type`, `cont
 ('49', '6', 'Kiểm tra 15 phút: Khái niệm Docker, Image và Container', NULL, 'quiz', NULL, '0', '2', '2026-11-21 14:08:32'),
 ('50', '7', 'Kiểm tra 15 phút: Kỹ thuật Truy vấn SQL & JOIN Bảng', NULL, 'quiz', NULL, '0', '2', '2026-11-21 14:08:32');
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `order_items`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `order_items`;
 CREATE TABLE `order_items` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -636,23 +573,10 @@ CREATE TABLE `order_items` (
   PRIMARY KEY (`id`),
   KEY `order_items_order_id` (`order_id`),
   KEY `order_items_product_id` (`product_id`),
-  CONSTRAINT `order_items_order_fk` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `order_items_product_fk` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=173 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+  CONSTRAINT `order_items_order_fk` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=186 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `order_items`
 INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `course_id`, `product_name`, `quantity`, `price`, `variant_id`) VALUES
-('1', '1', '1', NULL, 'iPhone 15', '1', '22000000', NULL),
-('2', '1', '6', NULL, 'Tai nghe Bluetooth', '1', '5500000', NULL),
-('3', '2', '2', NULL, 'iPhone 17', '3', '28990000', NULL),
-('4', '2', '6', NULL, 'Tai nghe Bluetooth', '1', '5500000', NULL),
-('5', '3', '2', NULL, 'iPhone 17', '1', '28990000', NULL),
-('6', '4', '2', NULL, 'iPhone 17', '1', '28990000', NULL),
-('7', '4', '1', NULL, 'iPhone 15', '1', '22000000', NULL),
-('8', '5', '2', NULL, 'iPhone 17', '1', '28990000', NULL),
-('9', '6', '7', NULL, 'Dây sạc nhanh USB-C', '1', '450000', NULL),
-('10', '7', '2', NULL, 'iPhone 17', '1', '28990000', NULL),
-('11', '8', '11', NULL, 'Cáp sạc nhanh USB-C bọc dù 60W', '1', '190000', NULL),
 ('12', '9', '33', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
 ('13', '10', '34', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
 ('14', '11', '35', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
@@ -673,82 +597,29 @@ INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `course_id`, `product
 ('41', '38', '75', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
 ('44', '41', '79', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
 ('47', '44', '83', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
-('48', '45', '30', NULL, 'iPad Gen 10 64GB WiFi', '1', '9490000', NULL),
-('49', '46', '27', NULL, 'iPad Air 5 M1 Cũ 64GB WiFi', '1', '11490000', NULL),
-('50', '47', '28', NULL, 'iPad Pro M4 11 inch 256GB', '1', '25990000', NULL),
-('51', '47', '26', NULL, 'Dell XPS 13 Cũ Giá Tốt', '1', '18900000', NULL),
-('52', '47', '29', NULL, 'iPad Air 6 M2 2026', '1', '16490000', NULL),
-('53', '47', '24', NULL, 'iPhone 15 Pro 128GB Cũ Đẹp', '1', '21490000', NULL),
-('54', '47', '8', NULL, 'ThinkPad X1 Carbon Gen 13', '60', '45990000', NULL),
-('55', '48', '8', NULL, 'ThinkPad X1 Carbon Gen 13', '30', '45990000', NULL),
-('56', '49', '84', NULL, 'Ô tô nè', '1', '999999999999999', NULL),
-('57', '50', '26', NULL, 'Dell XPS 13 Cũ Giá Tốt', '1', '18900000', NULL),
-('58', '51', '23', NULL, 'G-Shock GA-2100 \"CasiOak\"', '1', '3120000', NULL),
-('59', '52', '23', NULL, 'G-Shock GA-2100 \"CasiOak\"', '1', '3120000', NULL),
-('60', '53', '23', NULL, 'G-Shock GA-2100 \"CasiOak\"', '1', '3120000', NULL),
-('61', '54', '30', NULL, 'iPad Gen 10 64GB WiFi', '1', '9490000', NULL),
-('62', '55', '29', NULL, 'iPad Air 6 M2 2026', '1', '16490000', NULL),
-('63', '56', '29', NULL, 'iPad Air 6 M2 2026', '1', '16490000', NULL),
-('64', '57', '29', NULL, 'iPad Air 6 M2 2026', '1', '16490000', NULL),
-('65', '58', '29', NULL, 'iPad Air 6 M2 2026', '1', '16490000', NULL),
-('66', '59', '11', NULL, 'Cáp sạc nhanh USB-C bọc dù 60W', '1', '5000', NULL),
-('67', '60', '11', NULL, 'Cáp sạc nhanh USB-C bọc dù 60W', '1', '5000', NULL),
-('68', '61', '11', NULL, 'Cáp sạc nhanh USB-C bọc dù 60W', '1', '5000', NULL),
-('69', '62', '24', NULL, 'iPhone 15 Pro 128GB Cũ Đẹp', '3', '21490000', NULL),
-('70', '62', '29', NULL, 'iPad Air 6 M2 2026', '1', '16490000', NULL),
-('71', '63', '28', NULL, 'iPad Pro M4 11 inch 256GB', '1', '25990000', NULL),
-('72', '63', '27', NULL, 'iPad Air 5 M1 Cũ 64GB WiFi', '1', '11490000', NULL),
-('73', '64', '26', NULL, 'Dell XPS 13 Cũ Giá Tốt', '1', '18900000', NULL),
-('74', '65', '26', NULL, 'Dell XPS 13 Cũ Giá Tốt', '1', '18900000', NULL),
-('75', '66', '28', NULL, 'iPad Pro M4 11 inch 256GB', '1', '25990000', NULL),
-('76', '67', '29', NULL, 'iPad Air 6 M2 2026', '1', '16490000', NULL),
-('77', '67', '30', NULL, 'iPad Gen 10 64GB WiFi', '1', '9490000', NULL),
-('78', '67', '28', NULL, 'iPad Pro M4 11 inch 256GB', '1', '25990000', NULL),
-('79', '68', '28', NULL, 'iPad Pro M4 11 inch 256GB', '1', '25990000', NULL),
-('80', '69', '28', NULL, 'iPad Pro M4 11 inch 256GB', '1', '25990000', NULL),
-('81', '70', '27', NULL, 'iPad Air 5 M1 Cũ 64GB WiFi', '1', '11490000', NULL),
-('82', '71', '24', NULL, 'iPhone 15 Pro 128GB Cũ Đẹp', '1', '21490000', NULL),
-('83', '72', '28', NULL, 'iPad Pro M4 11 inch 256GB', '1', '25990000', NULL),
-('84', '73', '30', NULL, 'iPad Gen 10 64GB WiFi', '1', '9490000', NULL),
-('85', '74', '30', NULL, 'iPad Gen 10 64GB WiFi', '1', '9490000', NULL),
-('86', '74', '29', NULL, 'iPad Air 6 M2 2026', '1', '16490000', NULL),
-('87', '74', '27', NULL, 'iPad Air 5 M1 Cũ 64GB WiFi', '1', '11490000', NULL),
-('88', '75', '30', NULL, 'iPad Gen 10 64GB WiFi', '1', '9490000', NULL),
-('89', '75', '29', NULL, 'iPad Air 6 M2 2026', '1', '16490000', NULL),
-('90', '75', '27', NULL, 'iPad Air 5 M1 Cũ 64GB WiFi', '1', '11490000', NULL),
-('91', '76', '25', NULL, 'MacBook Air M1 Cũ Likenew', '1', '13990000', NULL),
-('92', '76', '24', NULL, 'iPhone 15 Pro 128GB Cũ Đẹp', '1', '21490000', NULL),
-('93', '76', '23', NULL, 'G-Shock GA-2100 \"CasiOak\"', '1', '3120000', NULL),
-('94', '77', '25', NULL, 'MacBook Air M1 Cũ Likenew', '1', '13990000', NULL),
-('95', '77', '23', NULL, 'G-Shock GA-2100 \"CasiOak\"', '1', '3120000', NULL),
-('96', '78', '30', NULL, 'iPad Gen 10 64GB WiFi', '1', '9490000', NULL),
-('97', '78', '29', NULL, 'iPad Air 6 M2 2026', '1', '16490000', NULL),
-('98', '78', '27', NULL, 'iPad Air 5 M1 Cũ 64GB WiFi', '1', '11490000', NULL),
 ('103', '83', '90', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
 ('104', '84', '91', NULL, 'Máy thiếu IMEI Test', '1', '12000000', NULL),
 ('113', '93', '99', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
 ('114', '94', '100', NULL, 'Máy thiếu IMEI Test', '1', '12000000', NULL),
 ('119', '99', '106', NULL, 'iPhone 15 Pro Test', '1', '25000000', NULL),
 ('120', '100', '107', NULL, 'Máy thiếu IMEI Test', '1', '12000000', NULL),
-('123', '105', NULL, '3', 'Lập trình Frontend Hiện đại với ReactJS & Next.js', '1', '320000', NULL),
-('124', '106', NULL, '4', 'Thiết kế Giao diện UI/UX Chuyên nghiệp với Figma', '1', '450000', NULL),
-('125', '107', NULL, '5', 'DevOps Toàn Diện: Docker, Kubernetes & CI/CD Pipeline', '1', '799000', NULL),
-('126', '108', NULL, '6', 'Phân tích Dữ liệu Kinh doanh (Data Analytics & SQL Mastery)', '1', '0', NULL),
-('129', '111', NULL, '8', 'Lập Trình Di Động Đa Nền Tảng với Flutter & Dart 2026', '1', '390000', NULL),
-('130', '114', NULL, '5', 'DevOps Toàn Diện: Docker, Kubernetes & CI/CD Pipeline', '1', '799000', NULL),
-('131', '115', NULL, '5', 'DevOps Toàn Diện: Docker, Kubernetes & CI/CD Pipeline', '1', '799000', NULL),
-('132', '116', NULL, '2', 'Chinh Phục Python & Trí Tuệ Nhân Tạo (AI / Machine Learning)', '1', '499000', NULL),
-('133', '117', NULL, '7', 'Chuyên Sâu Golang & Kiến Trúc Microservices Hiệu Năng Cao', '1', '450000', NULL),
-('137', '121', NULL, '2', 'Chinh Phục Python & Trí Tuệ Nhân Tạo (AI / Machine Learning)', '1', '499000', NULL),
-('138', '122', NULL, '3', 'Lập trình Frontend Hiện đại với ReactJS & Next.js', '1', '320000', NULL),
-('139', '123', NULL, '3', 'Lập trình Frontend Hiện đại với ReactJS & Next.js', '1', '320000', NULL),
-('142', '126', NULL, '10', 'An Toàn Thông Tin & Thực Hành Ethical Hacking (Pentest Web)', '1', '490000', NULL),
-('145', '129', NULL, '10', 'An Toàn Thông Tin & Thực Hành Ethical Hacking (Pentest Web)', '1', '490000', NULL),
-('153', '137', NULL, '2', 'Chinh Phục Python & Trí Tuệ Nhân Tạo (AI / Machine Learning)', '1', '499000', NULL);
+('123', '105', '3', '3', 'Lập trình Frontend Hiện đại với ReactJS & Next.js', '1', '320000', NULL),
+('124', '106', '4', '4', 'Thiết kế Giao diện UI/UX Chuyên nghiệp với Figma', '1', '450000', NULL),
+('125', '107', '5', '5', 'DevOps Toàn Diện: Docker, Kubernetes & CI/CD Pipeline', '1', '799000', NULL),
+('126', '108', '6', '6', 'Phân tích Dữ liệu Kinh doanh (Data Analytics & SQL Mastery)', '1', '0', NULL),
+('129', '111', '8', '8', 'Lập Trình Di Động Đa Nền Tảng với Flutter & Dart 2026', '1', '390000', NULL),
+('130', '114', '5', '5', 'DevOps Toàn Diện: Docker, Kubernetes & CI/CD Pipeline', '1', '799000', NULL),
+('131', '115', '5', '5', 'DevOps Toàn Diện: Docker, Kubernetes & CI/CD Pipeline', '1', '799000', NULL),
+('132', '116', '2', '2', 'Chinh Phục Python & Trí Tuệ Nhân Tạo (AI / Machine Learning)', '1', '499000', NULL),
+('133', '117', '7', '7', 'Chuyên Sâu Golang & Kiến Trúc Microservices Hiệu Năng Cao', '1', '450000', NULL),
+('137', '121', '2', '2', 'Chinh Phục Python & Trí Tuệ Nhân Tạo (AI / Machine Learning)', '1', '499000', NULL),
+('138', '122', '3', '3', 'Lập trình Frontend Hiện đại với ReactJS & Next.js', '1', '320000', NULL),
+('139', '123', '3', '3', 'Lập trình Frontend Hiện đại với ReactJS & Next.js', '1', '320000', NULL),
+('142', '126', '10', '10', 'An Toàn Thông Tin & Thực Hành Ethical Hacking (Pentest Web)', '1', '490000', NULL),
+('145', '129', '10', '10', 'An Toàn Thông Tin & Thực Hành Ethical Hacking (Pentest Web)', '1', '490000', NULL),
+('153', '137', '2', '2', 'Chinh Phục Python & Trí Tuệ Nhân Tạo (AI / Machine Learning)', '1', '499000', NULL),
+('182', '168', '10', '10', 'An Toàn Thông Tin & Thực Hành Ethical Hacking (Pentest Web)', '1', '490000', NULL);
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `order_status_logs`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `order_status_logs`;
 CREATE TABLE `order_status_logs` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
@@ -764,7 +635,6 @@ CREATE TABLE `order_status_logs` (
   CONSTRAINT `order_status_logs_fk` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=156 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `order_status_logs`
 INSERT INTO `order_status_logs` (`id`, `order_id`, `from_status`, `to_status`, `actor_type`, `actor_id`, `note`, `created_at`) VALUES
 ('1', '9', 'pending', 'confirmed', 'system', NULL, NULL, '2026-07-10 04:22:01'),
 ('2', '9', 'confirmed', 'packing', 'system', NULL, NULL, '2026-07-10 04:22:01'),
@@ -846,58 +716,6 @@ INSERT INTO `order_status_logs` (`id`, `order_id`, `from_status`, `to_status`, `
 ('78', '44', 'confirmed', 'packing', 'system', NULL, NULL, '2026-07-10 19:51:25'),
 ('79', '44', 'packing', 'shipping', 'system', NULL, NULL, '2026-07-10 19:51:25'),
 ('80', '44', 'shipping', 'completed', 'system', NULL, NULL, '2026-07-10 19:51:25'),
-('81', '45', NULL, 'pending', 'customer', '1', 'Hồ sơ trả góp 12 tháng, cọc 1898000', '2026-07-10 20:04:08'),
-('82', '45', 'pending', 'confirmed', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-07-10 20:05:14'),
-('83', '46', NULL, 'pending', 'customer', '1', 'Tạo đơn hàng mới (Chuyển khoản VietQR MB Bank)', '2026-07-10 20:05:48'),
-('84', '47', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Chuyển khoản VietQR MB Bank)', '2026-07-10 20:10:19'),
-('85', '47', 'pending', 'confirmed', 'admin', '1', 'Admin xác nhận đã nhận chuyển khoản VietQR', '2026-07-10 20:13:02'),
-('86', '47', 'confirmed', 'packing', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-07-10 20:14:58'),
-('87', '47', 'packing', 'shipping', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-07-10 20:17:18'),
-('88', '48', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (Chuyển khoản VietQR MB Bank)', '2026-07-10 20:23:30'),
-('89', '48', 'pending', 'confirmed', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-07-10 20:24:36'),
-('90', '48', 'confirmed', 'confirmed', 'admin', '1', 'Admin xác nhận đã nhận chuyển khoản VietQR', '2026-07-10 20:25:12'),
-('91', '49', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (COD)', '2026-07-10 20:29:03'),
-('92', '49', 'confirmed', 'packing', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-07-10 20:31:01'),
-('93', '49', 'packing', 'cancelled', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-07-10 20:32:06'),
-('94', '6', 'pending', 'confirmed', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-07-10 20:36:12'),
-('95', '50', NULL, 'pending', 'customer', '1', 'Tạo đơn hàng mới (Chuyển khoản VietQR MB Bank)', '2026-08-09 16:52:36'),
-('96', '51', NULL, 'pending', 'customer', '1', 'Tạo đơn hàng mới (Thanh toán qua MoMo)', '2026-08-09 16:53:22'),
-('97', '52', NULL, 'pending', 'customer', '1', 'Tạo đơn hàng mới (Thanh toán qua MoMo)', '2026-08-09 17:26:29'),
-('98', '53', NULL, 'pending', 'customer', '1', 'Tạo đơn hàng mới (Chuyển khoản VietQR MB Bank)', '2026-08-09 17:27:00'),
-('99', '54', NULL, 'pending', 'customer', '1', 'Tạo đơn hàng mới (Chuyển khoản VietQR MB Bank)', '2026-08-09 17:27:20'),
-('100', '55', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Thanh toán qua MoMo)', '2026-08-12 06:25:13'),
-('101', '56', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Thanh toán qua MoMo)', '2026-08-12 06:25:20'),
-('102', '57', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Thanh toán qua MoMo)', '2026-08-12 06:25:20'),
-('103', '58', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Chuyển khoản VietQR MB Bank)', '2026-08-12 06:26:20'),
-('104', '59', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Chuyển khoản VietQR MB Bank)', '2026-08-12 06:41:07'),
-('105', '59', 'pending', 'cancelled', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-08-12 06:49:22'),
-('106', '59', 'cancelled', 'cancelled', 'system', NULL, 'SePay webhook xác nhận chuyển khoản VietQR (ref: TESTREF123)', '2026-08-12 06:50:19'),
-('107', '58', 'pending', 'confirmed', 'system', NULL, 'SePay webhook xác nhận chuyển khoản VietQR (ref: OK)', '2026-08-12 06:50:35'),
-('108', '58', 'confirmed', 'cancelled', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-08-12 06:51:12'),
-('109', '60', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Chuyển khoản VietQR MB Bank)', '2026-08-12 06:53:52'),
-('110', '61', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Chuyển khoản VietQR MB Bank)', '2026-08-12 06:56:29'),
-('111', '61', 'pending', 'confirmed', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-08-12 07:00:36'),
-('112', '57', 'pending', 'confirmed', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-08-12 07:01:10'),
-('113', '62', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-08-12 07:38:28'),
-('114', '63', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 09:59:09'),
-('115', '64', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 10:11:20'),
-('116', '65', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 10:12:11'),
-('117', '66', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 10:19:29'),
-('118', '67', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 10:29:46'),
-('119', '67', 'confirmed', 'packing', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-09-25 10:33:25'),
-('120', '67', 'packing', 'shipping', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-09-25 10:33:34'),
-('121', '67', 'shipping', 'completed', 'admin', '1', 'Admin cập nhật trạng thái đơn hàng.', '2026-09-25 10:33:57'),
-('122', '68', NULL, 'pending', 'customer', '2', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 10:38:00'),
-('123', '69', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 10:40:22'),
-('124', '70', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 10:41:09'),
-('125', '71', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 10:47:07'),
-('126', '72', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (COD)', '2026-09-25 10:49:58'),
-('127', '73', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 10:52:01'),
-('128', '74', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 11:00:57'),
-('129', '75', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 11:02:38'),
-('130', '76', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 11:34:47'),
-('131', '77', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 11:35:13'),
-('132', '78', NULL, 'pending', 'customer', '4', 'Tạo đơn hàng mới (Thanh toán qua VNPay)', '2026-09-25 11:35:57'),
 ('133', '83', 'pending', 'confirmed', 'system', NULL, NULL, '2026-11-21 11:37:44'),
 ('134', '83', 'confirmed', 'packing', 'system', NULL, NULL, '2026-11-21 11:37:44'),
 ('135', '83', 'packing', 'shipping', 'system', NULL, NULL, '2026-11-21 11:37:44'),
@@ -921,9 +739,6 @@ INSERT INTO `order_status_logs` (`id`, `order_id`, `from_status`, `to_status`, `
 ('153', '101', 'pending', 'cancelled', 'system', NULL, NULL, '2026-11-21 11:47:30'),
 ('154', '121', 'pending', 'confirmed', 'system', NULL, 'SePay webhook xác nhận chuyển khoản VietQR (ref: SIMULATE-1795268283)', '2026-11-21 13:38:07');
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `orders`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `orders`;
 CREATE TABLE `orders` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -988,52 +803,9 @@ CREATE TABLE `orders` (
   KEY `orders_created_at` (`created_at`),
   KEY `idx_orders_user_id` (`user_id`),
   KEY `idx_orders_store_id` (`store_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=159 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=172 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `orders`
 INSERT INTO `orders` (`id`, `user_id`, `customer_name`, `phone`, `email`, `contact_address`, `shipping_address`, `payment_method`, `payment_status`, `total_amount`, `status`, `vnpay_txn_ref`, `vnpay_transaction_no`, `vnpay_bank_code`, `vnpay_pay_date`, `created_at`, `coupon_code`, `discount_amount`, `shipper_id`, `shipping_lat`, `shipping_lng`, `user_address_id`, `order_code`, `wallet_amount`, `user_voucher_code`, `store_id`, `address_province`, `address_district`, `address_ward`, `address_street`, `preferred_time_slot`, `shipping_fee`, `shipping_distance_km`, `estimated_delivery_from`, `estimated_delivery_to`, `loyalty_discount_amount`, `loyalty_tier`, `earned_points`, `points_awarded`, `delivery_proof_path`, `shipper_assigned_at`, `installment_months`, `installment_deposit_amount`, `installment_status`, `is_preorder`, `preorder_deposit_paid`, `preorder_status`, `vat_company_name`, `vat_tax_code`, `vat_address`, `vat_email`, `vat_invoice_no`, `vat_invoice_issued`, `vat_invoice_issued_at`, `stock_reserved`) VALUES
-('1', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', '123 Lê Lợi, Hà Nội', '123 Lê Lợi, Hà Nội', 'cash', 'paid', '27500000', 'confirmed', NULL, NULL, NULL, NULL, '2026-06-16 10:00:00', NULL, '0', NULL, NULL, NULL, NULL, 'HD260616-IDGK0', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
-('2', '3', 'huy', '0781278321', 'huy28072k5@gmail.com', 'hn', 'hn', 'vnpay', 'paid', '92470000', 'completed', '2_1781583234', '52388410', 'NCB', '20260616111354', '2026-06-16 11:13:49', NULL, '0', NULL, NULL, NULL, NULL, 'HD260616-VXKV8', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
-('3', '3', 'huy', '0781278321', 'huy28072k5@gmail.com', 'hhh', 'hhh', 'vnpay', 'paid', '28990000', 'completed', '3_1781583345', '16708927', 'NCB', '20260616111545', '2026-06-16 11:15:41', NULL, '0', NULL, NULL, NULL, NULL, 'HD260616-CXEXL', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
-('4', '3', 'huy', '0781278321', 'huy28072k5@gmail.com', 'aa', 'aa', 'cash', 'pending', '50990000', 'completed', NULL, NULL, NULL, NULL, '2026-06-16 11:17:01', NULL, '0', NULL, NULL, NULL, NULL, 'HD260616-3CCH0', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
-('5', '4', 'huy', '0788415516', 'huy28072k5@gmail.com', 'hn', 'hn', 'momo', 'pending', '28990000', 'pending', NULL, NULL, NULL, NULL, '2026-06-21 08:43:40', NULL, '0', NULL, NULL, NULL, NULL, 'HD260621-BTFKA', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
-('6', '4', 'huy', '0788415516', 'huy28072k5@gmail.com', 'hn', 'hn', 'momo', 'pending', '450000', 'confirmed', NULL, NULL, NULL, NULL, '2026-06-21 08:50:54', NULL, '0', NULL, NULL, NULL, NULL, 'HD260621-QM6D0', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
-('7', '4', 'huy', '0788415516', 'huy28072k5@gmail.com', 'hn', 'hn', 'cash', 'pending', '28990000', 'pending', NULL, NULL, NULL, NULL, '2026-06-22 00:33:13', NULL, '0', NULL, NULL, NULL, NULL, 'HD260622-8D8J7', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
-('8', NULL, 'Test Customer', '0912345678', 'test@example.com', '123 Test Street', '123 Test Street', 'cash', 'pending', '152000', 'pending', NULL, NULL, NULL, NULL, '2026-06-22 01:43:39', 'SIEUOFFER', '38000', NULL, NULL, NULL, NULL, 'HD260622-D3N8X', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
-('45', '1', 'Admin', '0901234567', 'admin@shop.test', 'UBND phường Bưởi, 10A, Ngõ Cống Xanh, Yên Thái, Kẻ Bưởi, Phường Tây Hồ, Hà Nội, 11214, Việt Nam', 'UBND phường Bưởi, 10A, Ngõ Cống Xanh, Yên Thái, Kẻ Bưởi, Phường Tây Hồ, Hà Nội, 11214, Việt Nam', 'installment', 'pending', '9490000', 'confirmed', NULL, NULL, NULL, NULL, '2026-07-10 20:04:07', NULL, '0', NULL, '21.05085250', '105.81004360', NULL, 'HD260710-9WGCN', '0', NULL, '1', 'Hà Nội', 'Phường Tây Hồ', 'Kẻ Bưởi', 'Ngõ Cống Xanh', 'any', '0', '0.43', '2026-07-10', '2026-07-10', '0', 'Standard', '0', '0', NULL, NULL, '12', '1898000', 'pending_review', '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
-('46', '1', 'Admin', '0901234567', 'admin@shop.test', 'UBND phường Bưởi, 10A, Ngõ Cống Xanh, Yên Thái, Kẻ Bưởi, Phường Tây Hồ, Hà Nội, 11214, Việt Nam', 'UBND phường Bưởi, 10A, Ngõ Cống Xanh, Yên Thái, Kẻ Bưởi, Phường Tây Hồ, Hà Nội, 11214, Việt Nam', 'bank_transfer', 'pending', '11490000', 'pending', NULL, NULL, NULL, NULL, '2026-07-10 20:05:48', NULL, '0', NULL, '21.05087150', '105.81000870', NULL, 'HD260710-IWCB1', '0', NULL, '1', 'Hà Nội', 'Phường Tây Hồ', 'Kẻ Bưởi', 'Ngõ Cống Xanh', 'any', '0', '0.43', '2026-07-10', '2026-07-10', '0', 'Standard', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
-('47', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', 'FLC Complex, 36, Đường Phạm Hùng, Xuân Phong, Phường Từ Liêm, Hà Nội, 10051, Việt Nam', 'FLC Complex, 36, Đường Phạm Hùng, Xuân Phong, Phường Từ Liêm, Hà Nội, 10051, Việt Nam', 'bank_transfer', 'refunded', '2842270000', 'cancelled', NULL, NULL, NULL, NULL, '2026-07-10 20:10:19', NULL, '0', '21', '21.02722560', '105.77838080', NULL, 'HD260710-QG62M', '0', NULL, '2', 'Hà Nội', 'Xuân Phong', NULL, 'Đường Phạm Hùng', 'any', '0', '0.49', '2026-07-10', '2026-07-10', '0', 'Standard', '0', '0', NULL, '2026-07-10 20:14:58', NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
-('48', '4', 'huy', '0788415516', 'huy28072k5@gmail.com', 'UBND phường Bưởi, 10A, Ngõ Cống Xanh, Yên Thái, Kẻ Bưởi, Phường Tây Hồ, Hà Nội, 11214, Việt Nam', 'UBND phường Bưởi, 10A, Ngõ Cống Xanh, Yên Thái, Kẻ Bưởi, Phường Tây Hồ, Hà Nội, 11214, Việt Nam', 'bank_transfer', 'paid', '1379700000', 'confirmed', NULL, NULL, NULL, NULL, '2026-07-10 20:23:30', NULL, '0', NULL, '21.05087330', '105.81000790', NULL, 'HD260710-7ILB9', '0', NULL, '1', 'Hà Nội', 'Phường Tây Hồ', 'Kẻ Bưởi', 'Ngõ Cống Xanh', 'any', '0', '0.43', '2026-07-10', '2026-07-10', '0', 'Standard', '137970', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
-('49', '4', 'huy', '0788415516', 'huy28072k5@gmail.com', 'UBND phường Bưởi, 10A, Ngõ Cống Xanh, Yên Thái, Kẻ Bưởi, Phường Tây Hồ, Hà Nội, 11214, Việt Nam', 'UBND phường Bưởi, 10A, Ngõ Cống Xanh, Yên Thái, Kẻ Bưởi, Phường Tây Hồ, Hà Nội, 11214, Việt Nam', 'cash', 'refunded', '100000000000000', 'cancelled', NULL, NULL, NULL, NULL, '2026-07-10 20:29:03', NULL, '100000000000000', '21', '21.05087330', '105.81000790', NULL, 'HD260710-KTCKS', '0', NULL, '1', 'Hà Nội', 'Phường Tây Hồ', 'Kẻ Bưởi', 'Ngõ Cống Xanh', 'any', '0', '0.43', '2026-07-10', '2026-07-10', '100000000000000', 'Diamond', '0', '0', NULL, '2026-07-10 20:31:00', NULL, '0', NULL, '1', '0', 'completed', NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
-('50', '1', 'Admin', '0901234567', 'admin@shop.test', 'Mễ Trì Thượng, Mễ Trì, Phường Từ Liêm, Hà Nội, 10070, Việt Nam', 'Mễ Trì Thượng, Mễ Trì, Phường Từ Liêm, Hà Nội, 10070, Việt Nam', 'bank_transfer', 'pending', '18900000', 'pending', NULL, NULL, NULL, NULL, '2026-08-09 23:52:36', NULL, '0', NULL, '21.00428800', '105.77838080', NULL, 'HD260809-LZIG5', '0', NULL, '2', 'Hà Nội', 'Phường Từ Liêm', 'Mễ Trì', NULL, 'any', '0', '2.82', '2026-08-09', '2026-08-09', '0', 'Standard', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('51', '1', 'Admin', '0901234567', 'admin@shop.test', 'Mễ Trì Thượng, Mễ Trì, Phường Từ Liêm, Hà Nội, 10070, Việt Nam', 'Mễ Trì Thượng, Mễ Trì, Phường Từ Liêm, Hà Nội, 10070, Việt Nam', 'momo', 'pending', '3120000', 'pending', NULL, NULL, NULL, NULL, '2026-08-09 23:53:22', NULL, '0', NULL, '21.00428800', '105.77838080', NULL, 'HD260809-2NMNJ', '0', NULL, '2', 'Hà Nội', 'Phường Từ Liêm', 'Mễ Trì', NULL, 'any', '0', '2.82', '2026-08-09', '2026-08-09', '0', 'Standard', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('52', '1', 'Admin', '0901234567', 'admin@shop.test', 'Phường Tùng Thiện, Hà Nội, Việt Nam', 'Phường Tùng Thiện, Hà Nội, Việt Nam', 'momo', 'pending', '3285000', 'pending', NULL, NULL, NULL, NULL, '2026-08-10 00:26:29', NULL, '0', NULL, '21.11300340', '105.43413670', NULL, 'HD260810-ICRLM', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '165000', '37.32', '2026-08-11', '2026-08-11', '0', 'Standard', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('53', '1', 'Admin', '0901234567', 'admin@shop.test', 'Phường Tùng Thiện, Hà Nội, Việt Nam', 'Phường Tùng Thiện, Hà Nội, Việt Nam', 'bank_transfer', 'pending', '3285000', 'pending', NULL, NULL, NULL, NULL, '2026-08-10 00:27:00', NULL, '0', NULL, '21.11300340', '105.43413670', NULL, 'HD260810-PSXQG', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '165000', '37.32', '2026-08-11', '2026-08-11', '0', 'Standard', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('54', '1', 'Admin', '0901234567', 'admin@shop.test', 'Phường Tùng Thiện, Hà Nội, Việt Nam', 'Phường Tùng Thiện, Hà Nội, Việt Nam', 'bank_transfer', 'pending', '9655000', 'pending', NULL, NULL, NULL, NULL, '2026-08-10 00:27:20', NULL, '0', NULL, '21.11300340', '105.43413670', NULL, 'HD260810-G8QFJ', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '165000', '37.32', '2026-08-11', '2026-08-11', '0', 'Standard', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('55', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', 'Ngách 18 Ngõ 575 Kim Mã, Ngọc Khánh, Phường Giảng Võ, Hà Nội, 11110, Việt Nam', 'Ngách 18 Ngõ 575 Kim Mã, Ngọc Khánh, Phường Giảng Võ, Hà Nội, 11110, Việt Nam', 'momo', 'pending', '16490000', 'pending', NULL, NULL, NULL, NULL, '2026-08-12 13:25:13', NULL, '0', NULL, '21.02877493', '105.80912018', NULL, 'HD260812-CUGXO', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '0', '2.76', '2026-08-12', '2026-08-12', '0', 'Standard', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('56', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', 'Ngách 18 Ngõ 575 Kim Mã, Ngọc Khánh, Phường Giảng Võ, Hà Nội, 11110, Việt Nam', 'Ngách 18 Ngõ 575 Kim Mã, Ngọc Khánh, Phường Giảng Võ, Hà Nội, 11110, Việt Nam', 'momo', 'pending', '16490000', 'pending', NULL, NULL, NULL, NULL, '2026-08-12 13:25:20', NULL, '0', NULL, '21.02877493', '105.80912018', NULL, 'HD260812-ZZJYW', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '0', '2.76', '2026-08-12', '2026-08-12', '0', 'Standard', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('57', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', 'Ngách 18 Ngõ 575 Kim Mã, Ngọc Khánh, Phường Giảng Võ, Hà Nội, 11110, Việt Nam', 'Ngách 18 Ngõ 575 Kim Mã, Ngọc Khánh, Phường Giảng Võ, Hà Nội, 11110, Việt Nam', 'momo', 'pending', '16490000', 'confirmed', NULL, NULL, NULL, NULL, '2026-08-12 13:25:20', NULL, '0', NULL, '21.02877493', '105.80912018', NULL, 'HD260812-TSFIG', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '0', '2.76', '2026-08-12', '2026-08-12', '0', 'Standard', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('58', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', 'Trường Đại học Lao động - Xã hội, 43, Đường Trần Duy Hưng, Trung Kính Thượng, Kẻ Giàn, Phường Yên Hòa, Hà Nội, 11312, Việt Nam', 'Trường Đại học Lao động - Xã hội, 43, Đường Trần Duy Hưng, Trung Kính Thượng, Kẻ Giàn, Phường Yên Hòa, Hà Nội, 11312, Việt Nam', 'bank_transfer', 'refunded', '16490000', 'cancelled', NULL, NULL, NULL, NULL, '2026-08-12 13:26:20', NULL, '0', NULL, '21.01199950', '105.80265800', NULL, 'HD260812-433QP', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '0', '2.85', '2026-08-12', '2026-08-12', '0', 'Standard', '1649', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
-('59', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', 'Khách sạn Fortuna, 6B, Phố Láng Hạ, Nhược Công, Phường Giảng Võ, Hà Nội, 11110, Việt Nam', 'Khách sạn Fortuna, 6B, Phố Láng Hạ, Nhược Công, Phường Giảng Võ, Hà Nội, 11110, Việt Nam', 'bank_transfer', 'paid', '30000', 'confirmed', NULL, NULL, NULL, NULL, '2026-08-12 13:41:07', NULL, '0', NULL, '21.02067200', '105.81770240', NULL, 'HD260812-XZ3IU', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '25000', '3.78', '2026-08-12', '2026-08-12', '0', 'Standard', '3', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
-('60', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', 'Trường Đại học Lao động - Xã hội, 43, Đường Trần Duy Hưng, Trung Kính Thượng, Kẻ Giàn, Phường Yên Hòa, Hà Nội, 11312, Việt Nam', 'Trường Đại học Lao động - Xã hội, 43, Đường Trần Duy Hưng, Trung Kính Thượng, Kẻ Giàn, Phường Yên Hòa, Hà Nội, 11312, Việt Nam', 'bank_transfer', 'pending', '4900', 'pending', NULL, NULL, NULL, NULL, '2026-08-12 13:53:52', NULL, '100', NULL, '21.01200390', '105.80264940', NULL, 'HD260812-ITDDK', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '0', '2.85', '2026-08-12', '2026-08-12', '100', 'Silver', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('61', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', 'Khách sạn Fortuna, 6B, Phố Láng Hạ, Nhược Công, Phường Giảng Võ, Hà Nội, 11110, Việt Nam', 'Khách sạn Fortuna, 6B, Phố Láng Hạ, Nhược Công, Phường Giảng Võ, Hà Nội, 11110, Việt Nam', 'bank_transfer', 'pending', '29400', 'confirmed', NULL, NULL, NULL, NULL, '2026-08-12 13:56:29', NULL, '600', NULL, '21.02067200', '105.81770240', NULL, 'HD260812-SQ8RB', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '25000', '3.78', '2026-08-12', '2026-08-12', '600', 'Silver', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('62', '4', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', 'Trụ sở chính: Võng Thị, Tây Hồ, Hà Nội', 'Trụ sở chính: Võng Thị, Tây Hồ, Hà Nội', 'vnpay', 'paid', '72864000', 'confirmed', '62_1786520313', '11726430', 'NCB', '20260812143833', '2026-08-12 14:38:28', NULL, '8096000', NULL, '21.01201960', '105.80265730', NULL, 'HD260812-VMZHC', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '0', '2.85', '2026-08-12', '2026-08-12', '8096000', 'Diamond', '7286', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('63', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', 'Trước trường Trung học cơ sở Yên Hòa 30m - Trung Kính, Phố Trung Kính, Hạ Yên Quyết, Phường Yên Hòa, Hà Nội, 11312, Việt Nam', 'Trước trường Trung học cơ sở Yên Hòa 30m - Trung Kính, Phố Trung Kính, Hạ Yên Quyết, Phường Yên Hòa, Hà Nội, 11312, Việt Nam', 'vnpay', 'paid', '36730400', 'confirmed', '63_1790330355', '69591426', 'NCB', '20260925165915', '2026-09-25 16:59:09', NULL, '749600', NULL, '21.02211572', '105.79092062', NULL, 'HD260925-VB70G', '0', NULL, '2', NULL, NULL, NULL, NULL, 'afternoon', '0', '1.19', '2026-09-25', '2026-09-25', '749600', 'Silver', '3673', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('64', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', '45 xuân thủy', '45 xuân thủy', 'vnpay', 'pending', '17955000', 'pending', NULL, NULL, NULL, NULL, '2026-09-25 17:11:20', NULL, '945000', NULL, NULL, NULL, NULL, 'HD260925-9C0VG', '0', NULL, NULL, NULL, NULL, NULL, NULL, 'any', '0', NULL, '2026-09-28', '2026-09-30', '945000', 'Gold', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('65', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', '45 XUÂN THỦY', '45 XUÂN THỦY', 'vnpay', 'paid', '17955000', 'confirmed', '65_1790331137', '59523104', 'NCB', '20260925171217', '2026-09-25 17:12:11', NULL, '945000', NULL, NULL, NULL, NULL, 'HD260925-6M62W', '0', NULL, NULL, NULL, NULL, NULL, NULL, 'any', '0', NULL, '2026-09-28', '2026-09-30', '945000', 'Gold', '1795', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('66', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', 'Tọa độ: 21.03013, 105.78972', 'Tọa độ: 21.03013, 105.78972', 'vnpay', 'paid', '24690500', 'confirmed', '66_1790331573', '14680087', 'NCB', '20260925171933', '2026-09-25 17:19:29', NULL, '1299500', NULL, '21.03012731', '105.78971903', NULL, 'HD260925-WTGOM', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '0', '0.75', '2026-09-25', '2026-09-25', '1299500', 'Gold', '2469', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('67', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', '45 xuan thuy', '45 xuan thuy', 'vnpay', 'paid', '49371500', 'completed', '67_1790332192', '46657935', 'NCB', '20260925172952', '2026-09-25 17:29:46', NULL, '2598500', '21', NULL, NULL, NULL, 'HD260925-9JEK6', '0', NULL, NULL, NULL, NULL, NULL, NULL, 'any', '0', NULL, '2026-09-28', '2026-09-30', '2598500', 'Gold', '4937', '1', NULL, '2026-09-25 17:33:25', NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('68', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', 'Trường Đại học Lao động - Xã hội, 43, Đường Trần Duy Hưng, Trung Kính Hạ, Kẻ Giàn, Phường Yên Hòa, Hà Nội, 11312, Việt Nam', 'Trường Đại học Lao động - Xã hội, 43, Đường Trần Duy Hưng, Trung Kính Hạ, Kẻ Giàn, Phường Yên Hòa, Hà Nội, 11312, Việt Nam', 'vnpay', 'paid', '23391000', 'confirmed', '68_1790332688', '16250791', 'NCB', '20260925173808', '2026-09-25 17:38:00', NULL, '2599000', NULL, '21.01210540', '105.80300330', NULL, 'HD260925-NCSJV', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '0', '2.87', '2026-09-25', '2026-09-25', '2599000', 'Diamond', '2339', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('69', '4', 'huy', '0128282728', 'huy28072k5@gmail.com', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'vnpay', 'paid', '23413500', 'confirmed', '69_1790332832', '28289659', 'NCB', '20260925174032', '2026-09-25 17:40:22', NULL, '2601500', NULL, '21.01411840', '105.82097920', NULL, 'HD260925-AMBTY', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '25000', '4.34', '2026-09-25', '2026-09-25', '2601500', 'Diamond', '2341', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('70', '4', 'huy', '0788415516', 'huy28072k5@gmail.com', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'vnpay', 'paid', '10363500', 'confirmed', '70_1790332875', '15081829', 'NCB', '20260925174115', '2026-09-25 17:41:09', NULL, '1151500', NULL, '21.01411840', '105.82097920', NULL, 'HD260925-A4W9A', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '25000', '4.34', '2026-09-25', '2026-09-25', '1151500', 'Diamond', '1036', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('71', '4', 'huy', '0788415517', 'huy28072k5@gmail.com', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'vnpay', 'paid', '19363500', 'confirmed', '71_1790333232', '50669816', 'NCB', '20260925174712', '2026-09-25 17:47:07', NULL, '2151500', NULL, '21.01411840', '105.82097920', NULL, 'HD260925-QFA4W', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '25000', '4.34', '2026-09-25', '2026-09-25', '2151500', 'Diamond', '1936', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('72', '4', 'huy', '0788415516', 'huy28072k5@gmail.com', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'cash', 'pending', '23413500', 'pending', NULL, NULL, NULL, NULL, '2026-09-25 17:49:58', NULL, '2601500', NULL, '21.01411840', '105.82097920', NULL, 'HD260925-1IJJQ', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '25000', '4.34', '2026-09-25', '2026-09-25', '2601500', 'Diamond', '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('73', '4', 'ban', '0282827283', 'huy28072k5@gmail.com', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'vnpay', 'paid', '8563500', 'confirmed', '73_1790333526', '56182047', 'NCB', '20260925175206', '2026-09-25 17:52:00', NULL, '951500', NULL, '21.01411840', '105.82097920', NULL, 'HD260925-BGLQ3', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '25000', '4.34', '2026-09-25', '2026-09-25', '951500', 'Diamond', '856', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('74', '4', 'ban', '0282827284', 'huy28072k5@gmail.com', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'vnpay', 'paid', '33745500', 'confirmed', '74_1790334062', '13554921', 'NCB', '20260925180102', '2026-09-25 18:00:57', NULL, '3749500', NULL, '21.01411840', '105.82097920', NULL, 'HD260925-PMX7G', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '25000', '4.34', '2026-09-25', '2026-09-25', '3749500', 'Diamond', '3374', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('75', '4', 'huy', '0282827286', 'huy28072k5@gmail.com', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'vnpay', 'paid', '33745500', 'confirmed', '75_1790334163', '46279145', 'NCB', '20260925180243', '2026-09-25 18:02:38', NULL, '3749500', NULL, '21.01411840', '105.82097920', NULL, 'HD260925-LPWUR', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '25000', '4.34', '2026-09-25', '2026-09-25', '3749500', 'Diamond', '3374', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('76', '4', 'huy', '0282827285', 'huy28072k5@gmail.com', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'vnpay', 'paid', '34762500', 'confirmed', '76_1790336095', '37362342', 'NCB', '20260925183455', '2026-09-25 18:34:47', NULL, '3862500', NULL, '21.01411840', '105.82097920', NULL, 'HD260925-GR79S', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '25000', '4.34', '2026-09-25', '2026-09-25', '3862500', 'Diamond', '3476', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('77', '4', 'huy', '0282827284', 'huy28072k5@gmail.com', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'vnpay', 'paid', '15421500', 'confirmed', '77_1790336121', '26989159', 'NCB', '20260925183521', '2026-09-25 18:35:13', NULL, '1713500', NULL, '21.01411840', '105.82097920', NULL, 'HD260925-0EFTU', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '25000', '4.34', '2026-09-25', '2026-09-25', '1713500', 'Diamond', '1542', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
-('78', '4', 'huy', '0282827284', 'huy28072k5@gmail.com', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'Ngách 183/4 Đặng Tiến Đông, Phường Đống Đa, Hà Nội, 11527, Việt Nam', 'vnpay', 'paid', '33745500', 'confirmed', '78_1790336161', '19329556', 'NCB', '20260925183601', '2026-09-25 18:35:57', NULL, '3749500', NULL, '21.01411840', '105.82097920', NULL, 'HD260925-4P6O3', '0', NULL, '2', NULL, NULL, NULL, NULL, 'any', '25000', '4.34', '2026-09-25', '2026-09-25', '3749500', 'Diamond', '3374', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '1'),
 ('103', '43', 'Nguyễn Đình Quân', '0988776655', 'quan.nguyen@gmail.com', NULL, NULL, 'bank_transfer', 'paid', '499000', 'delivered', NULL, NULL, NULL, NULL, '2026-11-21 11:49:51', NULL, '0', NULL, NULL, NULL, NULL, 'LMS-20261121-12A879', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
 ('104', '44', 'Phạm Thuỳ Linh', '0988776655', 'linh.pham@gmail.com', NULL, NULL, 'bank_transfer', 'paid', '499000', 'delivered', NULL, NULL, NULL, NULL, '2026-11-21 11:50:40', NULL, '0', NULL, NULL, NULL, NULL, 'LMS-20261121-ED9881', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
 ('105', '45', 'Hoàng Minh Tuấn', '0988776655', 'tuan.hoang@gmail.com', NULL, NULL, 'bank_transfer', 'paid', '320000', 'delivered', NULL, NULL, NULL, NULL, '2026-11-21 11:51:24', NULL, '0', NULL, NULL, NULL, NULL, 'LMS-20261121-E42157', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
@@ -1051,11 +823,9 @@ INSERT INTO `orders` (`id`, `user_id`, `customer_name`, `phone`, `email`, `conta
 ('126', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', NULL, NULL, 'cash', 'paid', '490000', 'completed', NULL, NULL, NULL, NULL, '2026-11-21 14:01:55', NULL, '0', NULL, NULL, NULL, NULL, 'HD261121-9WQ3U', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
 ('129', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', NULL, NULL, 'vnpay', 'pending', '490000', 'pending', NULL, NULL, NULL, NULL, '2026-11-21 14:07:20', NULL, '0', NULL, NULL, NULL, NULL, 'HD261121-1ILH3', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
 ('137', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', NULL, NULL, 'vnpay', 'paid', '499000', 'confirmed', '137_1795270291', '50370217', 'NCB', '20261121211131', '2026-11-21 14:11:27', NULL, '0', NULL, NULL, NULL, NULL, 'HD261121-BVMUO', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '49', '1', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
-('150', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', NULL, NULL, 'bank_transfer', 'pending', '450000', 'pending', NULL, NULL, NULL, NULL, '2026-11-21 14:46:12', NULL, '0', NULL, NULL, NULL, NULL, 'TEST12345', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0');
+('150', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', NULL, NULL, 'bank_transfer', 'pending', '450000', 'pending', NULL, NULL, NULL, NULL, '2026-11-21 14:46:12', NULL, '0', NULL, NULL, NULL, NULL, 'TEST12345', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0'),
+('168', '2', 'Nguyễn Văn A', '0912345678', 'khach@shop.test', NULL, NULL, 'vnpay', 'paid', '490000', 'confirmed', '168_1795325359', '75458727', 'NCB', '20261122122919', '2026-11-22 05:29:12', NULL, '0', NULL, NULL, NULL, NULL, 'HD261122-NAMHY', '0', NULL, NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, '0', NULL, '0', '0', NULL, NULL, NULL, NULL, NULL, NULL, '0', NULL, '0');
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `password_reset_requests`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `password_reset_requests`;
 CREATE TABLE `password_reset_requests` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -1076,9 +846,6 @@ CREATE TABLE `password_reset_requests` (
   CONSTRAINT `prr_user_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `quiz_answers`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `quiz_answers`;
 CREATE TABLE `quiz_answers` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -1091,7 +858,6 @@ CREATE TABLE `quiz_answers` (
   CONSTRAINT `quiz_answers_ibfk_1` FOREIGN KEY (`question_id`) REFERENCES `quiz_questions` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=145 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `quiz_answers`
 INSERT INTO `quiz_answers` (`id`, `question_id`, `answer_text`, `is_correct`, `created_at`) VALUES
 ('1', '1', 'Model', '1', '2026-11-21 11:33:12'),
 ('2', '1', 'View', '0', '2026-11-21 11:33:12'),
@@ -1238,9 +1004,6 @@ INSERT INTO `quiz_answers` (`id`, `question_id`, `answer_text`, `is_correct`, `c
 ('143', '39', 'Toàn bộ dữ liệu của bảng bên phải', '0', '2026-11-21 14:08:32'),
 ('144', '39', 'Tất cả các dòng của cả hai bảng bất kể có khớp hay không', '0', '2026-11-21 14:08:32');
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `quiz_attempt_answers`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `quiz_attempt_answers`;
 CREATE TABLE `quiz_attempt_answers` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -1255,9 +1018,8 @@ CREATE TABLE `quiz_attempt_answers` (
   CONSTRAINT `quiz_attempt_answers_ibfk_1` FOREIGN KEY (`attempt_id`) REFERENCES `quiz_attempts` (`id`) ON DELETE CASCADE,
   CONSTRAINT `quiz_attempt_answers_ibfk_2` FOREIGN KEY (`question_id`) REFERENCES `quiz_questions` (`id`) ON DELETE CASCADE,
   CONSTRAINT `quiz_attempt_answers_ibfk_3` FOREIGN KEY (`answer_id`) REFERENCES `quiz_answers` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=94 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=106 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `quiz_attempt_answers`
 INSERT INTO `quiz_attempt_answers` (`id`, `attempt_id`, `question_id`, `answer_id`, `is_correct`) VALUES
 ('1', '1', '1', '1', '1'),
 ('2', '1', '2', '5', '1'),
@@ -1351,11 +1113,20 @@ INSERT INTO `quiz_attempt_answers` (`id`, `attempt_id`, `question_id`, `answer_i
 ('90', '32', '3', '9', '1'),
 ('91', '33', '1', '1', '1'),
 ('92', '33', '2', '5', '1'),
-('93', '33', '3', '9', '1');
+('93', '33', '3', '9', '1'),
+('94', '34', '1', '1', '1'),
+('95', '34', '2', '5', '1'),
+('96', '34', '3', '9', '1'),
+('97', '35', '1', '1', '1'),
+('98', '35', '2', '5', '1'),
+('99', '35', '3', '9', '1'),
+('100', '36', '1', '1', '1'),
+('101', '36', '2', '5', '1'),
+('102', '36', '3', '9', '1'),
+('103', '37', '1', '1', '1'),
+('104', '37', '2', '5', '1'),
+('105', '37', '3', '9', '1');
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `quiz_attempts`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `quiz_attempts`;
 CREATE TABLE `quiz_attempts` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -1372,9 +1143,8 @@ CREATE TABLE `quiz_attempts` (
   KEY `idx_attempt_user` (`user_id`,`quiz_id`),
   CONSTRAINT `quiz_attempts_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
   CONSTRAINT `quiz_attempts_ibfk_2` FOREIGN KEY (`quiz_id`) REFERENCES `quizzes` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=34 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `quiz_attempts`
 INSERT INTO `quiz_attempts` (`id`, `user_id`, `quiz_id`, `score_achieved`, `total_score`, `score_percentage`, `is_passed`, `started_at`, `submitted_at`) VALUES
 ('1', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 11:39:21', '2026-11-21 18:39:21'),
 ('2', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-21 11:39:21', '2026-11-21 18:39:21'),
@@ -1408,11 +1178,12 @@ INSERT INTO `quiz_attempts` (`id`, `user_id`, `quiz_id`, `score_achieved`, `tota
 ('30', '2', '18', '0.00', '2.00', '0.00', '0', '2026-11-22 04:42:11', '2026-11-22 11:42:11'),
 ('31', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-22 04:47:14', '2026-11-22 11:47:14'),
 ('32', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-22 04:49:51', '2026-11-22 11:49:51'),
-('33', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-22 04:51:04', '2026-11-22 11:51:04');
+('33', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-22 04:51:04', '2026-11-22 11:51:04'),
+('34', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-22 04:54:52', '2026-11-22 11:54:52'),
+('35', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-22 05:00:59', '2026-11-22 12:00:59'),
+('36', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-22 05:05:38', '2026-11-22 12:05:38'),
+('37', '2', '1', '3.00', '3.00', '100.00', '1', '2026-11-22 05:34:09', '2026-11-22 12:34:09');
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `quiz_questions`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `quiz_questions`;
 CREATE TABLE `quiz_questions` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -1428,7 +1199,6 @@ CREATE TABLE `quiz_questions` (
   CONSTRAINT `quiz_questions_ibfk_1` FOREIGN KEY (`quiz_id`) REFERENCES `quizzes` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `quiz_questions`
 INSERT INTO `quiz_questions` (`id`, `quiz_id`, `question_text`, `question_type`, `points`, `explanation`, `sort_order`, `created_at`) VALUES
 ('1', '1', 'Trong mô hình MVC, thành phần nào trực tiếp tương tác với Cơ sở Dữ liệu?', 'single_choice', '1.00', 'Model đại diện cho dữ liệu và các quy tắc nghiệp vụ truy vấn DB.', '1', '2026-11-21 11:33:12'),
 ('2', '1', 'Kỹ thuật nào dùng để chống tấn công SQL Injection hiệu quả nhất?', 'single_choice', '1.00', 'Prepared Statements với tham số buộc chặt (parameter binding) ngăn chặn chèn mã độc.', '2', '2026-11-21 11:33:12'),
@@ -1470,9 +1240,6 @@ INSERT INTO `quiz_questions` (`id`, `quiz_id`, `question_text`, `question_type`,
 ('38', '18', 'Mệnh đề nào trong SQL được dùng để lọc dữ liệu trên các hàm tổng hợp (AGGREGATE functions)?', 'single_choice', '1.00', 'Mệnh đề HAVING lọc kết quả sau khi đã GROUP BY và tính hàm tổng hợp; WHERE chỉ lọc dòng dữ liệu thô.', '1', '2026-11-21 14:08:32'),
 ('39', '18', 'INNER JOIN trả về kết quả như thế nào giữa 2 bảng?', 'single_choice', '1.00', 'INNER JOIN chỉ trả về các bản ghi thỏa mãn điều kiện kết nối ở cả 2 bảng.', '2', '2026-11-21 14:08:32');
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `quizzes`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `quizzes`;
 CREATE TABLE `quizzes` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -1492,7 +1259,6 @@ CREATE TABLE `quizzes` (
   CONSTRAINT `quizzes_ibfk_2` FOREIGN KEY (`lesson_id`) REFERENCES `lessons` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `quizzes`
 INSERT INTO `quizzes` (`id`, `course_id`, `lesson_id`, `title`, `description`, `duration_minutes`, `passing_score`, `max_attempts`, `is_random_questions`, `created_at`) VALUES
 ('1', '1', '5', 'Kiểm tra trắc nghiệm Kiến trúc MVC & Web Core', 'Bài kiểm tra trắc nghiệm đánh giá kiến thức bài học.', '15', '80.00', '3', '0', '2026-11-21 11:33:12'),
 ('2', '2', '8', 'Đánh giá Năng lực Python & Machine Learning', 'Bài kiểm tra trắc nghiệm đánh giá kiến thức bài học.', '15', '80.00', '3', '0', '2026-11-21 11:33:12'),
@@ -1513,9 +1279,6 @@ INSERT INTO `quizzes` (`id`, `course_id`, `lesson_id`, `title`, `description`, `
 ('17', '5', '49', 'Kiểm tra 15 phút: Khái niệm Docker, Image và Container', 'Kiểm tra thực hành các lệnh cơ bản Docker sau khi hoàn thành Bài 1.', '15', '80.00', '0', '0', '2026-11-21 14:08:32'),
 ('18', '6', '50', 'Kiểm tra 15 phút: Kỹ thuật Truy vấn SQL & JOIN Bảng', 'Củng cố kiến thức cú pháp SQL sau bài giảng thực chiến đầu tiên.', '15', '80.00', '0', '0', '2026-11-21 14:08:32');
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `rate_limits`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `rate_limits`;
 CREATE TABLE `rate_limits` (
   `key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -1524,13 +1287,9 @@ CREATE TABLE `rate_limits` (
   PRIMARY KEY (`key`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `rate_limits`
 INSERT INTO `rate_limits` (`key`, `hits`, `expires_at`) VALUES
 ('login:127.0.0.1', '1', '1795322612');
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `sections`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `sections`;
 CREATE TABLE `sections` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -1543,7 +1302,6 @@ CREATE TABLE `sections` (
   CONSTRAINT `sections_ibfk_1` FOREIGN KEY (`course_id`) REFERENCES `courses` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB AUTO_INCREMENT=20 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `sections`
 INSERT INTO `sections` (`id`, `course_id`, `title`, `sort_order`, `created_at`) VALUES
 ('1', '1', 'Chương 1: Tổng quan và Thiết lập môi trường', '1', '2026-11-21 11:19:46'),
 ('2', '1', 'Chương 2: Kiến trúc Nâng cao & Lập trình Hướng đối tượng', '2', '2026-11-21 11:33:11'),
@@ -1565,9 +1323,6 @@ INSERT INTO `sections` (`id`, `course_id`, `title`, `sort_order`, `created_at`) 
 ('18', '12', 'Chương 1: Nền tảng kiến thức & Thiết lập môi trường', '1', '2026-11-21 11:47:30'),
 ('19', '12', 'Chương 2: Thực chiến chuyên sâu & Kiểm tra đánh giá', '2', '2026-11-21 11:47:30');
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `user_addresses`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `user_addresses`;
 CREATE TABLE `user_addresses` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -1588,9 +1343,6 @@ CREATE TABLE `user_addresses` (
   CONSTRAINT `user_addresses_user_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ---------------------------------------------------------
--- Cấu trúc bảng `users`
--- ---------------------------------------------------------
 DROP TABLE IF EXISTS `users`;
 CREATE TABLE `users` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -1612,7 +1364,6 @@ CREATE TABLE `users` (
   UNIQUE KEY `users_email_unique` (`email`)
 ) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Dữ liệu bảng `users`
 INSERT INTO `users` (`id`, `name`, `email`, `phone`, `avatar`, `password`, `role`, `status`, `created_at`, `failed_login_attempts`, `lockout_until`, `loyalty_points`, `loyalty_tier`, `two_factor_secret`, `two_factor_enabled`) VALUES
 ('1', 'Admin', 'admin@shop.test', '0901234567', NULL, '$2y$10$kdcd7bTl11qWkeuQlDjHd.wgsCUWuTjJnwtXad0WNKtB/9154yWwu', 'admin', 'active', '2026-06-16 01:46:26', '0', NULL, '0', 'Standard', NULL, '0'),
 ('2', 'Nguyễn Văn A', 'khach@shop.test', '0912345678', NULL, '$2y$10$Qrp7GX7/3abDVbnAZdVLX.1edRvM80TkGu4fyTWJPaFa27LA2WbAC', 'customer', 'active', '2026-06-16 01:46:26', '0', NULL, '18134', 'Diamond', NULL, '0'),
