@@ -55,23 +55,31 @@ class ProfileController
         $stmtSpent->execute([$currentUser['id']]);
         $totalSpent = (int) $stmtSpent->fetchColumn();
 
-        $walletBalance = 0;
-        $vouchersCount = count((new \App\Models\UserVoucher())->activeForUser((int) $currentUser['id']));
-        $wishlistCount = (new \App\Models\Wishlist())->countByUser((int) $currentUser['id']);
+        $stmtEnrolled = $db->prepare('SELECT COUNT(*) FROM enrollments WHERE user_id = ? AND status = "active"');
+        $stmtEnrolled->execute([$currentUser['id']]);
+        $enrolledCount = (int) $stmtEnrolled->fetchColumn();
+
+        $stmtCerts = $db->prepare('SELECT COUNT(*) FROM certificates WHERE user_id = ? AND status = "valid"');
+        $stmtCerts->execute([$currentUser['id']]);
+        $certsCount = (int) $stmtCerts->fetchColumn();
+
+        $stmtQuizAttempts = $db->prepare('SELECT COUNT(*) FROM quiz_attempts WHERE user_id = ?');
+        $stmtQuizAttempts->execute([$currentUser['id']]);
+        $quizAttemptsCount = (int) $stmtQuizAttempts->fetchColumn();
 
         $stmtRecentOrders = $db->prepare('SELECT * FROM orders WHERE user_id = ? ORDER BY id DESC LIMIT 15');
         $stmtRecentOrders->execute([$currentUser['id']]);
         $recentOrders = $stmtRecentOrders->fetchAll();
 
         view('client.profile.edit', [
-            'title' => 'Thông tin cá nhân',
+            'title' => 'Hồ sơ học viên - Hades Academy',
             'user' => $user,
             'addresses' => $addresses,
             'ordersCount' => $ordersCount,
             'totalSpent' => $totalSpent,
-            'walletBalance' => $walletBalance,
-            'vouchersCount' => $vouchersCount,
-            'wishlistCount' => $wishlistCount,
+            'enrolledCount' => $enrolledCount,
+            'certsCount' => $certsCount,
+            'quizAttemptsCount' => $quizAttemptsCount,
             'recentOrders' => $recentOrders,
         ]);
     }
