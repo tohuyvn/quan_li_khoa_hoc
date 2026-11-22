@@ -1,60 +1,97 @@
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h2 class="fw-bold mb-0" style="letter-spacing: -0.02em;">🛡️ Nhật ký hoạt động hệ thống</h2>
-    <a href="/admin/dashboard" class="btn btn-outline-secondary btn-sm fw-bold">← Quay lại Tổng quan</a>
-</div>
-
-<div class="card p-0 border rounded-3 bg-white shadow-sm overflow-hidden">
-    <div class="p-3 border-bottom bg-light">
-        <span class="text-muted small fw-semibold"><i class="bi bi-info-circle me-1"></i> Hiển thị 100 hoạt động gần nhất của các tài khoản quản trị viên.</span>
+<div class="container-fluid py-4">
+    <!-- Header Page -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-secondary bg-opacity-25 text-secondary border border-secondary border-opacity-25 rounded-pill px-3 py-1">
+                    <i class="bi bi-shield-check me-1"></i> Security & Audit
+                </span>
+                <span class="text-white-50 small">• 100 sự kiện gần nhất</span>
+            </div>
+            <h1 class="h3 fw-bold text-white mb-1">Nhật Ký Hoạt Động Hệ Thống (Audit Logs)</h1>
+            <p class="text-muted mb-0 small">Theo dõi chi tiết các thao tác quản trị, bảo mật và thay đổi cấu hình trên hệ thống</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="/admin/lms/dashboard" class="btn btn-outline-secondary btn-sm px-3 rounded-pill d-inline-flex align-items-center gap-1.5">
+                <i class="bi bi-arrow-left"></i> Quay lại Tổng quan
+            </a>
+        </div>
     </div>
-    <div class="table-responsive">
-        <table class="table table-hover table-striped mb-0 align-middle" style="font-size: 13px;">
-            <thead class="table-dark">
-                <tr>
-                    <th width="80" class="text-center">ID</th>
-                    <th width="150">Thời gian</th>
-                    <th width="150">Người thực hiện</th>
-                    <th width="180">Hành động</th>
-                    <th>Chi tiết hoạt động</th>
-                    <th width="120" class="text-center">Địa chỉ IP</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (empty($logs)): ?>
+
+    <!-- Glass Card Table -->
+    <div class="refract-card p-0 overflow-hidden">
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead>
                     <tr>
-                        <td colspan="6" class="text-center py-5 text-muted">
-                            Chưa có nhật ký hoạt động nào được ghi lại.
-                        </td>
+                        <th width="75" class="ps-4">ID</th>
+                        <th width="160">Thời Gian</th>
+                        <th width="160">Người Thực Hiện</th>
+                        <th width="180">Hành Động</th>
+                        <th>Chi Tiết Hoạt Động</th>
+                        <th width="130" class="text-end pe-4">Địa Chỉ IP</th>
                     </tr>
-                <?php else: ?>
-                    <?php foreach ($logs as $log): ?>
+                </thead>
+                <tbody>
+                    <?php if (empty($logs)): ?>
                         <tr>
-                            <td class="text-center fw-bold text-muted">#<?= $log['id'] ?></td>
-                            <td><?= date('d/m/Y H:i:s', strtotime($log['created_at'])) ?></td>
-                            <td>
-                                <strong class="text-dark"><?= e($log['admin_name']) ?></strong>
-                                <?php if (!empty($log['admin_id'])): ?>
-                                    <span class="badge bg-secondary" style="font-size: 9px;">UID: <?= (int)$log['admin_id'] ?></span>
-                                <?php endif; ?>
+                            <td colspan="6" class="text-center py-5">
+                                <div class="text-muted py-3">
+                                    <i class="bi bi-shield-slash fs-1 d-block mb-3 text-secondary opacity-50"></i>
+                                    <h5 class="fw-bold text-white">Chưa có nhật ký hoạt động</h5>
+                                    <p class="small text-muted mb-0">Hệ thống chưa ghi nhận thao tác quản trị nào.</p>
+                                </div>
                             </td>
-                            <td>
-                                <?php
-                                $actionClass = match ($log['action']) {
-                                    'price_change' => 'warning text-dark',
-                                    'password_reset' => 'danger',
-                                    'user_password_changed_directly' => 'danger',
-                                    'review_deletion' => 'dark',
-                                    default => 'info text-dark'
-                                };
-                                ?>
-                                <span class="badge bg-<?= $actionClass ?> text-uppercase" style="font-size: 10px;"><?= str_replace('_', ' ', e($log['action'])) ?></span>
-                            </td>
-                            <td class="text-dark fw-semibold"><?= e($log['details']) ?></td>
-                            <td class="text-center text-muted"><?= e($log['ip_address']) ?></td>
                         </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </tbody>
-        </table>
+                    <?php else: ?>
+                        <?php foreach ($logs as $log): ?>
+                            <tr>
+                                <td class="ps-4">
+                                    <span class="text-white-50 font-monospace small">#<?= $log['id'] ?></span>
+                                </td>
+                                <td>
+                                    <div class="text-white-50 small">
+                                        <i class="bi bi-clock-history me-1 text-secondary"></i>
+                                        <span><?= date('d/m/Y H:i:s', strtotime($log['created_at'])) ?></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar-refract-pill" style="width: 32px; height: 32px; font-size: 11px;">
+                                            <?= strtoupper(substr($log['admin_name'] ?? 'AD', 0, 2)) ?>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold text-white small"><?= e($log['admin_name']) ?></div>
+                                            <?php if (!empty($log['admin_id'])): ?>
+                                                <span class="badge bg-white bg-opacity-10 text-white-50 border border-white border-opacity-10 rounded-pill" style="font-size: 9px;">UID: <?= (int)$log['admin_id'] ?></span>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <?php
+                                    $actionBadgeClass = match ($log['action']) {
+                                        'price_change' => 'bg-warning bg-opacity-25 text-warning border border-warning border-opacity-25',
+                                        'password_reset', 'user_password_changed_directly' => 'bg-danger bg-opacity-25 text-danger border border-danger border-opacity-25',
+                                        'review_deletion' => 'bg-secondary bg-opacity-25 text-light border border-secondary border-opacity-25',
+                                        default => 'bg-info bg-opacity-25 text-info border border-info border-opacity-25'
+                                    };
+                                    ?>
+                                    <span class="badge <?= $actionBadgeClass ?> rounded-pill px-2.5 py-1 small fw-semibold text-uppercase" style="font-size: 10px;">
+                                        <?= str_replace('_', ' ', e($log['action'])) ?>
+                                    </span>
+                                </td>
+                                <td class="text-white-50 small">
+                                    <span class="text-white fw-medium"><?= e($log['details']) ?></span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <span class="font-monospace text-white-50 small"><?= e($log['ip_address']) ?></span>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>

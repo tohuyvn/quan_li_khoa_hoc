@@ -249,7 +249,7 @@ class Order
 
             $order = $this->find($orderId);
             if ($order && ($order['payment_status'] === 'paid' || $order['status'] === 'completed')) {
-                \App\Services\LoyaltyService::awardPointsForOrder($orderId);
+                // Loyalty removed
                 $order = $this->find($orderId);
             }
 
@@ -366,10 +366,10 @@ class Order
         $order = $this->find($id);
         if ($order) {
             if (($order['payment_status'] === 'paid' || $order['status'] === 'completed') && (int)$order['points_awarded'] === 0) {
-                \App\Services\LoyaltyService::awardPointsForOrder($id);
+                // Loyalty removed
                 $order = $this->find($id);
             } elseif (in_array($order['status'], ['cancelled', 'refunded']) && (int)$order['points_awarded'] === 1) {
-                \App\Services\LoyaltyService::revertPointsForOrder($id);
+                // Loyalty removed
                 $order = $this->find($id);
             }
         }

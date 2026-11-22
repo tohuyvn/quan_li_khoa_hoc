@@ -3,8 +3,6 @@
 namespace App;
 
 use App\Models\Order;
-use App\Services\DeviceUnitService;
-use App\Services\ShipperMatcher;
 
 class OrderStateService
 {
@@ -70,9 +68,9 @@ class OrderStateService
 
         if ($newStatus === 'packing') {
             try {
-                $reservation = DeviceUnitService::reserveForOrder($orderId);
+                // Legacy physical shop handler removed
                 if (!$reservation['ok']) {
-                    DeviceUnitService::releaseForOrder($orderId);
+                // Legacy physical shop handler removed
                     return [
                         'ok' => false,
                         'error' => $reservation['error']
@@ -80,14 +78,14 @@ class OrderStateService
                     ];
                 }
             } catch (\Throwable $e) {
-                DeviceUnitService::releaseForOrder($orderId);
+                // Legacy physical shop handler removed
                 return ['ok' => false, 'error' => 'Không thể cấp IMEI / Serial: ' . $e->getMessage()];
             }
         }
 
         if (in_array($newStatus, ['shipping', 'completed'], true)) {
             try {
-                $summary = DeviceUnitService::assignmentSummary($orderId, $items);
+                // Legacy physical shop handler removed
                 if ($summary['missing'] > 0) {
                     return [
                         'ok' => false,
@@ -144,7 +142,7 @@ class OrderStateService
 
         if ($newStatus === 'packing') {
             try {
-                ShipperMatcher::assign($orderId);
+                // Legacy physical shop handler removed
             } catch (\Throwable $e) {
                 // non-blocking
             }
@@ -152,7 +150,7 @@ class OrderStateService
 
         if ($newStatus === 'cancelled') {
             try {
-                DeviceUnitService::releaseForOrder($orderId);
+                // Legacy physical shop handler removed
             } catch (\Throwable $e) {
             }
 
@@ -177,7 +175,7 @@ class OrderStateService
 
         if ($newStatus === 'completed') {
             try {
-                DeviceUnitService::markSoldAndBuildWarranties($orderId, $order, $items);
+                // Legacy physical shop handler removed
 
                 // Decrement store stock
                 if (!empty($order['store_id'])) {
@@ -269,7 +267,7 @@ class OrderStateService
         }
 
         $code = $order['order_code'] ?? ('#' . $orderId);
-        WalletService::credit(
+                // Legacy physical shop handler removed
             $userId,
             $amount,
             'order_cancel',

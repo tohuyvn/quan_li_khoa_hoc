@@ -55,7 +55,7 @@ class ProfileController
         $stmtSpent->execute([$currentUser['id']]);
         $totalSpent = (int) $stmtSpent->fetchColumn();
 
-        $walletBalance = \App\WalletService::balance((int) $currentUser['id']);
+        $walletBalance = 0;
         $vouchersCount = count((new \App\Models\UserVoucher())->activeForUser((int) $currentUser['id']));
         $wishlistCount = (new \App\Models\Wishlist())->countByUser((int) $currentUser['id']);
 
