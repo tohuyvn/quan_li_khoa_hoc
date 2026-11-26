@@ -27,8 +27,10 @@ $u = $user ?? [];
                         <label class="form-label">Vai trò</label>
                         <?php $role = old('role', $u['role'] ?? 'customer'); ?>
                         <select name="role" class="form-select">
-                            <option value="customer" <?= $role === 'customer' ? 'selected' : '' ?>>Customer</option>
-                            <option value="admin" <?= $role === 'admin' ? 'selected' : '' ?>>Admin</option>
+                            <option value="customer" <?= $role === 'customer' ? 'selected' : '' ?>>Customer (Khách hàng)</option>
+                            <option value="student" <?= $role === 'student' ? 'selected' : '' ?>>Student (Học viên LMS)</option>
+                            <option value="instructor" <?= $role === 'instructor' ? 'selected' : '' ?>>Instructor (Giảng viên LMS)</option>
+                            <option value="admin" <?= $role === 'admin' ? 'selected' : '' ?>>Admin (Quản trị viên)</option>
                         </select>
                     </div>
                 <?php endif; ?>

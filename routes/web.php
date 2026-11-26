@@ -169,6 +169,9 @@ $router->get('/admin/lms/quiz-results/{id}', admin(fn($id) => (new AdminLmsContr
 // Học viên, Giảng viên & Chứng chỉ
 $router->get('/admin/lms/students', admin(fn() => (new AdminLmsController())->students()));
 $router->get('/admin/lms/instructors', admin(fn() => (new AdminLmsController())->instructors()));
+$router->post('/admin/lms/instructors', admin(fn() => (new AdminLmsController())->storeInstructor()));
+$router->post('/admin/lms/instructors/{id}/update', admin(fn($id) => (new AdminLmsController())->updateInstructor((int)$id)));
+$router->post('/admin/lms/instructors/{id}/delete', admin(fn($id) => (new AdminLmsController())->deleteInstructor((int)$id)));
 $router->get('/admin/lms/certificates', admin(fn() => (new AdminLmsController())->certificates()));
 $router->post('/admin/lms/certificates/{id}/toggle', admin(fn($id) => (new AdminLmsController())->toggleCertificate((int)$id)));
 $router->post('/admin/lms/certificates/issue', admin(fn() => (new AdminLmsController())->issueCertificateManual()));

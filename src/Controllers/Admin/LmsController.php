@@ -88,8 +88,8 @@ class LmsController
 
     public function createCourse(): void
     {
-        $instructors = $this->db->query("SELECT id, name FROM users WHERE role = 'instructor' OR role = 'admin'")->fetchAll(PDO::FETCH_ASSOC);
-        $categories = $this->db->query("SELECT id, name FROM categories ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
+        $instructors = $this->db->query("SELECT id, name, email, role FROM users WHERE role = 'instructor' OR role = 'admin' ORDER BY CASE WHEN role = 'instructor' THEN 0 ELSE 1 END, name ASC")->fetchAll(PDO::FETCH_ASSOC);
+        $categories = $this->db->query("SELECT id, name FROM categories WHERE status = 'active' OR status IS NULL ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
 
         view('admin.lms.courses.create', [
             'instructors' => $instructors,
@@ -100,33 +100,46 @@ class LmsController
 
     public function storeCourse(): void
     {
-        $title = trim($_POST['title'] ?? '');
-        if ($title === '') {
-            flash('error', 'Vui lòng nhập tiêu đề khóa học.');
+        try {
+            $title = trim($_POST['title'] ?? '');
+            if ($title === '') {
+                flash('error', 'Vui lòng nhập tiêu đề khóa học.');
+                redirect('/admin/lms/courses/create');
+            }
+
+            $rawSlug = trim($_POST['slug'] ?? '');
+            $slug = $this->generateSlug($rawSlug !== '' ? $rawSlug : $title);
+            $slug = $this->ensureUniqueSlug($slug);
+
+            $instructorId = (int) ($_POST['instructor_id'] ?? authUser()['id']);
+            $categoryId = !empty($_POST['category_id']) ? (int) $_POST['category_id'] : null;
+
+            $price = max(0, (float) ($_POST['price'] ?? 0));
+            $salePrice = (isset($_POST['sale_price']) && trim((string)$_POST['sale_price']) !== '') ? max(0, (float) $_POST['sale_price']) : null;
+            if ($salePrice !== null && $price > 0 && $salePrice > $price) {
+                $salePrice = $price;
+            }
+
+            $id = $this->courseModel->create([
+                'instructor_id' => $instructorId,
+                'category_id' => $categoryId,
+                'title' => $title,
+                'slug' => $slug,
+                'summary' => trim($_POST['summary'] ?? ''),
+                'description' => trim($_POST['description'] ?? ''),
+                'thumbnail' => trim($_POST['thumbnail'] ?? '') ?: '/image/banner1.png',
+                'price' => $price,
+                'sale_price' => $salePrice,
+                'level' => in_array($_POST['level'] ?? '', ['all', 'beginner', 'intermediate', 'advanced']) ? $_POST['level'] : 'all',
+                'status' => in_array($_POST['status'] ?? '', ['published', 'draft', 'archived']) ? $_POST['status'] : 'published',
+            ]);
+
+            flash('success', 'Đã tạo khóa học thành công! Bạn có thể tiếp tục bổ sung chương học & bài giảng.');
+            redirect('/admin/lms/courses/' . $id . '/curriculum');
+        } catch (\Throwable $e) {
+            flash('error', 'Lỗi khi tạo khóa học: ' . $e->getMessage());
             redirect('/admin/lms/courses/create');
         }
-
-        $slug = trim($_POST['slug'] ?? '');
-        if ($slug === '') {
-            $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $title)));
-        }
-
-        $id = $this->courseModel->create([
-            'instructor_id' => (int) ($_POST['instructor_id'] ?? authUser()['id']),
-            'category_id' => !empty($_POST['category_id']) ? (int) $_POST['category_id'] : null,
-            'title' => $title,
-            'slug' => $slug,
-            'summary' => trim($_POST['summary'] ?? ''),
-            'description' => trim($_POST['description'] ?? ''),
-            'thumbnail' => trim($_POST['thumbnail'] ?? '/image/courses/web_fullstack.jpg'),
-            'price' => (float) ($_POST['price'] ?? 0),
-            'sale_price' => !empty($_POST['sale_price']) ? (float) $_POST['sale_price'] : null,
-            'level' => $_POST['level'] ?? 'all',
-            'status' => $_POST['status'] ?? 'published',
-        ]);
-
-        flash('success', 'Đã tạo khóa học thành công!');
-        redirect('/admin/lms/courses/' . $id . '/curriculum');
     }
 
     public function editCourse(int $id): void
@@ -137,8 +150,8 @@ class LmsController
             redirect('/admin/lms/courses');
         }
 
-        $instructors = $this->db->query("SELECT id, name FROM users WHERE role = 'instructor' OR role = 'admin'")->fetchAll(PDO::FETCH_ASSOC);
-        $categories = $this->db->query("SELECT id, name FROM categories ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
+        $instructors = $this->db->query("SELECT id, name, email, role FROM users WHERE role = 'instructor' OR role = 'admin' ORDER BY CASE WHEN role = 'instructor' THEN 0 ELSE 1 END, name ASC")->fetchAll(PDO::FETCH_ASSOC);
+        $categories = $this->db->query("SELECT id, name FROM categories WHERE status = 'active' OR status IS NULL ORDER BY name ASC")->fetchAll(PDO::FETCH_ASSOC);
 
         view('admin.lms.courses.edit', [
             'course' => $course,
@@ -150,33 +163,101 @@ class LmsController
 
     public function updateCourse(int $id): void
     {
-        $title = trim($_POST['title'] ?? '');
-        if ($title === '') {
-            flash('error', 'Vui lòng nhập tiêu đề khóa học.');
+        try {
+            $course = $this->courseModel->find($id);
+            if (!$course) {
+                flash('error', 'Khóa học không tồn tại.');
+                redirect('/admin/lms/courses');
+            }
+
+            $title = trim($_POST['title'] ?? '');
+            if ($title === '') {
+                flash('error', 'Vui lòng nhập tiêu đề khóa học.');
+                redirect('/admin/lms/courses/' . $id . '/edit');
+            }
+
+            $rawSlug = trim($_POST['slug'] ?? '');
+            $slug = $this->generateSlug($rawSlug !== '' ? $rawSlug : ($course['slug'] ?: $title));
+            $slug = $this->ensureUniqueSlug($slug, $id);
+
+            $instructorId = (int) ($_POST['instructor_id'] ?? $course['instructor_id']);
+            $categoryId = !empty($_POST['category_id']) ? (int) $_POST['category_id'] : null;
+
+            $price = max(0, (float) ($_POST['price'] ?? 0));
+            $salePrice = (isset($_POST['sale_price']) && trim((string)$_POST['sale_price']) !== '') ? max(0, (float) $_POST['sale_price']) : null;
+            if ($salePrice !== null && $price > 0 && $salePrice > $price) {
+                $salePrice = $price;
+            }
+
+            $this->courseModel->update($id, [
+                'instructor_id' => $instructorId,
+                'category_id' => $categoryId,
+                'title' => $title,
+                'slug' => $slug,
+                'summary' => trim($_POST['summary'] ?? ''),
+                'description' => trim($_POST['description'] ?? ''),
+                'thumbnail' => trim($_POST['thumbnail'] ?? '') ?: ($course['thumbnail'] ?: '/image/banner1.png'),
+                'price' => $price,
+                'sale_price' => $salePrice,
+                'level' => in_array($_POST['level'] ?? '', ['all', 'beginner', 'intermediate', 'advanced']) ? $_POST['level'] : 'all',
+                'status' => in_array($_POST['status'] ?? '', ['published', 'draft', 'archived']) ? $_POST['status'] : 'published',
+            ]);
+
+            flash('success', 'Đã cập nhật thông tin khóa học thành công!');
+            redirect('/admin/lms/courses');
+        } catch (\Throwable $e) {
+            flash('error', 'Lỗi khi cập nhật khóa học: ' . $e->getMessage());
             redirect('/admin/lms/courses/' . $id . '/edit');
         }
+    }
 
-        $slug = trim($_POST['slug'] ?? '');
-        if ($slug === '') {
-            $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $title)));
+    private function generateSlug(string $text): string
+    {
+        $unicode = [
+            'a' => 'á|à|ả|ã|ạ|ă|ắ|ặ|ằ|ẳ|ẵ|â|ấ|ầ|ẩ|ẫ|ậ',
+            'd' => 'đ',
+            'e' => 'é|è|ẻ|ẽ|ẹ|ê|ế|ề|ể|ễ|ệ',
+            'i' => 'í|ì|ỉ|ĩ|ị',
+            'o' => 'ó|ò|ỏ|õ|ọ|ô|ố|ồ|ổ|ỗ|ộ|ơ|ớ|ờ|ở|ỡ|ợ',
+            'u' => 'ú|ù|ủ|ũ|ụ|ư|ứ|ừ|ử|ữ|ự',
+            'y' => 'ý|ỳ|ỷ|ỹ|ỵ',
+            'A' => 'Á|À|Ả|Ã|Ạ|Ă|Ắ|Ặ|Ằ|Ẳ|Ẵ|Â|Ấ|Ầ|Ẩ|Ẫ|Ậ',
+            'D' => 'Đ',
+            'E' => 'É|È|Ả|Ẽ|Ẹ|Ê|Ế|Ề|Ể|Ễ|Ệ',
+            'I' => 'Í|Ỉ|Ĩ|Ị',
+            'O' => 'Ó|Ò|Ỏ|Õ|Ọ|Ô|Ố|Ồ|Ổ|Ỗ|Ộ|Ơ|Ớ|Ờ|Ở|Ỡ|Ợ',
+            'U' => 'Ú|Ù|Ủ|Ũ|Ụ|Ư|Ứ|Ừ|Ử|Ữ|Ự',
+            'Y' => 'Ý|Ỳ|Ỷ|Ỹ|Ỵ',
+        ];
+        foreach ($unicode as $nonAccent => $pattern) {
+            $text = preg_replace("/($pattern)/u", $nonAccent, $text);
         }
+        $text = strtolower(trim($text));
+        $text = preg_replace('/[^a-z0-9-]+/', '-', $text);
+        $text = preg_replace('/-+/', '-', $text);
+        $text = trim($text, '-');
+        return $text !== '' ? $text : 'khoa-hoc-' . time();
+    }
 
-        $this->courseModel->update($id, [
-            'instructor_id' => (int) ($_POST['instructor_id'] ?? authUser()['id']),
-            'category_id' => !empty($_POST['category_id']) ? (int) $_POST['category_id'] : null,
-            'title' => $title,
-            'slug' => $slug,
-            'summary' => trim($_POST['summary'] ?? ''),
-            'description' => trim($_POST['description'] ?? ''),
-            'thumbnail' => trim($_POST['thumbnail'] ?? '/image/courses/web_fullstack.jpg'),
-            'price' => (float) ($_POST['price'] ?? 0),
-            'sale_price' => (isset($_POST['sale_price']) && $_POST['sale_price'] !== '') ? (float) $_POST['sale_price'] : null,
-            'level' => $_POST['level'] ?? 'all',
-            'status' => $_POST['status'] ?? 'published',
-        ]);
+    private function ensureUniqueSlug(string $slug, ?int $excludeId = null): string
+    {
+        $base = $slug;
+        $counter = 1;
+        while (true) {
+            if ($excludeId !== null) {
+                $stmt = $this->db->prepare("SELECT id FROM courses WHERE slug = ? AND id != ? LIMIT 1");
+                $stmt->execute([$slug, $excludeId]);
+            } else {
+                $stmt = $this->db->prepare("SELECT id FROM courses WHERE slug = ? LIMIT 1");
+                $stmt->execute([$slug]);
+            }
 
-        flash('success', 'Đã cập nhật thông tin khóa học!');
-        redirect('/admin/lms/courses');
+            if (!$stmt->fetchColumn()) {
+                return $slug;
+            }
+
+            $slug = $base . '-' . $counter++;
+        }
     }
 
     public function deleteCourse(int $id): void
@@ -438,19 +519,123 @@ class LmsController
 
     public function instructors(): void
     {
-        $instructors = $this->db->query("SELECT u.*, ip.headline, ip.experience_years,
+        $instructors = $this->db->query("SELECT u.*, ip.headline, ip.qualification, ip.experience_years, ip.bio,
                        COUNT(c.id) AS total_courses
                 FROM users u
                 LEFT JOIN instructor_profiles ip ON ip.user_id = u.id
                 LEFT JOIN courses c ON c.instructor_id = u.id
                 WHERE u.role = 'instructor'
-                GROUP BY u.id, ip.headline, ip.experience_years
+                GROUP BY u.id, ip.headline, ip.qualification, ip.experience_years, ip.bio
                 ORDER BY u.id DESC")->fetchAll(PDO::FETCH_ASSOC);
 
         view('admin.lms.instructors.index', [
             'instructors' => $instructors,
             'title' => 'Quản lý Giảng viên',
         ], 'layouts.admin');
+    }
+
+    public function storeInstructor(): void
+    {
+        try {
+            $name = trim($_POST['name'] ?? '');
+            $email = trim($_POST['email'] ?? '');
+            $phone = trim($_POST['phone'] ?? '');
+            $password = trim($_POST['password'] ?? '');
+            $headline = trim($_POST['headline'] ?? '');
+            $qualification = trim($_POST['qualification'] ?? '');
+            $experienceYears = max(0, (int) ($_POST['experience_years'] ?? 1));
+            $bio = trim($_POST['bio'] ?? '');
+
+            if ($name === '' || $email === '') {
+                flash('error', 'Họ tên và email không được để trống.');
+                redirect('/admin/lms/instructors');
+            }
+
+            if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+                flash('error', 'Email không đúng định dạng.');
+                redirect('/admin/lms/instructors');
+            }
+
+            // Check email uniqueness
+            $checkStmt = $this->db->prepare("SELECT id FROM users WHERE email = ? LIMIT 1");
+            $checkStmt->execute([$email]);
+            if ($checkStmt->fetchColumn()) {
+                flash('error', 'Email này đã tồn tại trên hệ thống. Vui lòng chọn email khác.');
+                redirect('/admin/lms/instructors');
+            }
+
+            $passHash = password_hash($password !== '' ? $password : '123456', PASSWORD_BCRYPT);
+            $uStmt = $this->db->prepare("INSERT INTO users (name, email, phone, password, role, status) VALUES (?, ?, ?, ?, 'instructor', 'active')");
+            $uStmt->execute([$name, $email, $phone ?: '0900000000', $passHash]);
+            $userId = (int) $this->db->lastInsertId();
+
+            $pStmt = $this->db->prepare("INSERT INTO instructor_profiles (user_id, headline, qualification, experience_years, bio) VALUES (?, ?, ?, ?, ?)");
+            $pStmt->execute([
+                $userId,
+                $headline ?: 'Chuyên gia & Giảng viên Đào tạo',
+                $qualification ?: 'Cử nhân / Kỹ sư Công nghệ',
+                $experienceYears,
+                $bio ?: 'Giảng viên giàu kinh nghiệm thực chiến trong ngành.'
+            ]);
+
+            flash('success', "Đã thêm giảng viên '{$name}' thành công!");
+            redirect('/admin/lms/instructors');
+        } catch (\Throwable $e) {
+            flash('error', 'Lỗi khi thêm giảng viên: ' . $e->getMessage());
+            redirect('/admin/lms/instructors');
+        }
+    }
+
+    public function updateInstructor(int $id): void
+    {
+        try {
+            $name = trim($_POST['name'] ?? '');
+            $phone = trim($_POST['phone'] ?? '');
+            $status = in_array($_POST['status'] ?? '', ['active', 'inactive', 'banned']) ? $_POST['status'] : 'active';
+            $headline = trim($_POST['headline'] ?? '');
+            $qualification = trim($_POST['qualification'] ?? '');
+            $experienceYears = max(0, (int) ($_POST['experience_years'] ?? 0));
+            $bio = trim($_POST['bio'] ?? '');
+
+            if ($name === '') {
+                flash('error', 'Họ tên giảng viên không được để trống.');
+                redirect('/admin/lms/instructors');
+            }
+
+            $stmt = $this->db->prepare("UPDATE users SET name = ?, phone = ?, status = ? WHERE id = ? AND role = 'instructor'");
+            $stmt->execute([$name, $phone, $status, $id]);
+
+            $pStmt = $this->db->prepare("INSERT INTO instructor_profiles (user_id, headline, qualification, experience_years, bio)
+                VALUES (?, ?, ?, ?, ?)
+                ON DUPLICATE KEY UPDATE headline = VALUES(headline), qualification = VALUES(qualification), experience_years = VALUES(experience_years), bio = VALUES(bio)");
+            $pStmt->execute([$id, $headline, $qualification, $experienceYears, $bio]);
+
+            flash('success', "Đã cập nhật thông tin giảng viên thành công!");
+            redirect('/admin/lms/instructors');
+        } catch (\Throwable $e) {
+            flash('error', 'Lỗi cập nhật giảng viên: ' . $e->getMessage());
+            redirect('/admin/lms/instructors');
+        }
+    }
+
+    public function deleteInstructor(int $id): void
+    {
+        try {
+            $courseCount = (int) $this->db->query("SELECT COUNT(*) FROM courses WHERE instructor_id = {$id}")->fetchColumn();
+            if ($courseCount > 0) {
+                flash('error', "Không thể xóa giảng viên này vì đang phụ trách {$courseCount} khóa học. Vui lòng chuyển giao khóa học trước!");
+                redirect('/admin/lms/instructors');
+            }
+
+            $this->db->prepare("DELETE FROM instructor_profiles WHERE user_id = ?")->execute([$id]);
+            $this->db->prepare("DELETE FROM users WHERE id = ? AND role = 'instructor'")->execute([$id]);
+
+            flash('success', 'Đã xóa giảng viên thành công!');
+            redirect('/admin/lms/instructors');
+        } catch (\Throwable $e) {
+            flash('error', 'Lỗi khi xóa giảng viên: ' . $e->getMessage());
+            redirect('/admin/lms/instructors');
+        }
     }
 
     // ========================================================

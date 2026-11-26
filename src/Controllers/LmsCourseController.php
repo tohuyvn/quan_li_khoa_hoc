@@ -30,7 +30,7 @@ class LmsCourseController
 
         // Fetch categories for filter dropdown
         $db = \App\DB::connection();
-        $categories = $db->query("SELECT id, name FROM categories WHERE is_active = 1 OR is_active IS NULL ORDER BY name ASC")->fetchAll(\PDO::FETCH_ASSOC);
+        $categories = $db->query("SELECT id, name FROM categories WHERE status = 'active' OR status IS NULL ORDER BY name ASC")->fetchAll(\PDO::FETCH_ASSOC);
 
         view('client.courses.index', [
             'courses' => $courses,
