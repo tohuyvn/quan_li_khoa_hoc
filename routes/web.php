@@ -192,6 +192,19 @@ $router->get('/admin/orders/{id}', admin(fn($id) => (new \App\Controllers\Admin\
 $router->post('/admin/orders/{id}/status', admin(fn($id) => (new \App\Controllers\Admin\OrderController())->updateStatus((int) $id)));
 $router->get('/admin/orders/{id}/invoice', admin(fn($id) => (new \App\Controllers\Admin\OrderController())->invoice((int) $id)));
 
+// Hệ thống & Cài đặt Admin (Audit Logs & Admin Settings / Profile)
+$router->get('/admin/audit-logs', admin(fn() => (new \App\Controllers\Admin\DashboardController())->auditLogs()));
+$router->get('/admin/lms/audit-logs', admin(fn() => (new \App\Controllers\Admin\DashboardController())->auditLogs()));
+
+$router->get('/admin/profile', admin(fn() => (new \App\Controllers\ProfileController())->adminEdit()));
+$router->post('/admin/profile', admin(fn() => (new \App\Controllers\ProfileController())->adminUpdate()));
+$router->get('/admin/settings', admin(fn() => (new \App\Controllers\ProfileController())->adminEdit()));
+$router->post('/admin/settings', admin(fn() => (new \App\Controllers\ProfileController())->adminUpdate()));
+
+$router->post('/admin/profile/2fa/enable', admin(fn() => (new \App\Controllers\ProfileController())->enable2fa()));
+$router->post('/admin/profile/2fa/confirm', admin(fn() => (new \App\Controllers\ProfileController())->confirm2fa()));
+$router->post('/admin/profile/2fa/disable', admin(fn() => (new \App\Controllers\ProfileController())->disable2fa()));
+
 // API Migration CSDL LMS
 $router->get('/api/lms/setup', function () {
     header('Content-Type: application/json; charset=UTF-8');
