@@ -62,14 +62,14 @@
                 <!-- Giá gốc -->
                 <div class="col-md-4">
                     <label class="form-label text-white small fw-bold">Học phí gốc (VNĐ)</label>
-                    <input type="number" name="price" id="inputPrice" class="form-control" value="0" min="0" step="1000">
+                    <input type="number" name="price" id="inputPrice" class="form-control" value="0" min="0" step="any">
                     <small class="text-white-50" style="font-size: 11px;">Nhập 0 nếu là khóa học miễn phí</small>
                 </div>
 
                 <!-- Giá khuyến mãi -->
                 <div class="col-md-4">
                     <label class="form-label text-white small fw-bold">Giá ưu đãi (VNĐ)</label>
-                    <input type="number" name="sale_price" class="form-control" placeholder="Để trống nếu không ưu đãi" min="0" step="1000">
+                    <input type="number" name="sale_price" class="form-control" placeholder="Để trống nếu không ưu đãi" min="0" step="any">
                 </div>
 
                 <!-- Cấp độ -->

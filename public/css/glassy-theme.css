@@ -591,6 +591,10 @@ body {
 }
 
 .btn-refract-action {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
   background: var(--refract-gradient-pill) !important;
   border: 1px solid rgba(255, 255, 255, 0.4) !important;
   color: #ffffff !important;
@@ -1023,3 +1027,79 @@ body {
 #curriculumAccordion .lesson-row:hover {
   background: rgba(255, 255, 255, 0.05) !important;
 }
+
+/* ==========================================================================
+   REFRACT GLASS ALERT & NOTIFICATION BANNERS
+   ========================================================================== */
+.refract-alert {
+  padding: 14px 20px !important;
+  border-radius: 14px !important;
+  font-size: 0.92rem !important;
+  font-weight: 500 !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45) !important;
+  animation: refractAlertSlideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  margin-bottom: 22px !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+@keyframes refractAlertSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.refract-alert.alert-success {
+  background: rgba(16, 185, 129, 0.18) !important;
+  border: 1px solid rgba(52, 211, 153, 0.5) !important;
+  color: #6ee7b7 !important;
+}
+
+.refract-alert.alert-success i {
+  color: #34d399 !important;
+  font-size: 1.25rem !important;
+}
+
+.refract-alert.alert-danger,
+.refract-alert.alert-error {
+  background: rgba(239, 68, 68, 0.18) !important;
+  border: 1px solid rgba(248, 113, 113, 0.5) !important;
+  color: #fca5a5 !important;
+}
+
+.refract-alert.alert-danger i,
+.refract-alert.alert-error i {
+  color: #f87171 !important;
+  font-size: 1.25rem !important;
+}
+
+.refract-alert.alert-warning {
+  background: rgba(245, 158, 11, 0.18) !important;
+  border: 1px solid rgba(251, 191, 36, 0.5) !important;
+  color: #fde68a !important;
+}
+
+.refract-alert.alert-warning i {
+  color: #fbbf24 !important;
+  font-size: 1.25rem !important;
+}
+
+.refract-alert.alert-info {
+  background: rgba(59, 130, 246, 0.18) !important;
+  border: 1px solid rgba(96, 165, 250, 0.5) !important;
+  color: #93c5fd !important;
+}
+
+.refract-alert.alert-info i {
+  color: #60a5fa !important;
+  font-size: 1.25rem !important;
+}
+

@@ -8,6 +8,26 @@
         </ol>
     </nav>
 
+    <?php if (isAdmin() || (authUser() && (int)(authUser()['id'] ?? 0) === (int)($course['instructor_id'] ?? 0))): ?>
+        <div class="refract-card p-3 mb-4 d-flex justify-content-between align-items-center flex-wrap gap-3 border border-warning border-opacity-50" style="background: rgba(245, 158, 11, 0.08);">
+            <div class="d-flex align-items-center gap-2">
+                <i class="bi bi-shield-lock-fill text-warning fs-4"></i>
+                <div>
+                    <div class="fw-bold text-white small">Khu vực Quản trị viên / Giảng viên</div>
+                    <div class="text-white-50" style="font-size: 11px;">Bạn có toàn quyền chỉnh sửa thông tin, giá bán và giáo trình của khóa học này.</div>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <a href="/admin/lms/courses/<?= $course['id'] ?>/edit" class="btn btn-warning btn-sm rounded-pill px-3 py-1.5 fw-semibold d-inline-flex align-items-center gap-1">
+                    <i class="bi bi-pencil-square"></i> Chỉnh sửa thông tin
+                </a>
+                <a href="/admin/lms/courses/<?= $course['id'] ?>/curriculum" class="btn btn-outline-warning btn-sm rounded-pill px-3 py-1.5 d-inline-flex align-items-center gap-1">
+                    <i class="bi bi-diagram-3"></i> Quản lý giáo trình & video
+                </a>
+            </div>
+        </div>
+    <?php endif; ?>
+
     <div class="row g-4">
         <!-- Main Content (Left) -->
         <div class="col-lg-8">

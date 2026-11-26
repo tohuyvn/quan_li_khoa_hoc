@@ -151,8 +151,10 @@ $router->post('/admin/lms/courses/{id}/update', admin(fn($id) => (new AdminLmsCo
 $router->post('/admin/lms/courses/{id}/delete', admin(fn($id) => (new AdminLmsController())->deleteCourse((int)$id)));
 $router->get('/admin/lms/courses/{id}/curriculum', admin(fn($id) => (new AdminLmsController())->curriculum((int)$id)));
 $router->post('/admin/lms/courses/{id}/sections', admin(fn($id) => (new AdminLmsController())->storeSection((int)$id)));
+$router->post('/admin/lms/courses/{id}/sections/{sid}/update', admin(fn($id, $sid) => (new AdminLmsController())->updateSection((int)$id, (int)$sid)));
 $router->post('/admin/lms/courses/{id}/sections/{sid}/delete', admin(fn($id, $sid) => (new AdminLmsController())->deleteSection((int)$id, (int)$sid)));
 $router->post('/admin/lms/courses/{id}/lessons', admin(fn($id) => (new AdminLmsController())->storeLesson((int)$id)));
+$router->post('/admin/lms/courses/{id}/lessons/{lid}/update', admin(fn($id, $lid) => (new AdminLmsController())->updateLesson((int)$id, (int)$lid)));
 $router->post('/admin/lms/courses/{id}/lessons/{lid}/delete', admin(fn($id, $lid) => (new AdminLmsController())->deleteLesson((int)$id, (int)$lid)));
 $router->post('/admin/lms/courses/{id}/lessons/{lid}/materials', admin(fn($id, $lid) => (new AdminLmsController())->storeMaterial((int)$id, (int)$lid)));
 

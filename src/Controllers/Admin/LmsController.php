@@ -204,6 +204,11 @@ class LmsController
             ]);
 
             flash('success', 'Đã cập nhật thông tin khóa học thành công!');
+
+            if (isset($_POST['action']) && $_POST['action'] === 'save_and_continue') {
+                redirect('/admin/lms/courses/' . $id . '/edit');
+            }
+
             redirect('/admin/lms/courses');
         } catch (\Throwable $e) {
             flash('error', 'Lỗi khi cập nhật khóa học: ' . $e->getMessage());
@@ -300,6 +305,27 @@ class LmsController
         redirect('/admin/lms/courses/' . $courseId . '/curriculum');
     }
 
+    public function updateSection(int $courseId, int $sectionId): void
+    {
+        $title = trim($_POST['title'] ?? '');
+        $sortOrder = isset($_POST['sort_order']) && $_POST['sort_order'] !== '' ? (int) $_POST['sort_order'] : null;
+
+        if ($title !== '') {
+            if ($sortOrder !== null) {
+                $stmt = $this->db->prepare("UPDATE sections SET title = ?, sort_order = ? WHERE id = ? AND course_id = ?");
+                $stmt->execute([$title, $sortOrder, $sectionId, $courseId]);
+            } else {
+                $stmt = $this->db->prepare("UPDATE sections SET title = ? WHERE id = ? AND course_id = ?");
+                $stmt->execute([$title, $sectionId, $courseId]);
+            }
+            flash('success', 'Đã cập nhật chương học thành công!');
+        } else {
+            flash('error', 'Vui lòng nhập tên chương học.');
+        }
+
+        redirect('/admin/lms/courses/' . $courseId . '/curriculum');
+    }
+
     public function deleteSection(int $courseId, int $sectionId): void
     {
         $this->db->prepare("DELETE FROM sections WHERE id = ? AND course_id = ?")->execute([$sectionId, $courseId]);
@@ -340,6 +366,48 @@ class LmsController
             flash('success', 'Đã thêm bài học mới thành công!');
         }
 
+        redirect('/admin/lms/courses/' . $courseId . '/curriculum');
+    }
+
+    public function updateLesson(int $courseId, int $lessonId): void
+    {
+        $title = trim($_POST['title'] ?? '');
+        $lessonType = $_POST['lesson_type'] ?? 'video';
+        $videoUrl = trim($_POST['video_url'] ?? '');
+        $durationSeconds = (int) ($_POST['duration_seconds'] ?? 600);
+        $content = trim($_POST['content'] ?? '');
+        $isPreview = !empty($_POST['is_preview']) ? 1 : 0;
+        $sectionId = !empty($_POST['section_id']) ? (int) $_POST['section_id'] : null;
+
+        if ($title === '') {
+            flash('error', 'Vui lòng nhập tiêu đề bài học.');
+            redirect('/admin/lms/courses/' . $courseId . '/curriculum');
+        }
+
+        if ($sectionId) {
+            $stmt = $this->db->prepare("UPDATE lessons SET section_id = ?, title = ?, lesson_type = ?, content = ?, is_preview = ? WHERE id = ?");
+            $stmt->execute([$sectionId, $title, $lessonType, $content, $isPreview, $lessonId]);
+        } else {
+            $stmt = $this->db->prepare("UPDATE lessons SET title = ?, lesson_type = ?, content = ?, is_preview = ? WHERE id = ?");
+            $stmt->execute([$title, $lessonType, $content, $isPreview, $lessonId]);
+        }
+
+        // Cập nhật hoặc chèn video liên kết
+        if ($lessonType === 'video') {
+            $chk = $this->db->prepare("SELECT id FROM lesson_videos WHERE lesson_id = ? LIMIT 1");
+            $chk->execute([$lessonId]);
+            $videoExists = $chk->fetchColumn();
+            if ($videoExists) {
+                $vStmt = $this->db->prepare("UPDATE lesson_videos SET video_url = ?, duration_seconds = ? WHERE lesson_id = ?");
+                $vStmt->execute([$videoUrl, $durationSeconds, $lessonId]);
+            } elseif ($videoUrl !== '') {
+                $vStmt = $this->db->prepare("INSERT INTO lesson_videos (lesson_id, provider, video_url, duration_seconds) VALUES (?, 'youtube', ?, ?)");
+                $vStmt->execute([$lessonId, $videoUrl, $durationSeconds]);
+            }
+        }
+
+        $this->courseModel->updateCounters($courseId);
+        flash('success', 'Đã cập nhật bài học thành công!');
         redirect('/admin/lms/courses/' . $courseId . '/curriculum');
     }
 

@@ -76,14 +76,14 @@
                 <!-- Giá gốc -->
                 <div class="col-md-4">
                     <label class="form-label text-white small fw-bold">Học phí gốc (VNĐ)</label>
-                    <input type="number" name="price" class="form-control" value="<?= (float)$course['price'] ?>" min="0" step="1000">
+                    <input type="number" name="price" class="form-control" value="<?= (float)$course['price'] ?>" min="0" step="any">
                     <small class="text-white-50" style="font-size: 11px;">Nhập 0 nếu là khóa học miễn phí</small>
                 </div>
 
                 <!-- Giá khuyến mãi -->
                 <div class="col-md-4">
                     <label class="form-label text-white small fw-bold">Giá ưu đãi (VNĐ)</label>
-                    <input type="number" name="sale_price" class="form-control" value="<?= ($course['sale_price'] !== null && $course['sale_price'] !== '') ? (float)$course['sale_price'] : '' ?>" placeholder="Để trống nếu không ưu đãi" min="0" step="1000">
+                    <input type="number" name="sale_price" class="form-control" value="<?= ($course['sale_price'] !== null && $course['sale_price'] !== '') ? (float)$course['sale_price'] : '' ?>" placeholder="Để trống nếu không ưu đãi" min="0" step="any">
                 </div>
 
                 <!-- Cấp độ -->
@@ -138,13 +138,16 @@
                 <!-- Footer Buttons -->
                 <div class="col-12 d-flex justify-content-between align-items-center pt-4 border-top border-white border-opacity-10 mt-3 flex-wrap gap-2">
                     <a href="/admin/lms/courses" class="btn btn-outline-secondary rounded-pill px-4">
-                        <i class="bi bi-arrow-left me-1"></i> Quay lại
+                        <i class="bi bi-arrow-left me-1"></i> Quay lại danh sách
                     </a>
-                    <div class="d-flex gap-2">
-                        <a href="/admin/lms/courses/<?= $course['id'] ?>/curriculum" class="btn btn-outline-info rounded-pill px-4 py-2">
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <a href="/admin/lms/courses/<?= $course['id'] ?>/curriculum" class="btn btn-outline-info rounded-pill px-3 py-2">
                             <i class="bi bi-diagram-3 me-1"></i> Soạn giáo trình
                         </a>
-                        <button type="submit" class="btn-refract-action px-5 py-2.5 fw-bold">
+                        <button type="submit" name="action" value="save_and_continue" class="btn btn-outline-warning rounded-pill px-4 py-2 fw-semibold" style="cursor: pointer;">
+                            <i class="bi bi-arrow-clockwise me-1"></i> Lưu & Tiếp tục sửa
+                        </button>
+                        <button type="submit" name="action" value="save" class="btn btn-refract-action px-5 py-2 fw-bold" style="cursor: pointer;">
                             <i class="bi bi-check2-circle me-1"></i> Lưu thay đổi
                         </button>
                     </div>

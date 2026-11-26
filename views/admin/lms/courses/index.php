@@ -53,9 +53,13 @@
                             <tr>
                                 <td class="ps-4">
                                     <div class="d-flex align-items-center gap-3">
-                                        <img src="<?= e($c['thumbnail'] ?: '/image/banner1.png') ?>" class="rounded-3 border border-secondary border-opacity-25 object-fit-cover shadow-sm" style="width: 54px; height: 38px;" alt="">
+                                        <a href="/admin/lms/courses/<?= $c['id'] ?>/edit" title="Bấm để chỉnh sửa khóa học">
+                                            <img src="<?= e($c['thumbnail'] ?: '/image/banner1.png') ?>" class="rounded-3 border border-secondary border-opacity-25 object-fit-cover shadow-sm" style="width: 54px; height: 38px;" alt="">
+                                        </a>
                                         <div>
-                                            <div class="fw-bold text-white mb-0"><?= e($c['title']) ?></div>
+                                            <a href="/admin/lms/courses/<?= $c['id'] ?>/edit" class="fw-bold text-white mb-0 text-decoration-none hover-text-warning" title="Bấm để chỉnh sửa khóa học">
+                                                <?= e($c['title']) ?>
+                                            </a>
                                             <div class="small text-white-50" style="font-size: 11px;">
                                                 <i class="bi bi-folder me-1 text-secondary"></i><?= e($c['category_name'] ?? 'Chưa phân loại') ?>
                                             </div>
@@ -94,8 +98,8 @@
                                         <a href="/admin/lms/courses/<?= $c['id'] ?>/curriculum" class="btn btn-outline-primary btn-sm px-2.5 py-1 rounded-pill d-inline-flex align-items-center gap-1" title="Quản lý giáo trình">
                                             <i class="bi bi-diagram-3"></i> Giáo trình
                                         </a>
-                                        <a href="/admin/lms/courses/<?= $c['id'] ?>/edit" class="btn btn-outline-warning btn-sm px-2.5 py-1 rounded-pill d-inline-flex align-items-center" title="Chỉnh sửa thông tin">
-                                            <i class="bi bi-pencil"></i>
+                                        <a href="/admin/lms/courses/<?= $c['id'] ?>/edit" class="btn btn-outline-warning btn-sm px-3 py-1 rounded-pill d-inline-flex align-items-center gap-1" title="Chỉnh sửa thông tin">
+                                            <i class="bi bi-pencil-square"></i> Sửa
                                         </a>
                                         <a href="/courses/<?= e($c['slug'] ?: $c['id']) ?>" target="_blank" class="btn btn-outline-info btn-sm px-2.5 py-1 rounded-pill d-inline-flex align-items-center" title="Xem trên web">
                                             <i class="bi bi-eye"></i>
